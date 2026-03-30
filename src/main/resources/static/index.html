@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .section-title { text-transform: uppercase; font-size: 1.1rem; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
+        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem;}
+        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        <div id="topbar-placeholder"></div>
+
+        <div id="dashboard-view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 class="section-title">📊 Status da Arena</h2>
+                <button class="btn-acao" onclick="window.location.href='/setup/modalidades'">+ Novo Lote de Gênero</button>
+            </div>
+            <div id="active-modalidades-container">
+                </div>
+        </div>
+    </div> 
+
+    <div id="footbar-placeholder"></div>
+
+    <script>
+        window.onload = () => {
+            // Repare na barra inicial '/' para sempre buscar na raiz
+            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+            
+            const setupData = JSON.parse(localStorage.getItem('arenaSetup'));
+            
+            // Se não tem configuração, força a ir para a tela de setup
+            if(!setupData || !setupData.genero) {
+                window.location.href = '/setup/modalidades';
+                return;
+            }
+
+            // Exibe o resumo do lote no dashboard
+            document.getElementById('active-modalidades-container').innerHTML = `
+                <div class="glass" style="padding: 1.5rem; border-radius: 15px; border-left: 5px solid var(--theme-primary);">
+                    <h3 style="color: var(--theme-primary); margin-bottom: 10px; text-transform: uppercase;">Lotes Ativos: ${setupData.genero}</h3>
+                    <p style="font-family: 'Segoe UI'; font-size: 0.9rem;">${setupData.esportes.length} modalidades prontas. Aguardando a inscrição dos alunos para gerar chaves.</p>
+                </div>
+            `;
+        };
+
+        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<header class="game-header glass" style="border-radius: 15px; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-left: 4px solid #00f2fe; position: relative;">
+    
+    <div>
+        <h1 style="font-weight: 700; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; color: #00f2fe; text-shadow: 0 0 10px #00f2fe; margin:0;">Interclass Arena</h1>
+        <p class="escola-nome" id="escola-nome-top" style="font-size: 0.9rem; font-family: 'Segoe UI'; opacity: 0.7; margin:0;">Colégio Estadual Modelo</p>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 20px;">
+        
+        <div id="header-stats">
+            <span style="color: #ff00de; font-weight: bold; font-family: 'Orbitron'; font-size: 0.9rem;">● AO VIVO</span>
+        </div>
+
+        <div style="position: relative;">
+            
+            <div class="user-profile-btn" onclick="toggleUserMenu(event)" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 30px; transition: all 0.3s ease;">
+                <span style="font-family: 'Segoe UI'; font-size: 0.95rem; font-weight: 600; color: #fff;">Prof. Dyego</span>
+                
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: #00f2fe; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">
+                    👤
+                </div>
+            </div>
+
+            <div id="user-dropdown" class="glass-dropdown" style="display: none;">
+                <ul>
+                    <li onclick="window.location.href='/config.html'">
+                        <span>⚙️</span> Configurações
+                    </li>
+                    <li onclick="window.location.href='/pagamento.html'">
+                        <span>💳</span> Assinatura / Pagamento
+                    </li>
+                    <li onclick="window.location.href='/ajuda.html'">
+                        <span>❓</span> Ajuda e Suporte
+                    </li>
+                    <li onclick="fazerLogout()" class="logout-btn">
+                        <span>🚪</span> Sair da Conta
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+<style>
+    /* Hover do botão principal */
+    .user-profile-btn:hover {
+        background: rgba(0, 242, 254, 0.1) !important;
+        border-color: #00f2fe !important;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Estilo do Dropdown (Glassmorphism) */
+    .glass-dropdown {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 240px;
+        background: rgba(10, 10, 20, 0.95);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        overflow: hidden;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-dropdown ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .glass-dropdown li {
+        padding: 12px 20px;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.85);
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-dropdown li:last-child {
+        border-bottom: none;
+    }
+
+    .glass-dropdown li:hover {
+        background: rgba(0, 242, 254, 0.15);
+        color: #00f2fe;
+        padding-left: 25px; /* Efeito visual de avanço no hover */
+    }
+
+    .glass-dropdown li.logout-btn:hover {
+        background: rgba(255, 69, 0, 0.15);
+        color: #ff4500;
+    }
+</style>
+
+<script>
+    // Como a topbar é injetada via fetch, garantimos que a função seja global (window)
+    window.toggleUserMenu = function(event) {
+        event.stopPropagation(); // Evita que o clique feche imediatamente
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    };
+
+    window.fazerLogout = function() {
+        alert("Saindo da plataforma...");
+        window.location.href = '/login.html';
+    };
+
+    // Fecha o menu se o usuário clicar em qualquer outro lugar da tela
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown && dropdown.style.display === 'block') {
+            dropdown.style.display = 'none';
+        }
+    });
+</script>

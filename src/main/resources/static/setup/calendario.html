@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendário - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
+        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); --bg-gradient: linear-gradient(-45deg, #0a001a, #2a004d, #000000, #1f0033); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-gradient); color: #ffffff; min-height: 100vh; padding: 2rem; padding-bottom: 100px; }
+        .arena-container { max-width: 1200px; margin: 0 auto; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 2rem;}
+        
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); }
+        .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap; }
+        .stepper-step.active { color: var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); }
+        .stepper-step.completed { color: #00ff00; text-shadow: 0 0 8px rgba(0,255,0,0.4); }
+        .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; }
+        .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
+        
+        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-family: 'Orbitron'; margin-top: 2rem;}
+        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); margin-right: 15px; }
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        
+        <div class="stepper-container glass">
+            <div class="stepper-step completed"><span>1.</span> Gênero</div>
+            <div class="stepper-line active"></div>
+            <div class="stepper-step completed"><span>2.</span> Modalidades</div>
+            <div class="stepper-line active"></div>
+            <div class="stepper-step completed"><span>3.</span> Torneios</div>
+            <div class="stepper-line active"></div>
+            <div class="stepper-step active"><span>4.</span> Calendário</div>
+            <div class="stepper-line"></div>
+            <div class="stepper-step"><span>5.</span> Alunos</div>
+        </div>
+
+        <div class="glass" style="text-align: center; padding: 4rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🗓️</div>
+            <h2 style="color: var(--theme-primary); text-transform: uppercase;">Módulo de Calendário</h2>
+            <p style="font-family: 'Segoe UI'; margin-top: 10px;">Em breve: Geração automática de chaves e datas das partidas baseado nas suas configurações.</p>
+            
+            <div style="display: flex; justify-content: center; margin-top: 3rem;">
+                <button class="btn-acao btn-secundario" onclick="window.location.href='torneios.html'">🡨 Voltar Torneios</button>
+                <button class="btn-acao" onclick="finalizarSetupInteiro()">Concluir Setup e Abrir Inscrições ✓</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        window.onload = () => {
+            const setupData = JSON.parse(localStorage.getItem('arenaSetup'));
+            if (setupData && setupData.genero === 'feminino') document.body.classList.add('theme-fem');
+            if (setupData && setupData.genero === 'misto') document.body.classList.add('theme-misto');
+        };
+
+        function finalizarSetupInteiro() {
+            alert('🏆 Arena preparada com sucesso! Enviando você para o Dashboard...');
+            // Volta para a RAIZ onde está o Dashboard Principal
+            window.location.href = '/index.html';
+        }
+    </script>
+</body>
+</html>

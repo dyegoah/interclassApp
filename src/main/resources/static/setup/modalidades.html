@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Setup Modalidades - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
+        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); --bg-gradient: linear-gradient(-45deg, #0a001a, #2a004d, #000000, #1f0033); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; transition: background 0.5s ease; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; transition: color 0.5s, text-shadow 0.5s; }
+
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); overflow-x: auto; }
+        .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap; transition: 0.3s; }
+        .stepper-step.active { color: var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); }
+        .stepper-step.completed { color: #00ff00; text-shadow: 0 0 8px rgba(0,255,0,0.4); }
+        .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; min-width: 20px; transition: 0.3s; }
+        .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
+
+        .info-balloon { border-left: 4px solid var(--theme-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-family: 'Segoe UI'; font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.85); transition: border-color 0.5s; }
+        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
+        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
+        .btn-acao:disabled { background: #555; color: #888; cursor: not-allowed; }
+        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
+        .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
+
+        .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .config-card { border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; border: 2px solid transparent; }
+        .config-card:hover { transform: translateY(-5px); border-color: var(--theme-glow); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+        .config-card.selected { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.05); box-shadow: 0 0 25px var(--theme-glow); }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        <div id="topbar-placeholder"></div>
+
+        <div class="stepper-container glass">
+            <div class="stepper-step active" id="step-1"><span>1.</span> Gênero</div>
+            <div class="stepper-line" id="line-1"></div>
+            <div class="stepper-step" id="step-2"><span>2.</span> Modalidades</div>
+            <div class="stepper-line" id="line-2"></div>
+            <div class="stepper-step" id="step-3"><span>3.</span> Torneios</div>
+            <div class="stepper-line" id="line-3"></div>
+            <div class="stepper-step" id="step-4"><span>4.</span> Calendário</div>
+            <div class="stepper-line" id="line-4"></div>
+            <div class="stepper-step" id="step-5"><span>5.</span> Alunos</div>
+        </div>
+
+        <div id="setup-step1-genero">
+            <h2 class="section-title">👥 Passo 1: Ambiente de Configuração</h2>
+            <div class="info-balloon glass">
+                <strong>💡 Como funciona a Central da Arena:</strong><br>
+                Escolha o gênero para preparar o ambiente visual. A sequência de sucesso é: <br>
+                <span style="color: var(--theme-primary); font-weight: bold;">Gênero ➔ Modalidades ➔ Torneios ➔ Calendário ➔ Alunos.</span>
+            </div>
+
+            <div class="setup-grid">
+                <div class="config-card glass" id="card-masc" onclick="selecionarGenero('masculino')"><div style="font-size: 3rem;">🚹</div><h3 style="color: #00f2fe;">MASCULINO</h3></div>
+                <div class="config-card glass" id="card-fem" onclick="selecionarGenero('feminino')"><div style="font-size: 3rem;">🚺</div><h3 style="color: #ff00de;">FEMININO</h3></div>
+                <div class="config-card glass" id="card-misto" onclick="selecionarGenero('misto')"><div style="font-size: 3rem;">🚻</div><h3 style="color: #b200ff;">MISTO</h3></div>
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="btn-acao" id="btn-avancar-genero" disabled onclick="irParaPassoModalidades()">Avançar para Modalidades ➔</button>
+            </div>
+        </div>
+
+        <div id="setup-step2-modalidades" style="display: none;">
+            <h2 class="section-title">🕹️ Passo 2: Seleção de Esportes (<span id="txt-genero-atual"></span>)</h2>
+            <div class="setup-grid" id="setup-container"></div>
+            <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+                <button class="btn-acao btn-secundario" onclick="voltarPara(1)">🡨 Voltar Gênero</button>
+                <button class="btn-acao" onclick="irParaPaginaTorneios()">Avançar para Config. de Torneios ➔</button>
+            </div>
+        </div>
+    </div> 
+
+    <div id="footbar-placeholder"></div>
+
+    <script>
+        const modalidadeDefs = [
+            { id: 1, nome: 'Futsal', icone: '⚽', cor: '#00f2fe' }, { id: 2, nome: 'Vôlei', icone: '🏐', cor: '#ff00de' },
+            { id: 3, nome: 'Basquete', icone: '🏀', cor: '#ffee00' }, { id: 4, nome: 'Handebol', icone: '🤾', cor: '#ff7300' },
+            { id: 5, nome: 'Queimada', icone: '☄️', cor: '#7f00ff' }, { id: 6, nome: 'Vôlei de Areia', icone: '🏖️', cor: '#f4a460' },
+            { id: 7, nome: 'Natação', icone: '🏊', cor: '#00bfff' }, { id: 8, nome: 'Atletismo', icone: '🏃', cor: '#32cd32' },
+            { id: 9, nome: 'Tênis de Mesa', icone: '🏓', cor: '#ff4500' }, { id: 10, nome: 'Xadrez', icone: '♟️', cor: '#ffffff' },
+            { id: 11, nome: 'Dama', icone: '🏁', cor: '#b22222' }, { id: 12, nome: 'E-Sports', icone: '🎮', cor: '#00ff00' }
+        ];
+
+        let generoSelecionado = null; 
+
+        window.onload = () => {
+            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+        };
+
+        function atualizarMapa(passoAtivo) {
+            document.getElementById('step-1').className = passoAtivo >= 1 ? (passoAtivo === 1 ? 'stepper-step active' : 'stepper-step completed') : 'stepper-step';
+            document.getElementById('line-1').className = passoAtivo > 1 ? 'stepper-line active' : 'stepper-line';
+            document.getElementById('step-2').className = passoAtivo >= 2 ? (passoAtivo === 2 ? 'stepper-step active' : 'stepper-step completed') : 'stepper-step';
+        }
+
+        function voltarPara(passo) {
+            document.getElementById('setup-step2-modalidades').style.display = 'none';
+            document.getElementById('setup-step1-genero').style.display = 'block';
+            atualizarMapa(1);
+        }
+
+        function selecionarGenero(tipo) {
+            generoSelecionado = tipo;
+            const body = document.body;
+            body.classList.remove('theme-fem', 'theme-misto');
+            ['masc', 'fem', 'misto'].forEach(id => document.getElementById(`card-${id}`).classList.remove('selected'));
+
+            if (tipo === 'feminino') { body.classList.add('theme-fem'); document.getElementById('card-fem').classList.add('selected'); } 
+            else if (tipo === 'misto') { body.classList.add('theme-misto'); document.getElementById('card-misto').classList.add('selected'); } 
+            else { document.getElementById('card-masc').classList.add('selected'); }
+
+            document.getElementById('txt-genero-atual').textContent = tipo.toUpperCase();
+            document.getElementById('btn-avancar-genero').disabled = false;
+        }
+
+        function irParaPassoModalidades() {
+            const container = document.getElementById('setup-container');
+            container.innerHTML = '';
+            
+            let salvos = JSON.parse(localStorage.getItem('arenaSetup')) || { esportes: [] };
+            
+            modalidadeDefs.forEach(mod => {
+                const card = document.createElement('div');
+                card.className = 'config-card glass';
+                if(salvos.esportes.find(e => e.id === mod.id)) card.classList.add('selected');
+                card.onclick = () => card.classList.toggle('selected');
+                card.innerHTML = `<div style="font-size: 3rem;">${mod.icone}</div><h3 style="color: ${mod.cor}; text-transform: uppercase;">${mod.nome}</h3>`;
+                card.setAttribute('data-id', mod.id);
+                container.appendChild(card);
+            });
+            
+            document.getElementById('setup-step1-genero').style.display = 'none';
+            document.getElementById('setup-step2-modalidades').style.display = 'block';
+            atualizarMapa(2);
+        }
+
+        function irParaPaginaTorneios() {
+            const selecionados = document.querySelectorAll('.config-card.selected');
+            if (selecionados.length === 0) { alert("Selecione pelo menos um esporte!"); return; }
+
+            const esportesArray = Array.from(selecionados).map(card => {
+                return { id: parseInt(card.getAttribute('data-id')), configurado: false };
+            });
+
+            const setupData = { genero: generoSelecionado, esportes: esportesArray };
+            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+            
+            window.location.href = '/setup/torneios';
+        }
+
+        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+    </script>
+</body>
+</html>
