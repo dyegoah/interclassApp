@@ -116,7 +116,7 @@
             container.innerHTML = '<p style="text-align: center; color: #00f2fe; margin-top: 50px;">⏳ A carregar torneios e chaves do servidor...</p>';
 
             try {
-                const response = await fetch(`http://localhost:8080/api/jogos/lote/${genero}`);
+                const response = await fetch(`http://localhost:8015/api/jogos/lote/${genero}`);
                 
                 if (!response.ok) throw new Error('Falha API');
                 const jogos = await response.json(); 

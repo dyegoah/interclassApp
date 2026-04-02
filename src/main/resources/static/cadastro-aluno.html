@@ -67,21 +67,21 @@
                 </div>
                 <div style="flex: 1;">
                     <label>Modalidade (Esporte)</label>
-                    <select id="modalidade" required>
-                        <option value="">Selecione...</option>
-                        <option value="1">⚽ Futsal</option>
-                        <option value="2">🏐 Vôlei</option>
-                        <option value="3">🏀 Basquete</option>
-                        <option value="4">🤾 Handebol</option>
-                        <option value="5">☄️ Queimada</option>
-                        <option value="6">🏖️ Vôlei de Areia</option>
-                        <option value="7">🏊 Natação</option>
-                        <option value="8">🏃 Atletismo</option>
-                        <option value="9">🏓 Tênis de Mesa</option>
-                        <option value="10">♟️ Xadrez</option>
-                        <option value="11">🏁 Dama</option>
-                        <option value="12">🎮 E-Sports</option>
-                    </select>
+					<select id="modalidade" required>
+					    <option value="" data-icone="">Selecione...</option>
+					    <option value="Futsal" data-icone="⚽">⚽ Futsal</option>
+					    <option value="Vôlei" data-icone="🏐">🏐 Vôlei</option>
+					    <option value="Basquete" data-icone="🏀">🏀 Basquete</option>
+					    <option value="Handebol" data-icone="🤾">🤾 Handebol</option>
+					    <option value="Queimada" data-icone="☄️">☄️ Queimada</option>
+					    <option value="Vôlei de Areia" data-icone="🏖️">🏖️ Vôlei de Areia</option>
+					    <option value="Natação" data-icone="🏊">🏊 Natação</option>
+					    <option value="Atletismo" data-icone="🏃">🏃 Atletismo</option>
+					    <option value="Tênis de Mesa" data-icone="🏓">🏓 Tênis de Mesa</option>
+					    <option value="Xadrez" data-icone="♟️">♟️ Xadrez</option>
+					    <option value="Dama" data-icone="🏁">🏁 Dama</option>
+					    <option value="E-Sports" data-icone="🎮">🎮 E-Sports</option>
+					</select>
                 </div>
             </div>
 
@@ -105,6 +105,7 @@
 
         window.onload = () => {
             gerarMenuDeTurmas();
+			
         };
 
         // GERA AS TURMAS PADRÃO DO BRASIL AUTOMATICAMENTE
@@ -129,6 +130,36 @@
             select.innerHTML = html;
         }
 
+		// BUSCA AS MODALIDADES ATIVAS NO BANCO DE DADOS
+		async function carregarModalidadesDoBanco() {
+		    const selectMod = document.getElementById('modalidade');
+		    try {
+		        const response = await fetch('/api/modalidades');
+		        if (response.ok) {
+		            const modalidades = await response.json();
+		            
+		            if (modalidades.length === 0) {
+		                selectMod.innerHTML = '<option value="">Nenhum torneio ativo ainda!</option>';
+		                selectMod.disabled = true;
+		                return;
+		            }
+
+		            let html = '<option value="">Selecione...</option>';
+		            modalidades.forEach(mod => {
+		                // Aqui usamos o ID real que o banco gerou, seja ele 1, 10 ou 54!
+		                html += `<option value="${mod.id}">${mod.icone} ${mod.nomeEsporte}</option>`;
+		            });
+		            
+		            selectMod.innerHTML = html;
+		            selectMod.disabled = false;
+		        }
+		    } catch (error) {
+		        console.error("Erro ao buscar modalidades:", error);
+		        selectMod.innerHTML = '<option value="">Erro ao conectar no servidor</option>';
+		    }
+		}
+		
+		
         // LÊ A FOTO DO CELULAR/PC E MOSTRA NA BOLINHA
         function processarImagem(event) {
             const file = event.target.files[0];
@@ -146,60 +177,59 @@
         }
 
 		async function enviarCadastro() {
-		            const nome = document.getElementById('nome').value;
-		            const dataNasc = document.getElementById('dataNascimento').value;
-		            const turmaSelect = document.getElementById('turma');
-		            const generoSelect = document.getElementById('genero');
-		            const selectMod = document.getElementById('modalidade');
+		    const nome = document.getElementById('nome').value;
+		    const dataNasc = document.getElementById('dataNascimento').value;
+		    const turmaSelect = document.getElementById('turma');
+		    const generoSelect = document.getElementById('genero');
+		    const selectMod = document.getElementById('modalidade');
 
-		            if(!nome) { alert("Digite o seu nome."); return; }
-		            if(!dataNasc) { alert("Informe a data de nascimento."); return; }
-		            if(turmaSelect.value === "") { alert("Selecione a sua turma!"); return; }
-		            if(generoSelect.value === "") { alert("Selecione a sua categoria/gênero!"); return; }
-		            if(selectMod.value === "") { alert("Selecione um esporte!"); return; }
-		            
-		            const textoMod = selectMod.options[selectMod.selectedIndex].text;
-		            const iconeSelecionado = textoMod.split(' ')[0];
-		            const esporteSelecionado = textoMod.substring(textoMod.indexOf(' ') + 1);
-		            const coresMapeadas = { 'Futsal': '#00f2fe', 'Vôlei': '#ff00de', 'Basquete': '#ffee00', 'Handebol': '#ff7300', 'Queimada': '#7f00ff', 'Vôlei de Areia': '#f4a460', 'Natação': '#00bfff', 'Atletismo': '#32cd32', 'Tênis de Mesa': '#ff4500', 'Xadrez': '#ffffff', 'Dama': '#b22222', 'E-Sports': '#00ff00' };
+		    if(!nome) { alert("Digite o seu nome."); return; }
+		    if(!dataNasc) { alert("Informe a data de nascimento."); return; }
+		    if(turmaSelect.value === "") { alert("Selecione a sua turma!"); return; }
+		    if(generoSelect.value === "") { alert("Selecione a sua categoria/gênero!"); return; }
+		    if(selectMod.value === "") { alert("Selecione um esporte!"); return; }
 
-		            let fotoFinal = fotoBase64;
-		            if (!fotoFinal) {
-		                fotoFinal = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=random&color=fff`;
-		            }
+		    let fotoFinal = fotoBase64;
+		    if (!fotoFinal) {
+		        fotoFinal = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=random&color=fff`;
+		    }
 
-		            const novoAluno = {
-		                nome: nome,
-		                turma: turmaSelect.value,
-		                dataNascimento: dataNasc,
-		                genero: generoSelect.value,
-		                esporte: esporteSelecionado,
-		                icone: iconeSelecionado,
-		                cor: coresMapeadas[esporteSelecionado] || '#00f2fe',
-		                foto: fotoFinal 
-		            };
+		    // CAPTURANDO O NOME DO ESPORTE E O ÍCONE DA OPÇÃO SELECIONADA
+		    const optionSelecionada = selectMod.options[selectMod.selectedIndex];
+		    const nomeEsporte = optionSelecionada.value;
+		    const iconeEsporte = optionSelecionada.getAttribute('data-icone');
 
-		            try {
-		                // A MÁGICA: Manda o DTO para o Spring Boot!
-		                const response = await fetch('http://localhost:8080/api/alunos', {
-		                    method: 'POST',
-		                    headers: { 'Content-Type': 'application/json' },
-		                    body: JSON.stringify(novoAluno)
-		                });
+		    // JSON formatado para a sua classe Aluno.java
+		    const novoAluno = {
+		        nome: nome,
+		        turma: turmaSelect.value,
+		        dataNascimento: dataNasc,
+		        fotoUrl: fotoFinal,
+		        genero: generoSelect.value,
+		        esporte: nomeEsporte,
+		        iconeEsporte: iconeEsporte
+		    };
 
-		                if(response.ok) {
-		                    alert("Inscrição gravada com sucesso no Banco de Dados!");
-		                    document.getElementById('form-cadastro-aluno').reset();
-		                    fotoBase64 = null;
-		                    document.getElementById('preview-foto').src = "https://ui-avatars.com/api/?name=Atleta&background=222&color=fff";
-		                } else {
-		                    alert("⚠️ Erro ao salvar no Servidor.");
-		                }
-		            } catch (error) {
-		                console.error(error);
-		                alert("🚨 Falha de comunicação. Verifique se o Spring Boot está a rodar na porta 8080!");
-		            }
+		    try {
+		        const response = await fetch('/api/alunos', {
+		            method: 'POST',
+		            headers: { 'Content-Type': 'application/json' },
+		            body: JSON.stringify(novoAluno)
+		        });
+
+		        if(response.ok) {
+		            alert("Inscrição gravada com sucesso no Banco de Dados!");
+		            document.getElementById('form-cadastro-aluno').reset();
+		            fotoBase64 = null;
+		            document.getElementById('preview-foto').src = "https://ui-avatars.com/api/?name=Atleta&background=222&color=fff";
+		        } else {
+		            alert("⚠️ Erro ao salvar no Servidor. Verifique os dados.");
 		        }
+		    } catch (error) {
+		        console.error(error);
+		        alert("🚨 Falha de comunicação com o servidor.");
+		    }
+		}
     </script>
 </body>
 </html>

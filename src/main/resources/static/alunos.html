@@ -108,159 +108,168 @@
 
     <div id="footbar-placeholder"></div>
 
-    <script>
-        window.onload = async () => {
-            await fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-            await fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
-            
-            inicializarBancoDeDadosLocal();
-        };
+	<script>
+	        window.onload = async () => {
+	            await fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+	            await fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+	            
+	            inicializarBancoDeDadosLocal();
+	        };
 
-        let listaAlunos = [];
+	        let listaAlunos = [];
 
-        async function inicializarBancoDeDadosLocal() {
-            try {
-                const response = await fetch('http://localhost:8080/api/alunos');
-                if (response.ok) {
-                    listaAlunos = await response.json();
-                    atualizarTela(); 
-                } else {
-                    console.error("Falha ao ler os alunos do banco.");
-                }
-            } catch (error) {
-                console.error("Erro na API:", error);
-                document.getElementById('grid-alunos').innerHTML = `<p style="color:red; text-align:center; grid-column: 1 / -1;">🚨 Spring Boot desligado. Os dados não puderam ser carregados da porta 8080.</p>`;
-            }
-        }
+	        async function inicializarBancoDeDadosLocal() {
+	            try {
+	                // Rota relativa, evita o erro da porta 8080/8015
+	                const response = await fetch('/api/alunos');
+	                if (response.ok) {
+	                    listaAlunos = await response.json();
+	                    atualizarTela(); 
+	                } else {
+	                    console.error("Falha ao ler os alunos do banco.");
+	                }
+	            } catch (error) {
+	                console.error("Erro na API:", error);
+	                document.getElementById('grid-alunos').innerHTML = `<p style="color:red; text-align:center; grid-column: 1 / -1;">🚨 Erro de conexão com o servidor. Verifique se o Spring Boot está rodando.</p>`;
+	            }
+	        }
 
-        function atualizarTela() {
-            renderizarGrid(listaAlunos);
-            calcularEstatisticasEGerarBotoes();
-        }
+	        function atualizarTela() {
+	            renderizarGrid(listaAlunos);
+	            calcularEstatisticasEGerarBotoes();
+	        }
 
-        function renderizarGrid(alunos) {
-            const container = document.getElementById('grid-alunos');
-            container.innerHTML = '';
-            
-            // TRATAMENTO PARA BANCO DE DADOS VAZIO (NENHUM ALUNO CADASTRADO AINDA)
-            if(!alunos || alunos.length === 0) {
-                container.innerHTML = `<p style="font-family:'Segoe UI'; color: rgba(255,255,255,0.5); text-align: center; grid-column: 1 / -1; padding: 20px;">Nenhuma inscrição encontrada no Banco de Dados. Utilize o link público para cadastrar atletas.</p>`;
-                return;
-            }
+	        function renderizarGrid(alunos) {
+	            const container = document.getElementById('grid-alunos');
+	            container.innerHTML = '';
+	            
+	            if(!alunos || alunos.length === 0) {
+	                container.innerHTML = `<p style="font-family:'Segoe UI'; color: rgba(255,255,255,0.5); text-align: center; grid-column: 1 / -1; padding: 20px;">Nenhuma inscrição encontrada no Banco de Dados. Utilize o link público para cadastrar atletas.</p>`;
+	                return;
+	            }
 
-            alunos.forEach(aluno => {
-                // TRAVA DE SEGURANÇA: Se a API trouxer nulo, nós protegemos
-                let generoSeguro = aluno.genero ? String(aluno.genero) : 'não definido';
-                let iconeGenero = generoSeguro === 'feminino' ? '🚺' : (generoSeguro === 'masculino' ? '🚹' : '🚻');
-                let corGenero = generoSeguro === 'feminino' ? '#ff00de' : (generoSeguro === 'masculino' ? '#00f2fe' : '#b200ff');
-                let corPrincipal = aluno.cor || '#00f2fe';
-                let fotoSegura = aluno.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome || 'Atleta')}&background=222&color=fff`;
+	            alunos.forEach(aluno => {
+	                // Ajuste para ler as informações vindas do Java corretamente
+	                let generoSeguro = aluno.genero ? String(aluno.genero) : 'não definido';
+	                let iconeGenero = generoSeguro === 'feminino' ? '🚺' : (generoSeguro === 'masculino' ? '🚹' : '🚻');
+	                let corGenero = generoSeguro === 'feminino' ? '#ff00de' : (generoSeguro === 'masculino' ? '#00f2fe' : '#b200ff');
+	                let corPrincipal = '#00f2fe'; 
+	                
+	                // O Java retorna fotoUrl, não foto
+	                let fotoSegura = aluno.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome || 'Atleta')}&background=222&color=fff`;
 
-                container.innerHTML += `
-                    <div class="aluno-card glass" style="border-left-color: ${corPrincipal};">
-                        <img src="${fotoSegura}" alt="Foto" class="aluno-foto" style="border-color: ${corPrincipal};">
-                        <div class="aluno-info" style="flex-grow: 1;">
-                            <h4>${aluno.nome || 'Sem Nome'}</h4>
-                            <p>Turma: <b>${aluno.turma || 'N/A'}</b></p>
-                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                                <span class="aluno-badge" style="color: ${corPrincipal}; border: 1px solid rgba(255,255,255,0.1);">${aluno.icone || '🏅'} ${aluno.esporte || 'N/A'}</span>
-                                <span class="aluno-badge" style="color: ${corGenero}; background: rgba(0,0,0,0.5);">${iconeGenero} ${generoSeguro.toUpperCase()}</span>
-                            </div>
-                        </div>
-                        <div class="aluno-actions">
-                            <button class="btn-action delete" onclick="abrirModalExclusao(${aluno.id}, '${aluno.nome}')" title="Remover Inscrição">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
+	                // O esporte e o ícone estão dentro do objeto modalidade
+					let nomeEsporte = aluno.esporte || 'N/A';
+					let iconeEsporte = aluno.iconeEsporte || '🏅';
+	                container.innerHTML += `
+	                    <div class="aluno-card glass" style="border-left-color: ${corPrincipal};">
+	                        <img src="${fotoSegura}" alt="Foto" class="aluno-foto" style="border-color: ${corPrincipal};">
+	                        <div class="aluno-info" style="flex-grow: 1;">
+	                            <h4>${aluno.nome || 'Sem Nome'}</h4>
+	                            <p>Turma: <b>${aluno.turma || 'N/A'}</b></p>
+	                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+	                                <span class="aluno-badge" style="color: ${corPrincipal}; border: 1px solid rgba(255,255,255,0.1);">${iconeEsporte} ${nomeEsporte}</span>
+	                                <span class="aluno-badge" style="color: ${corGenero}; background: rgba(0,0,0,0.5);">${iconeGenero} ${generoSeguro.toUpperCase()}</span>
+	                            </div>
+	                        </div>
+	                        <div class="aluno-actions">
+	                            <button class="btn-action delete" onclick="abrirModalExclusao(${aluno.id}, '${aluno.nome}')" title="Remover Inscrição">🗑️</button>
+	                        </div>
+	                    </div>
+	                `;
+	            });
+	        }
 
-        function calcularEstatisticasEGerarBotoes() {
-            document.getElementById('stat-total').textContent = listaAlunos.length;
-            const containerRanking = document.getElementById('ranking-modalidades');
-            
-            if(listaAlunos.length === 0) {
-                document.getElementById('stat-top-esporte').textContent = '-';
-                document.getElementById('stat-top-turma').textContent = '-';
-                containerRanking.innerHTML = '<span style="font-family: \'Segoe UI\'; font-size: 0.85rem; color: rgba(255,255,255,0.5);">Nenhum esporte com inscritos no momento.</span>';
-                return;
-            }
+	        function calcularEstatisticasEGerarBotoes() {
+	            document.getElementById('stat-total').textContent = listaAlunos.length;
+	            const containerRanking = document.getElementById('ranking-modalidades');
+	            
+	            if(listaAlunos.length === 0) {
+	                document.getElementById('stat-top-esporte').textContent = '-';
+	                document.getElementById('stat-top-turma').textContent = '-';
+	                containerRanking.innerHTML = '<span style="font-family: \'Segoe UI\'; font-size: 0.85rem; color: rgba(255,255,255,0.5);">Nenhum esporte com inscritos no momento.</span>';
+	                return;
+	            }
 
-            let contagemEsportes = {};
-            let contagemTurmas = {};
+	            let contagemEsportes = {};
+	            let contagemTurmas = {};
 
-            listaAlunos.forEach(a => {
-                let esp = a.esporte || 'Sem Esporte';
-                let tur = a.turma || 'Sem Turma';
-                contagemEsportes[esp] = (contagemEsportes[esp] || 0) + 1;
-                contagemTurmas[tur] = (contagemTurmas[tur] || 0) + 1;
-            });
+	            listaAlunos.forEach(a => {
+	                // Lê o nome do esporte de dentro do objeto modalidade
+	                let esp = a.modalidade ? a.modalidade.nomeEsporte : 'Sem Esporte';
+	                let tur = a.turma || 'Sem Turma';
+	                contagemEsportes[esp] = (contagemEsportes[esp] || 0) + 1;
+	                contagemTurmas[tur] = (contagemTurmas[tur] || 0) + 1;
+	            });
 
-            document.getElementById('stat-top-esporte').textContent = Object.keys(contagemEsportes).reduce((a, b) => contagemEsportes[a] > contagemEsportes[b] ? a : b);
-            document.getElementById('stat-top-turma').textContent = Object.keys(contagemTurmas).reduce((a, b) => contagemTurmas[a] > contagemTurmas[b] ? a : b);
+	            document.getElementById('stat-top-esporte').textContent = Object.keys(contagemEsportes).reduce((a, b) => contagemEsportes[a] > contagemEsportes[b] ? a : b);
+	            document.getElementById('stat-top-turma').textContent = Object.keys(contagemTurmas).reduce((a, b) => contagemTurmas[a] > contagemTurmas[b] ? a : b);
 
-            containerRanking.innerHTML = '';
-            
-            for (let [esporte, qtd] of Object.entries(contagemEsportes)) {
-                if (esporte === 'Sem Esporte') continue;
-                containerRanking.innerHTML += `
-                    <div class="ranking-pill" onclick="criarTorneioDireto('${esporte}')" title="Criar torneio de ${esporte}">
-                        ${esporte} <span class="ranking-count">${qtd}</span> <span class="ranking-icone-acao">⚡</span>
-                    </div>
-                `;
-            }
-        }
+	            containerRanking.innerHTML = '';
+	            
+	            for (let [esporte, qtd] of Object.entries(contagemEsportes)) {
+	                if (esporte === 'Sem Esporte') continue;
+	                containerRanking.innerHTML += `
+	                    <div class="ranking-pill" onclick="criarTorneioDireto('${esporte}')" title="Criar torneio de ${esporte}">
+	                        ${esporte} <span class="ranking-count">${qtd}</span> <span class="ranking-icone-acao">⚡</span>
+	                    </div>
+	                `;
+	            }
+	        }
 
-        function criarTorneioDireto(esporteNome) {
-            const alunosDoEsporte = listaAlunos.filter(a => a.esporte === esporteNome);
-            
-            if(alunosDoEsporte.length < 2) {
-                alert(`Atenção: É necessário pelo menos 2 inscritos para gerar uma chave de ${esporteNome}. Aguarde mais inscrições!`);
-                return;
-            }
-            
-            const mapIds = { 'Futsal':1, 'Vôlei':2, 'Basquete':3, 'Handebol':4, 'Queimada':5, 'Vôlei de Areia':6, 'Natação':7, 'Atletismo':8, 'Tênis de Mesa':9, 'Xadrez':10, 'Dama':11, 'E-Sports':12 };
-            let esporteId = mapIds[esporteNome] || 99;
+	        function criarTorneioDireto(esporteNome) {
+	            // Ajuste para ler modalidade.nomeEsporte
+	            const alunosDoEsporte = listaAlunos.filter(a => a.modalidade && a.modalidade.nomeEsporte === esporteNome);
+	            
+	            if(alunosDoEsporte.length < 2) {
+	                alert(`Atenção: É necessário pelo menos 2 inscritos para gerar uma chave de ${esporteNome}. Aguarde mais inscrições!`);
+	                return;
+	            }
+	            
+	            const mapIds = { 'Futsal':1, 'Vôlei':2, 'Basquete':3, 'Handebol':4, 'Queimada':5, 'Vôlei de Areia':6, 'Natação':7, 'Atletismo':8, 'Tênis de Mesa':9, 'Xadrez':10, 'Dama':11, 'E-Sports':12 };
+	            let esporteId = mapIds[esporteNome] || 99;
 
-            let generos = [...new Set(alunosDoEsporte.map(a => a.genero))];
-            let generoTorneio = generos.length === 1 && generos[0] ? generos[0] : 'misto';
+	            let generos = [...new Set(alunosDoEsporte.map(a => a.genero))];
+	            let generoTorneio = generos.length === 1 && generos[0] ? generos[0] : 'misto';
 
-            const setupData = { 
-                genero: generoTorneio, 
-                esportes: [{ id: esporteId, nome: esporteNome, configurado: false }] 
-            };
-            
-            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
-            window.location.href = '/setup/torneios.html';
-        }
+	            const setupData = { 
+	                genero: generoTorneio, 
+	                esportes: [{ id: esporteId, nome: esporteNome, configurado: false }] 
+	            };
+	            
+	            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+	            window.location.href = '/setup/torneios.html';
+	        }
 
-        function filtrarAlunos() {
-            const termo = document.getElementById('busca-aluno').value.toLowerCase();
-            const filtrados = listaAlunos.filter(a => 
-                (a.nome || '').toLowerCase().includes(termo) || 
-                (a.turma || '').toLowerCase().includes(termo) || 
-                (a.esporte || '').toLowerCase().includes(termo) || 
-                (a.genero || '').toLowerCase().includes(termo)
-            );
-            renderizarGrid(filtrados);
-        }
+	        function filtrarAlunos() {
+	            const termo = document.getElementById('busca-aluno').value.toLowerCase();
+	            const filtrados = listaAlunos.filter(a => {
+	                let nomeEsporte = a.modalidade ? a.modalidade.nomeEsporte : '';
+	                return (a.nome || '').toLowerCase().includes(termo) || 
+	                       (a.turma || '').toLowerCase().includes(termo) || 
+	                       nomeEsporte.toLowerCase().includes(termo) || 
+	                       (a.genero || '').toLowerCase().includes(termo);
+	            });
+	            renderizarGrid(filtrados);
+	        }
 
-        function abrirModalExclusao(id, nome) { document.getElementById('id-exclusao').value = id; document.getElementById('nome-exclusao').textContent = nome; document.getElementById('modal-exclusao').style.display = 'flex'; }
-        function fecharModal() { document.getElementById('modal-exclusao').style.display = 'none'; }
+	        function abrirModalExclusao(id, nome) { document.getElementById('id-exclusao').value = id; document.getElementById('nome-exclusao').textContent = nome; document.getElementById('modal-exclusao').style.display = 'flex'; }
+	        function fecharModal() { document.getElementById('modal-exclusao').style.display = 'none'; }
 
-        async function confirmarExclusao() {
-            const id = parseInt(document.getElementById('id-exclusao').value);
-            try {
-                const response = await fetch(`http://localhost:8080/api/alunos/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    listaAlunos = listaAlunos.filter(a => a.id !== id);
-                    fecharModal(); atualizarTela();
-                }
-            } catch (error) { console.error(error); alert("Erro ao excluir do banco de dados."); }
-        }
+	        async function confirmarExclusao() {
+	            const id = parseInt(document.getElementById('id-exclusao').value);
+	            try {
+	                // Caminho relativo para exclusão
+	                const response = await fetch(`/api/alunos/${id}`, { method: 'DELETE' });
+	                if (response.ok) {
+	                    listaAlunos = listaAlunos.filter(a => a.id !== id);
+	                    fecharModal(); atualizarTela();
+	                }
+	            } catch (error) { console.error(error); alert("Erro ao excluir do banco de dados."); }
+	        }
 
-        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
-        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
-    </script>
+	        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+	        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+	    </script>
 </body>
 </html>

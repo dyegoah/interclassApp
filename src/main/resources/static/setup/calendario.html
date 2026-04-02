@@ -718,7 +718,7 @@
 
 		            try {
 		                // 1. Tenta enviar o Setup (Modalidades e Gênero) para o Spring Boot
-		                const resSetup = await fetch('http://localhost:8080/api/setup', {
+		                const resSetup = await fetch('http://localhost:8015/api/setup', {
 		                    method: 'POST',
 		                    headers: { 'Content-Type': 'application/json' },
 		                    body: JSON.stringify(loteSetupDTO)
@@ -727,7 +727,7 @@
 		                if (!resSetup.ok) throw new Error("Falha ao salvar as modalidades no banco.");
 
 		                // 2. Tenta enviar os Jogos para o PostgreSQL
-		                const resCalendario = await fetch('http://localhost:8080/api/jogos/calendario', {
+		                const resCalendario = await fetch('http://localhost:8015/api/jogos/calendario', {
 		                    method: 'POST',
 		                    headers: { 'Content-Type': 'application/json' },
 		                    body: JSON.stringify(calendarioSaveDTO)

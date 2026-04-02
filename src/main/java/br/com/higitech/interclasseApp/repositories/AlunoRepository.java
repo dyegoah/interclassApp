@@ -11,7 +11,7 @@ import br.com.higitech.interclasseApp.model.Aluno;
 public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     
     // Traz todos os alunos inscritos numa modalidade específica (Ex: Futsal)
-    List<Aluno> findByModalidadeId(Long modalidadeId);
+	List<Aluno> findByEsporte(String esporte);
     
     // Filtro para a barra de pesquisa do alunos.html
     List<Aluno> findByNomeContainingIgnoreCaseOrTurmaContainingIgnoreCase(String nome, String turma);
