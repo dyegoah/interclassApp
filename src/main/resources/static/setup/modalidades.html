@@ -59,8 +59,7 @@
             <h2 class="section-title">👥 Passo 1: Ambiente de Configuração</h2>
             <div class="info-balloon glass">
                 <strong>💡 Como funciona a Central da Arena:</strong><br>
-                Escolha o gênero para preparar o ambiente visual. A sequência de sucesso é: <br>
-                <span style="color: var(--theme-primary); font-weight: bold;">Gênero ➔ Modalidades ➔ Torneios ➔ Calendário ➔ Alunos.</span>
+                A sequência de sucesso é: <span style="color: var(--theme-primary); font-weight: bold;">Gênero ➔ Modalidades ➔ Torneios ➔ Calendário ➔ Alunos.</span>
             </div>
 
             <div class="setup-grid">
@@ -160,6 +159,7 @@
             const setupData = { genero: generoSelecionado, esportes: esportesArray };
             localStorage.setItem('arenaSetup', JSON.stringify(setupData));
             
+            // Chama a ROTA LIMPA DA API JAVA
             window.location.href = '/setup/torneios';
         }
 

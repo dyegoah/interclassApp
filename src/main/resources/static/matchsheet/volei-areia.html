@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Súmula Vôlei de Areia - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #f4a460; --team-a: #00f2fe; --team-b: #ff00de; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
+        
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        
+        .volei-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid var(--theme-primary);}
+        .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
+        
+        .set-display { text-align: center; }
+        .set-title { color: var(--theme-primary); font-size: 1.5rem; font-weight: bold; text-transform: uppercase; text-shadow: 0 0 10px rgba(244, 164, 96, 0.5);}
+        .set-subtitle { font-family: 'Segoe UI'; font-size: 0.8rem; color: #aaa; margin-top: 5px;}
+        
+        .btn-finalizar { background: #00ff00; color: #000; font-weight: bold; font-family: 'Orbitron'; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;}
+
+        .placar-board { display: flex; justify-content: space-around; align-items: stretch; margin: 20px 0; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px;}
+        .team-col { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .team-name { font-size: 1.2rem; font-weight: bold; color: #fff; font-family: 'Segoe UI'; text-transform: uppercase; margin-bottom: 10px;}
+        
+        .sets-won { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
+        .set-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: transparent; }
+        .team-a .set-dot.won { background: var(--team-a); border-color: var(--team-a); box-shadow: 0 0 10px var(--team-a); }
+        .team-b .set-dot.won { background: var(--team-b); border-color: var(--team-b); box-shadow: 0 0 10px var(--team-b); }
+
+        .team-score { font-size: 6rem; font-weight: bold; line-height: 1; text-shadow: 0 5px 15px rgba(0,0,0,0.8);}
+        .score-a { color: var(--team-a); } .score-b { color: var(--team-b); }
+        
+        .timeouts-area { font-family: 'Segoe UI'; font-size: 0.8rem; margin-top: 15px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; display: inline-block; margin-left: auto; margin-right: auto;}
+        .timeout-dots { display: flex; gap: 5px; justify-content: center; margin-top: 5px; }
+        .timeout-dot { width: 25px; height: 10px; background: #00ff00; border-radius: 3px; box-shadow: 0 0 5px #00ff00; cursor: pointer;}
+        .timeout-dot.used { background: #333; box-shadow: none; cursor: default;}
+
+        .prancheta { display: flex; gap: 20px; flex-wrap: wrap; }
+        .time-list { flex: 1; min-width: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent;}
+        .time-list.a { border-top-color: var(--team-a); } .time-list.b { border-top-color: var(--team-b); }
+        
+        .player-row { display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 15px 10px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
+        .player-row:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); transform: scale(1.02);}
+        .player-row.readonly { cursor: default; }
+        .player-row.readonly:hover { transform: none; background: rgba(0,0,0,0.4); border-color: transparent;}
+        
+        .player-photo { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid var(--theme-primary);}
+        .player-num { font-size: 1.3rem; font-weight: bold; color: #fff; width: 35px; }
+        .player-info { flex-grow: 1; }
+        .player-name { font-family: 'Segoe UI'; font-weight: bold; font-size: 1.1rem; color: #fff; }
+        
+        .player-stats { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+        .stat-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-family: 'Segoe UI'; font-size: 0.9rem; color: white; display: flex; align-items: center; gap: 5px; }
+        .stat-pill b { font-family: 'Orbitron'; color: var(--theme-primary); font-size: 1rem;}
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
+        .modal-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-family: 'Segoe UI'; font-size: 0.9rem;}
+        .btn-ponto { background: rgba(0, 255, 0, 0.2); border: 1px solid #00ff00; color: #00ff00;}
+        .btn-erro { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
+        .btn-card-amarelo { background: rgba(255, 234, 0, 0.2); border: 1px solid #ffea00; color: #ffea00;}
+        .btn-card-vermelho { background: rgba(255, 0, 0, 0.5); border: 1px solid #ff0000; color: #fff;}
+
+        .timeline-box { margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; display: none; }
+        .timeline-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-family: 'Segoe UI'; font-size: 0.9rem; }
+        .timeline-time { color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        
+        <div class="volei-header">
+            <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar PlayHub</button>
+            
+            <div class="set-display">
+                <div class="set-title" id="set-atual-lbl">1º SET</div>
+                <div class="set-subtitle" id="set-meta-lbl">Vitória a 21 pts (Vantagem de 2)</div>
+            </div>
+
+            <button class="btn-finalizar" id="btn-finalizar" onclick="finalizarPartida()">Finalizar ✓</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; font-family: 'Segoe UI'; color: #aaa; font-size: 0.85rem;" id="match-info">A Carregar Súmula...</div>
+
+        <div class="placar-board">
+            <div class="team-col team-a">
+                <div class="team-name" id="placar-nome-a">Dupla A</div>
+                <div class="sets-won" id="sets-dots-a"></div>
+                <div class="team-score score-a" id="score-a">0</div>
+                <div class="timeouts-area" id="box-timeouts-a">
+                    Tempo Restante (Set) <div class="timeout-dots" id="timeouts-a"></div>
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction: column; justify-content: center; font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.2);">X</div>
+            
+            <div class="team-col team-b">
+                <div class="team-name" id="placar-nome-b">Dupla B</div>
+                <div class="sets-won" id="sets-dots-b"></div>
+                <div class="team-score score-b" id="score-b">0</div>
+                <div class="timeouts-area" id="box-timeouts-b">
+                    Tempo Restante (Set) <div class="timeout-dots" id="timeouts-b"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prancheta">
+            <div class="time-list a" id="lista-a"></div>
+            <div class="time-list b" id="lista-b"></div>
+        </div>
+
+        <div class="timeline-box" id="timeline-container">
+            <h3 style="color: #fff; font-family: 'Orbitron'; margin-bottom: 10px;">📄 Relatório da Partida</h3>
+            <div id="timeline-lista"></div>
+        </div>
+
+    </div>
+
+    <div id="modal-acao" class="modal-overlay">
+        <div class="modal-box">
+            <img id="acao-foto" src="">
+            <h3 id="acao-nome" style="color: white; font-family: 'Segoe UI';">Nome</h3>
+            <p id="acao-num" style="color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px;">Atleta 1</p>
+            
+            <p style="font-family:'Segoe UI'; font-size:0.8rem; color:#aaa; text-align:left; margin-bottom:5px; text-transform:uppercase;">Ações Positivas</p>
+            <div class="action-grid" style="margin-top: 0; margin-bottom: 15px;">
+                <button class="action-btn btn-ponto" onclick="registrar('Ataque', '🏐', 'ponto')"><span style="font-size:1.5rem;">🏐</span> Ponto de Ataque</button>
+                <button class="action-btn btn-ponto" onclick="registrar('Bloqueio', '🧱', 'ponto')"><span style="font-size:1.5rem;">🧱</span> Bloqueio</button>
+                <button class="action-btn btn-ponto" onclick="registrar('Ace (Saque)', '☄️', 'ponto')" style="grid-column: span 2;"><span style="font-size:1.5rem;">☄️</span> Ace (Saque)</button>
+            </div>
+
+            <p style="font-family:'Segoe UI'; font-size:0.8rem; color:#aaa; text-align:left; margin-bottom:5px; text-transform:uppercase;">Erros (Ponto Adversário)</p>
+            <div class="action-grid" style="margin-top: 0; margin-bottom: 15px;">
+                <button class="action-btn btn-erro" onclick="registrar('Erro de Saque', '❌', 'erro')"><span style="font-size:1.5rem;">❌</span> Erro de Saque</button>
+                <button class="action-btn btn-erro" onclick="registrar('Toque/Invasão', '🕸️', 'erro')"><span style="font-size:1.5rem;">🕸️</span> Toque na Rede</button>
+                <button class="action-btn btn-erro" onclick="registrar('Ataque Fora', '⚠️', 'erro')" style="grid-column: span 2;"><span style="font-size:1.5rem;">⚠️</span> Ataque Fora</button>
+            </div>
+
+            <div class="action-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <button class="action-btn btn-card-amarelo" onclick="registrar('Advertência', '🟨', 'aviso')">🟨 Aviso</button>
+                <button class="action-btn btn-card-vermelho" onclick="registrar('Penalidade (Ponto Contra)', '🟥', 'punicao')">🟥 Punição</button>
+                <button class="action-btn" style="background: transparent; border: 1px solid #555;" onclick="fecharModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const idJogo = parseInt(urlParams.get('jogo')) || 999;
+        const lote = urlParams.get('lote') || 'masculino';
+        const isReadOnly = urlParams.get('read') === 'true';
+
+        let matchAtiva = null;
+        let placar = { A: 0, B: 0 };
+        let setsGanhos = { A: 0, B: 0 };
+        let timeoutsUsados = { A: [false], B: [false] }; 
+        let escalacao = { A: [], B: [] };
+        let timeline = [];
+        
+        let jogadorAcao = null; let timeAcao = null;
+        let totalSetsParaVencer = 2; 
+        let setAtualIndex = 1; 
+
+        window.onload = () => {
+            const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+            if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
+            
+            if(!matchAtiva) matchAtiva = { id: 999, esporte: 'Vôlei de Areia', titulo: 'Amistoso', quadra: 'Areia', icone: '🏖️' };
+
+            document.getElementById('match-info').innerHTML = `${matchAtiva.icone} <b>${matchAtiva.esporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
+
+            if(isReadOnly) {
+                let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, setsGanhos:{A:0,B:0}, setAtualIndex:0, escalacao:{A:[],B:[]}, timeline:[] };
+                placar = rel.placar; setsGanhos = rel.setsGanhos; escalacao = rel.escalacao; timeline = rel.timeline; setAtualIndex = rel.setAtualIndex;
+                
+                document.getElementById('btn-finalizar').style.display = 'none';
+                document.getElementById('box-timeouts-a').style.display = 'none';
+                document.getElementById('box-timeouts-b').style.display = 'none';
+                document.getElementById('timeline-container').style.display = 'block';
+                renderTimeline(); atualizarPlacarVisual(true);
+            } else {
+                escalarMockAreia(); atualizarPlacarVisual();
+            }
+            renderizarListas();
+        };
+
+        function escalarMockAreia() {
+            const nomes = ["Lucas", "Pedro", "João", "Gabriel"];
+            for(let i=0; i<2; i++) {
+                escalacao.A.push({ id: 'A'+i, numero: i+1, nome: nomes[i], foto: `https://i.pravatar.cc/150?img=${i+10}`, stats: [] });
+                escalacao.B.push({ id: 'B'+i, numero: i+1, nome: nomes[i+2] || 'Atleta B', foto: `https://i.pravatar.cc/150?img=${i+20}`, stats: [] });
+            }
+            document.getElementById('placar-nome-a').textContent = `Dupla A`; document.getElementById('placar-nome-b').textContent = `Dupla B`;
+        }
+
+        function checarFimDeSet() {
+            let ptsParaVencer = (setAtualIndex === (totalSetsParaVencer * 2 - 1)) ? 15 : 21; 
+            let venceuA = placar.A >= ptsParaVencer && (placar.A - placar.B) >= 2;
+            let venceuB = placar.B >= ptsParaVencer && (placar.B - placar.A) >= 2;
+
+            if(venceuA || venceuB) {
+                let timeVencedor = venceuA ? 'A' : 'B';
+                addTimeline(`🏆 FIM DO ${setAtualIndex}º SET! Vitória da Dupla ${timeVencedor} por ${placar.A} x ${placar.B}`);
+                setsGanhos[timeVencedor]++;
+                
+                if(setsGanhos[timeVencedor] === totalSetsParaVencer) {
+                    alert(`🏆 FIM DE JOGO! A Dupla ${timeVencedor} venceu a partida.`);
+                    finalizarPartida();
+                } else {
+                    alert(`Fim do ${setAtualIndex}º Set! Vitória da Dupla ${timeVencedor}.\nAs duplas trocarão de lado.`);
+                    placar.A = 0; placar.B = 0; timeoutsUsados = { A: [false], B: [false] };
+                    setAtualIndex++; atualizarPlacarVisual();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function atualizarPlacarVisual(leitura = false) {
+            document.getElementById('score-a').textContent = placar.A;
+            document.getElementById('score-b').textContent = placar.B;
+
+            let isTieBreak = setAtualIndex === (totalSetsParaVencer * 2 - 1);
+            document.getElementById('set-atual-lbl').innerHTML = isTieBreak ? `🔥 TIE-BREAK` : `${setAtualIndex}º SET`;
+            document.getElementById('set-meta-lbl').textContent = isTieBreak ? `Vitória a 15 pts` : `Vitória a 21 pts`;
+
+            const renderDots = (t) => {
+                let html = '';
+                for(let i=0; i<totalSetsParaVencer; i++) html += `<div class="set-dot ${i < setsGanhos[t] ? 'won' : ''}"></div>`;
+                document.getElementById(`sets-dots-${t.toLowerCase()}`).innerHTML = html;
+            };
+            renderDots('A'); renderDots('B');
+
+            if(!leitura) {
+                const renderTimeouts = (t) => {
+                    document.getElementById(`timeouts-${t.toLowerCase()}`).innerHTML = `<div class="timeout-dot ${timeoutsUsados[t][0] ? 'used' : ''}" onclick="pedirTempo('${t}', 0)"></div>`;
+                };
+                renderTimeouts('A'); renderTimeouts('B');
+            }
+        }
+
+        function pedirTempo(time, index) {
+            if(timeoutsUsados[time][index]) return; 
+            if(confirm(`Confirmar Pedido de Tempo (30s) para a Dupla ${time}?`)) {
+                timeoutsUsados[time][index] = true;
+                addTimeline(`⏱️ TEMPO TÉCNICO: Solicitado pela Dupla ${time}.`); atualizarPlacarVisual();
+            }
+        }
+
+        function renderizarListas() {
+            const renderTime = (t, domId) => {
+                let html = '';
+                escalacao[t].forEach(j => {
+                    let contagemStats = {}; if (!j.stats) j.stats = []; 
+                    j.stats.forEach(icone => { contagemStats[icone] = (contagemStats[icone] || 0) + 1; });
+                    let statsHtml = '';
+                    for(let icone in contagemStats) statsHtml += `<span class="stat-pill">${icone} <b>${contagemStats[icone]}</b></span>`;
+
+                    let pointer = isReadOnly ? 'readonly' : '';
+                    let click = isReadOnly ? '' : `onclick="abrirModal('${j.id}', '${t}')"`;
+                    
+                    html += `
+                        <div class="player-row ${pointer}" ${click}>
+                            <img src="${j.foto}" class="player-photo">
+                            <div class="player-info">
+                                <div class="player-name">${j.nome}</div>
+                                <div class="player-num" style="font-size:0.8rem; color:var(--theme-primary); width:auto;">Atleta ${j.numero}</div>
+                            </div>
+                            <div class="player-stats">${statsHtml}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById(domId).innerHTML = html;
+            };
+            renderTime('A', 'lista-a'); renderTime('B', 'lista-b');
+        }
+
+        function abrirModal(id, t) {
+            jogadorAcao = escalacao[t].find(j => j.id === id); timeAcao = t;
+            document.getElementById('acao-foto').src = jogadorAcao.foto;
+            document.getElementById('acao-nome').textContent = jogadorAcao.nome;
+            document.getElementById('acao-num').textContent = `Atleta ${jogadorAcao.numero}`;
+            document.getElementById('modal-acao').style.display = 'flex';
+        }
+        function fecharModal() { document.getElementById('modal-acao').style.display = 'none'; }
+
+        function registrar(nome, icone, tipoAcao) {
+            let timeRecebePonto = null;
+            if (tipoAcao === 'ponto') timeRecebePonto = timeAcao; 
+            else if (tipoAcao === 'erro') timeRecebePonto = timeAcao === 'A' ? 'B' : 'A'; 
+            else if (tipoAcao === 'punicao') { timeRecebePonto = timeAcao === 'A' ? 'B' : 'A'; alert("🟥 Cartão Vermelho na Areia é ponto e saque para o adversário!"); }
+
+            if (timeRecebePonto) placar[timeRecebePonto]++;
+            if(!jogadorAcao.stats) jogadorAcao.stats = [];
+            jogadorAcao.stats.push(icone);
+
+            addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`);
+            fecharModal(); atualizarPlacarVisual(); renderizarListas(); checarFimDeSet();
+        }
+
+        function addTimeline(txt) { timeline.push({ set: setAtualIndex, placarStr: `${placar.A}x${placar.B}`, txt: txt }); }
+        
+        function renderTimeline() {
+            let html = '';
+            timeline.forEach(t => { html += `<div class="timeline-item"><span class="timeline-time">[Set ${t.set} | ${t.placarStr}]</span> <div style="flex-grow:1;">${t.txt}</div></div>`; });
+            document.getElementById('timeline-lista').innerHTML = html;
+        }
+
+        // --- INTEGRAÇÃO API SPRING BOOT ---
+        async function finalizarPartida() {
+            if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
+                
+                const sumulaFinalizadaDTO = { 
+                    placar: {A: setsGanhos.A, B: setsGanhos.B}, 
+                    periodoIndex: setAtualIndex, 
+                    escalacao: escalacao, 
+                    timeline: timeline 
+                };
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/sumulas/${idJogo}/finalizar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sumulaFinalizadaDTO)
+                    });
+
+                    if (response.ok) {
+                        alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
+                        
+                        let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                        rels[idJogo] = { placar: {A: setsGanhos.A, B: setsGanhos.B}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
+                        localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                        
+                        window.location.href = '/tabelas.html';
+                    } else {
+                        const erroMsg = await response.text();
+                        alert(`⚠️ Erro ao salvar na base de dados: ${erroMsg}`);
+                    }
+                } catch (error) {
+                    console.error("Erro de conexão com a API:", error);
+                    alert("🚨 Falha de comunicação com o Servidor. Salvando offline por segurança.");
+                    
+                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                    rels[idJogo] = { placar: {A: setsGanhos.A, B: setsGanhos.B}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
+                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                    window.location.href = '/tabelas.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

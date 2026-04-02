@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Súmula Handebol - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #ff7300; --team-a: #00f2fe; --team-b: #ff00de; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
+        
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        
+        .handebol-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid var(--theme-primary);}
+        .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
+        
+        .crono-box { text-align: center; position: relative; }
+        .crono-periodo { color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase; font-weight: bold; cursor: pointer; padding: 5px; border: 1px dashed transparent; border-radius: 8px; transition: 0.3s;}
+        .crono-periodo:hover { border-color: var(--theme-primary); background: rgba(255,115,0,0.1); }
+        .crono-display { font-size: 3.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; text-shadow: 0 0 15px rgba(255,115,0,0.6); line-height: 1; margin: 5px 0;}
+        .crono-controls button { background: transparent; border: 1px solid #aaa; color: #fff; border-radius: 5px; padding: 5px 15px; cursor: pointer; margin: 0 5px; font-weight: bold;}
+        .btn-config-tempo { position: absolute; top: 0; right: -30px; background: transparent; border: none; color: #aaa; font-size: 1.2rem; cursor: pointer; transition: 0.3s;}
+        
+        .btn-finalizar { background: #00ff00; color: #000; font-weight: bold; font-family: 'Orbitron'; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;}
+
+        .placar-board { display: flex; justify-content: space-around; align-items: center; margin: 20px 0; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 15px;}
+        .team-col { text-align: center; flex: 1; }
+        .team-name { font-size: 1.2rem; font-weight: bold; color: #fff; font-family: 'Segoe UI'; text-transform: uppercase;}
+        .team-score { font-size: 5rem; font-weight: bold; line-height: 1; }
+        .score-a { color: var(--team-a); } .score-b { color: var(--team-b); }
+        
+        .timeouts-area { font-family: 'Segoe UI'; font-size: 0.75rem; margin-top: 15px; color: #aaa;}
+        .timeout-dots { display: flex; gap: 5px; justify-content: center; margin-top: 5px; }
+        .timeout-dot { width: 25px; height: 8px; background: var(--theme-primary); border-radius: 3px; box-shadow: 0 0 5px var(--theme-primary); cursor: pointer;}
+        .timeout-dot.used { background: #333; box-shadow: none; cursor: default;}
+
+        .prancheta { display: flex; gap: 20px; flex-wrap: wrap; }
+        .time-list { flex: 1; min-width: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent;}
+        .time-list.a { border-top-color: var(--team-a); } .time-list.b { border-top-color: var(--team-b); }
+        
+        .player-row { display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
+        .player-row:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); transform: scale(1.02);}
+        .player-row.readonly { cursor: default; }
+        .player-row.readonly:hover { transform: none; border-color: transparent; background: rgba(0,0,0,0.4);}
+        
+        .player-photo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 2px solid #555;}
+        .player-num { font-size: 1.2rem; font-weight: bold; color: #fff; width: 30px; }
+        .player-info { flex-grow: 1; }
+        .player-name { font-family: 'Segoe UI'; font-weight: bold; font-size: 1rem; color: #fff; }
+        
+        .player-stats { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+        .stat-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; color: white; display: flex; align-items: center; gap: 4px; }
+        .stat-pill b { font-family: 'Orbitron'; color: var(--theme-primary); font-size: 0.9rem;}
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
+        
+        .input-dark { width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; margin-bottom: 15px;}
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 12px 5px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-family: 'Segoe UI'; font-size: 0.85rem;}
+        
+        .btn-pts { background: rgba(0, 242, 254, 0.2); border: 1px solid #00f2fe; color: #00f2fe;}
+        .btn-7m { background: rgba(255, 115, 0, 0.2); border: 1px solid #ff7300; color: #ff7300;}
+        .btn-2min { background: rgba(255, 255, 255, 0.1); border: 1px solid #fff; color: #fff;}
+        .btn-amarelo { background: rgba(255, 234, 0, 0.2); border: 1px solid #ffea00; color: #ffea00;}
+        .btn-vermelho { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
+        .btn-acao-generico { background: transparent; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 15px; width: 100%;}
+
+        .timeline-box { margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; display: none; }
+        .timeline-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-family: 'Segoe UI'; font-size: 0.9rem; display: flex; gap: 10px;}
+        .timeline-time { color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; white-space: nowrap;}
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        
+        <div class="handebol-header">
+            <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar PlayHub</button>
+            
+            <div class="crono-box" id="crono-area">
+                <button class="btn-config-tempo" onclick="abrirConfigTempo()">⚙️</button>
+                <div class="crono-periodo" id="periodo-lbl" onclick="avancarPeriodo()">1º TEMPO 🔄</div>
+                <div class="crono-display" id="crono-display">20:00</div>
+                <div class="crono-controls">
+                    <button id="btn-start-crono" onclick="toggleCronometro()" style="border-color:#00ff00; color:#00ff00;">▶ Play</button>
+                    <button onclick="resetCronometro()">Reset</button>
+                </div>
+            </div>
+
+            <button class="btn-finalizar" id="btn-finalizar" onclick="finalizarPartida()">Finalizar ✓</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; font-family: 'Segoe UI'; color: #aaa; font-size: 0.85rem;" id="match-info">A Carregar Jogo...</div>
+
+        <div style="text-align: center; margin-top: 10px;" id="manual-controls">
+            <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 3px 10px; border-radius: 5px; cursor: pointer; font-size:0.75rem;" onclick="corrigirPlacar('A', -1)">-1 Golo (A)</button>
+            <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 3px 10px; border-radius: 5px; cursor: pointer; font-size:0.75rem;" onclick="corrigirPlacar('B', -1)">-1 Golo (B)</button>
+        </div>
+
+        <div class="placar-board">
+            <div class="team-col">
+                <div class="team-name" id="nome-time-a">Equipa A</div>
+                <div class="team-score score-a" id="score-a">0</div>
+                <div class="timeouts-area" id="box-timeouts-a">
+                    Tempos Técnicos <div class="timeout-dots" id="timeouts-a"></div>
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction: column; justify-content: center; font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.2);">X</div>
+            
+            <div class="team-col">
+                <div class="team-name" id="nome-time-b">Equipa B</div>
+                <div class="team-score score-b" id="score-b">0</div>
+                <div class="timeouts-area" id="box-timeouts-b">
+                    Tempos Técnicos <div class="timeout-dots" id="timeouts-b"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prancheta">
+            <div class="time-list a" id="lista-a"></div>
+            <div class="time-list b" id="lista-b"></div>
+        </div>
+
+        <div class="timeline-box" id="timeline-container">
+            <h3 style="color: #fff; font-family: 'Orbitron'; margin-bottom: 10px;">📄 Relatório da Partida</h3>
+            <div id="timeline-lista"></div>
+        </div>
+
+    </div>
+
+    <div id="modal-config-tempo" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color: #ff7300; font-family: 'Orbitron'; margin-bottom: 20px;">⚙️ Configurar Relógio</h3>
+            <label style="display:block; text-align:left; color:#aaa; font-family:'Segoe UI'; font-size:0.85rem; margin-bottom:5px;">Formato de Disputa</label>
+            <select id="config-tipo-periodo" class="input-dark">
+                <option value="1">Tempo Único</option>
+                <option value="2" selected>2 Tempos</option>
+                <option value="3">3 Tempos (Infantil)</option>
+            </select>
+            <label style="display:block; text-align:left; color:#aaa; font-family:'Segoe UI'; font-size:0.85rem; margin-bottom:5px;">Minutos por Período</label>
+            <input type="number" id="config-minutos" class="input-dark" value="20" min="1" max="90">
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button class="btn-acao-generico" style="margin-top: 0;" onclick="fecharModalTempo()">Cancelar</button>
+                <button class="btn-acao-generico" style="background: #ff7300; border: none; color: #fff; margin-top: 0;" onclick="salvarConfigTempo()">Salvar Regra</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-acao" class="modal-overlay">
+        <div class="modal-box">
+            <img id="acao-foto" src="" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px;">
+            <h3 id="acao-nome" style="color: white; font-family: 'Segoe UI'; margin-bottom: 5px;">Nome</h3>
+            <p id="acao-num" style="color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px;">Camisola 10</p>
+            
+            <div class="action-grid">
+                <button class="action-btn btn-pts" onclick="registrar('Golo', '🤾', 1)"><span style="font-size:1.5rem;">🤾</span> Golo Normal</button>
+                <button class="action-btn btn-7m" onclick="registrar('Golo de 7 Metros', '🎯', 1)"><span style="font-size:1.5rem;">🎯</span> 7 Metros</button>
+            </div>
+
+            <div style="font-family: 'Segoe UI'; font-size: 0.8rem; color: #aaa; margin: 15px 0 5px 0; text-align: left; text-transform: uppercase;">Sanções Disciplinares</div>
+            
+            <div class="action-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <button class="action-btn btn-amarelo" onclick="registrarCartao('Cartão Amarelo', '🟨')"><span style="font-size:1.5rem;">🟨</span> Advert.</button>
+                <button class="action-btn btn-2min" onclick="registrarSuspensao()"><span style="font-size:1.5rem;">✌️</span> 2 Min.</button>
+                <button class="action-btn btn-vermelho" onclick="registrarCartao('Cartão Vermelho', '🟥')"><span style="font-size:1.5rem;">🟥</span> Desqualif.</button>
+            </div>
+
+            <button class="btn-acao-generico" onclick="fecharModalAcao()">Cancelar Acão</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const idJogo = parseInt(urlParams.get('jogo')) || 999;
+        const lote = urlParams.get('lote') || 'masculino';
+        const isReadOnly = urlParams.get('read') === 'true';
+
+        let matchAtiva = null;
+        let placar = { A: 0, B: 0 };
+        let timeoutsUsados = { A: [false], B: [false] }; 
+        let escalacao = { A: [], B: [] };
+        let timeline = [];
+        
+        let jogadorAcao = null; let timeAcao = null;
+        
+        let regrasTempo = { tipo: 2, minutos: 20 }; 
+        let periodosLista = ["1º Tempo", "2º Tempo", "Prorrogação"];
+        let periodoIndex = 0; 
+
+        let cronoInterval = null; 
+        let cronoSegundos = regrasTempo.minutos * 60; 
+        let cronoRodando = false; 
+
+        window.onload = () => {
+            const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+            if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
+            
+            if(!matchAtiva) matchAtiva = { id: 999, esporte: 'Handebol', titulo: 'Amistoso', quadra: 'Ginásio', icone: '🤾' };
+
+            document.getElementById('match-info').innerHTML = `${matchAtiva.icone} <b>${matchAtiva.esporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
+
+            if(isReadOnly) {
+                let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, escalacao:{A:[],B:[]}, timeline:[], periodoIndex:0 };
+                placar = rel.placar; escalacao = rel.escalacao; timeline = rel.timeline; periodoIndex = rel.periodoIndex;
+                
+                document.getElementById('crono-area').style.display = 'none';
+                document.getElementById('btn-finalizar').style.display = 'none';
+                document.getElementById('manual-controls').style.display = 'none';
+                document.getElementById('box-timeouts-a').style.display = 'none';
+                document.getElementById('box-timeouts-b').style.display = 'none';
+                document.getElementById('timeline-container').style.display = 'block';
+                
+                renderTimeline(); atualizarTela(true);
+            } else {
+                escalarMock(); configurarRelogioDisplay(); atualizarTela();
+            }
+            renderizarListas();
+        };
+
+        function escalarMock() {
+            const nomes = ["Lucas", "Pedro", "João", "Gabriel", "Matheus", "Carlos", "Rafael"];
+            for(let i=0; i<7; i++) {
+                escalacao.A.push({ id: 'A'+i, numero: i+2, nome: nomes[i], foto: `https://i.pravatar.cc/150?img=${i+10}`, stats: [] });
+                escalacao.B.push({ id: 'B'+i, numero: i+9, nome: nomes[i] || 'Atleta B', foto: `https://i.pravatar.cc/150?img=${i+20}`, stats: [] });
+            }
+        }
+
+        function abrirConfigTempo() { document.getElementById('modal-config-tempo').style.display = 'flex'; }
+        function fecharModalTempo() { document.getElementById('modal-config-tempo').style.display = 'none'; }
+        function salvarConfigTempo() {
+            regrasTempo.tipo = parseInt(document.getElementById('config-tipo-periodo').value);
+            regrasTempo.minutos = parseInt(document.getElementById('config-minutos').value);
+            if(regrasTempo.tipo === 1) periodosLista = ["Tempo Único", "Prorrogação"];
+            else if(regrasTempo.tipo === 3) periodosLista = ["1º Tempo", "2º Tempo", "3º Tempo", "Prorrogação"];
+            else periodosLista = ["1º Tempo", "2º Tempo", "Prorrogação"];
+            periodoIndex = 0; resetCrono(); fecharModalTempo();
+        }
+
+        function avancarPeriodo() {
+            if(periodoIndex < periodosLista.length - 1) {
+                if(confirm(`Terminar o ${periodosLista[periodoIndex]} e avançar para o próximo? (Os tempos técnicos serão renovados)`)) {
+                    periodoIndex++; timeoutsUsados = { A: [false], B: [false] }; resetCrono();
+                    addTimeline(`🔄 Início do ${periodosLista[periodoIndex]}`); atualizarTela();
+                }
+            }
+        }
+
+        function atualizarTela(leitura = false) {
+            document.getElementById('score-a').textContent = placar.A;
+            document.getElementById('score-b').textContent = placar.B;
+            document.getElementById('periodo-lbl').innerHTML = periodosLista[periodoIndex] + (leitura ? "" : " 🔄");
+
+            if(!leitura) {
+                const renderTimeouts = (t) => {
+                    document.getElementById(`timeouts-${t.toLowerCase()}`).innerHTML = `<div class="timeout-dot ${timeoutsUsados[t][0] ? 'used' : ''}" onclick="pedirTempo('${t}', 0)"></div>`;
+                };
+                renderTimeouts('A'); renderTimeouts('B');
+            }
+        }
+
+        function corrigirPlacar(time, valor) {
+            placar[time] += valor; if(placar[time] < 0) placar[time] = 0;
+            addTimeline(`Corretor Manual: Placar Equipa ${time} ajustado.`); atualizarTela();
+        }
+
+        function pedirTempo(time, index) {
+            if(timeoutsUsados[time][index]) return; 
+            if(confirm(`Confirmar Pedido de Tempo Técnico para a Equipa ${time}?`)) {
+                timeoutsUsados[time][index] = true;
+                addTimeline(`⏱️ TEMPO TÉCNICO: Solicitado pela Equipa ${time}.`); atualizarTela();
+            }
+        }
+
+        function renderizarListas() {
+            const renderTime = (t, domId) => {
+                let html = '';
+                escalacao[t].forEach(j => {
+                    let contagemStats = {}; let tomouVermelho = false;
+                    if (!j.stats) j.stats = []; 
+                    j.stats.forEach(icone => {
+                        contagemStats[icone] = (contagemStats[icone] || 0) + 1;
+                        if(icone === '🟥') tomouVermelho = true;
+                    });
+                    
+                    let statsHtml = '';
+                    for(let icone in contagemStats) statsHtml += `<span class="stat-pill">${icone} <b>${contagemStats[icone]}</b></span>`;
+
+                    let estiloLinha = tomouVermelho ? 'border-color: #ff0000; background: rgba(255,0,0,0.1); opacity:0.7;' : '';
+                    let pointer = isReadOnly || tomouVermelho ? 'readonly' : '';
+                    let click = (isReadOnly || tomouVermelho) ? `onclick="alert('Jogador desqualificado.')"` : `onclick="abrirModalAcao('${j.id}', '${t}')"`;
+                    
+                    html += `
+                        <div class="player-row ${pointer}" ${click} style="${estiloLinha}">
+                            <img src="${j.foto}" class="player-photo">
+                            <div class="player-num">${j.numero}</div>
+                            <div class="player-info"><div class="player-name">${j.nome}</div></div>
+                            <div class="player-stats">${statsHtml}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById(domId).innerHTML = html;
+            };
+            renderTime('A', 'lista-a'); renderTime('B', 'lista-b');
+        }
+
+        function abrirModalAcao(id, t) {
+            jogadorAcao = escalacao[t].find(j => j.id === id); timeAcao = t;
+            document.getElementById('acao-foto').src = jogadorAcao.foto;
+            document.getElementById('acao-nome').textContent = jogadorAcao.nome;
+            document.getElementById('acao-num').textContent = `Camisola ${jogadorAcao.numero}`;
+            document.getElementById('modal-acao').style.display = 'flex';
+        }
+        function fecharModalAcao() { document.getElementById('modal-acao').style.display = 'none'; }
+
+        function registrar(nome, icone, pts) {
+            if(pts > 0) placar[timeAcao] += pts;
+            if(!jogadorAcao.stats) jogadorAcao.stats = [];
+            jogadorAcao.stats.push(icone);
+            addTimeline(`<b>${icone} ${nome}</b>: ${jogadorAcao.nome}`);
+            fecharModalAcao(); atualizarTela(); renderizarListas();
+        }
+
+        function registrarSuspensao() {
+            if(!jogadorAcao.stats) jogadorAcao.stats = [];
+            jogadorAcao.stats.push('✌️');
+            let totalSuspensoes = jogadorAcao.stats.filter(s => s === '✌️').length;
+            let extraAlerta = "";
+            if (totalSuspensoes === 3) {
+                jogadorAcao.stats.push('🟥'); extraAlerta = " \n🟥 3ª EXCLUSÃO! Desqualificado.";
+            }
+            addTimeline(`<span style="color:#00f2fe;">✌️ Exclusão de 2 Minutos</span> para ${jogadorAcao.nome}.${extraAlerta}`);
+            fecharModalAcao(); renderizarListas(); if(extraAlerta !== "") alert(extraAlerta);
+        }
+
+        function registrarCartao(nome, icone) {
+            if(!jogadorAcao.stats) jogadorAcao.stats = [];
+            jogadorAcao.stats.push(icone);
+            let corTexto = icone === '🟥' ? 'color:#ff0000;' : 'color:#ffea00;';
+            addTimeline(`<span style="${corTexto}">${icone} ${nome}</span> para ${jogadorAcao.nome}.`);
+            fecharModalAcao(); renderizarListas();
+        }
+
+        function configurarRelogioDisplay() {
+            let m = Math.floor(cronoSegundos / 60).toString().padStart(2, '0');
+            let s = (cronoSegundos % 60).toString().padStart(2, '0');
+            document.getElementById('crono-display').textContent = `${m}:${s}`;
+            document.getElementById('periodo-lbl').innerHTML = periodosLista[periodoIndex] + " 🔄";
+        }
+
+        function toggleCronometro() {
+            const btn = document.getElementById('btn-start-crono');
+            if (cronoRodando) {
+                clearInterval(cronoInterval); cronoRodando = false;
+                btn.innerHTML = '▶ Play'; btn.style.borderColor = '#00ff00'; btn.style.color = '#00ff00';
+            } else {
+                cronoRodando = true;
+                btn.innerHTML = '⏸ Pause'; btn.style.borderColor = '#ffea00'; btn.style.color = '#ffea00';
+                cronoInterval = setInterval(() => {
+                    if(cronoSegundos > 0) { cronoSegundos--; configurarRelogioDisplay(); } 
+                    else { clearInterval(cronoInterval); cronoRodando = false; btn.innerHTML = '▶ Play'; alert(`O tempo esgotou!`); }
+                }, 1000); 
+            }
+        }
+        function resetCrono() { 
+            clearInterval(cronoInterval); cronoRodando = false; cronoSegundos = regrasTempo.minutos * 60; 
+            configurarRelogioDisplay();
+            let btn = document.getElementById('btn-start-crono');
+            btn.innerHTML = '▶ Play'; btn.style.borderColor = '#00ff00'; btn.style.color = '#00ff00';
+        }
+
+        function addTimeline(txt) {
+            let tStr = document.getElementById('crono-display').textContent;
+            timeline.push({ tempo: tStr, periodo: periodosLista[periodoIndex], txt: txt });
+        }
+        function renderTimeline() {
+            let html = '';
+            timeline.forEach(t => { html += `<div class="timeline-item"><span class="timeline-time">[${t.periodo} - ${t.tempo}]</span> <div style="flex-grow:1;">${t.txt}</div></div>`; });
+            document.getElementById('timeline-lista').innerHTML = html;
+        }
+
+        // --- INTEGRAÇÃO API SPRING BOOT ---
+        async function finalizarPartida() {
+            if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
+                
+                const sumulaFinalizadaDTO = { 
+                    placar: placar, 
+                    periodoIndex: periodoIndex, 
+                    escalacao: escalacao, 
+                    timeline: timeline 
+                };
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/sumulas/${idJogo}/finalizar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sumulaFinalizadaDTO)
+                    });
+
+                    if (response.ok) {
+                        alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
+                        
+                        let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                        rels[idJogo] = { placar: placar, escalacao: escalacao, timeline: timeline, periodoIndex: periodoIndex };
+                        localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                        
+                        window.location.href = '/tabelas.html';
+                    } else {
+                        const erroMsg = await response.text();
+                        alert(`⚠️ Erro ao salvar na base de dados: ${erroMsg}`);
+                    }
+                } catch (error) {
+                    console.error("Erro de conexão com a API:", error);
+                    alert("🚨 Falha de comunicação com o Servidor. Salvando offline por segurança.");
+                    
+                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                    rels[idJogo] = { placar: placar, escalacao: escalacao, timeline: timeline, periodoIndex: periodoIndex };
+                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                    window.location.href = '/tabelas.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

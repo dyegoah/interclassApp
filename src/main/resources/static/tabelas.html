@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PlayHub - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        .section-title { text-transform: uppercase; font-size: 1.2rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;}
+        
+        /* O NOVO ACORDEÃO (CHAVEAMENTO DO TORNEIO) */
+        .torneio-grupo { margin-bottom: 20px; background: rgba(0,0,0,0.4); border-radius: 15px; border-left: 5px solid var(--theme-primary); overflow: hidden; }
+        .torneio-header { padding: 15px 20px; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
+        .torneio-header:hover { background: rgba(255,255,255,0.1); }
+        .torneio-header h3 { font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .torneio-toggle { font-family: 'Segoe UI'; font-size: 0.85rem; color: var(--theme-primary); font-weight: bold; background: rgba(0,242,254,0.1); padding: 5px 10px; border-radius: 8px;}
+        
+        .torneio-body { padding: 15px; display: none; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        .playhub-card { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;}
+        .playhub-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+        .play-hora { font-size: 1.1rem; color: #00ff00; font-weight: bold; width: 100px; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); margin-right: 15px; padding-right: 15px;}
+        .play-info { flex-grow: 1; }
+        .play-title { font-size: 1rem; margin: 0 0 5px 0; color: #fff; }
+        .play-sub { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-family: 'Segoe UI'; }
+        
+        .btn-play { background: #00ff00; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,0,0.2); transition: 0.3s;}
+        .btn-play:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,0,0.5); }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        <div id="topbar-placeholder"></div>
+
+        <div id="playhub-view">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                <div>
+                    <h2 class="section-title">▶️ PlayHub e Chaveamentos</h2>
+                    <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Clique num torneio abaixo para ver a tabela de jogos e abrir a súmula.</p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;" id="filtros-lote"></div>
+            
+            <div id="lista-jogos">
+                </div>
+        </div>
+
+    </div>
+
+    <div id="footbar-placeholder"></div>
+
+    <script>
+        let relatoriosSalvos = {}; 
+        let loteAtualSelecionado = null;
+
+        const rotasSaaS = {
+            'Futsal': 'futsal', 'Handebol': 'handebol', 'Vôlei': 'volei', 'Vôlei de Areia': 'volei-areia',
+            'Basquete': 'basquete', 'Queimada': 'geral', 'Tênis de Mesa': 'geral',
+            'Xadrez': 'geral', 'Dama': 'geral', 'E-Sports': 'geral', 'Natação': 'geral', 'Atletismo': 'geral'
+        };
+
+        window.onload = () => {
+            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+            
+            // Backup de relatórios locais caso o servidor esteja com delay
+            relatoriosSalvos = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+            
+            carregarLotesDaAPI();
+        };
+
+        async function carregarLotesDaAPI() {
+            const generos = ['masculino', 'feminino', 'misto'];
+            const container = document.getElementById('filtros-lote');
+            container.innerHTML = '';
+            
+            generos.forEach((genero, idx) => {
+                let cor = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+                let active = idx === 0 ? `border-bottom: 3px solid ${cor}; font-weight: bold; background: rgba(255,255,255,0.1);` : '';
+                if(idx === 0) loteAtualSelecionado = genero;
+
+                container.innerHTML += `
+                    <button style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: ${cor}; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s; ${active}" 
+                            onclick="mudarLotePlayHub('${genero}', this)">
+                        ${genero}
+                    </button>
+                `;
+            });
+            
+            buscarJogosDoBanco(loteAtualSelecionado);
+        }
+
+        function mudarLotePlayHub(genero, btnElement) {
+            loteAtualSelecionado = genero;
+            Array.from(document.getElementById('filtros-lote').children).forEach(b => {
+                b.style.borderBottom = 'none'; b.style.fontWeight = 'normal'; b.style.background = 'rgba(0,0,0,0.5)';
+            });
+            btnElement.style.borderBottom = `3px solid ${btnElement.style.color}`;
+            btnElement.style.fontWeight = 'bold';
+            btnElement.style.background = 'rgba(255,255,255,0.1)';
+            
+            buscarJogosDoBanco(genero);
+        }
+
+        async function buscarJogosDoBanco(genero) {
+            const container = document.getElementById('lista-jogos');
+            container.innerHTML = '<p style="text-align: center; color: #00f2fe; margin-top: 50px;">⏳ A carregar torneios e chaves do servidor...</p>';
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/jogos/lote/${genero}`);
+                
+                if (!response.ok) throw new Error('Falha API');
+                const jogos = await response.json(); 
+                
+                renderizarJogosEmAcordeao(jogos, genero);
+
+            } catch (error) {
+                console.error(error);
+                
+                // MODO OFFLINE (Fallback caso o Java esteja desligado durante o teste)
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                if(calOffline[genero] && calOffline[genero].jogos) {
+                    renderizarJogosEmAcordeao(calOffline[genero].jogos, genero);
+                } else {
+                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 50px;">Nenhum torneio agendado para a categoria ${genero}.</p>`;
+                }
+            }
+        }
+
+        // A MÁGICA: AGRUPA OS JOGOS POR TORNEIO (ESPORTE)
+        function renderizarJogosEmAcordeao(todosJogos, genero) {
+            const container = document.getElementById('lista-jogos');
+            container.innerHTML = '';
+            
+            if (!todosJogos || todosJogos.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 50px;">Nenhum torneio gerado para a categoria ${genero}. Vá para Gestão de Alunos para criar um.</p>`;
+                return;
+            }
+
+            // 1. Agrupa os dados
+            let torneios = {};
+            todosJogos.forEach(jogo => {
+                if(!torneios[jogo.esporte]) {
+                    torneios[jogo.esporte] = { icone: jogo.icone, jogos: [] };
+                }
+                torneios[jogo.esporte].jogos.push(jogo);
+            });
+
+            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+
+            // 2. Renderiza os Blocos
+            for (let esporteNome in torneios) {
+                let dados = torneios[esporteNome];
+                let domId = esporteNome.replace(/\s+/g, '-').toLowerCase();
+
+                let htmlJogos = '';
+                dados.jogos.forEach(jogo => {
+                    let relatorio = relatoriosSalvos[jogo.id]; 
+                    
+                    // Ajuste para o campo data que vem do DTO (diaId) ou do Fallback (dataJogo)
+                    let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
+
+                    if (relatorio) {
+                        htmlJogos += `
+                            <div class="playhub-card" style="border-left: 3px solid #555;">
+                                <div class="play-hora" style="color: #aaa; font-size: 0.9rem;">FINAL<br><span style="font-size:0.7rem;">${dataDoJogo}</span></div>
+                                <div class="play-info">
+                                    <h3 class="play-title" style="color: #ccc;">${jogo.titulo}</h3>
+                                    <p style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.1rem; color: #fff; margin-top: 5px;">${relatorio.placar.A} <span style="color:#555; font-size:0.8rem;">X</span> ${relatorio.placar.B}</p>
+                                </div>
+                                <button class="btn-play" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); box-shadow: none;" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', true)">📄 Súmula</button>
+                            </div>
+                        `;
+                    } else {
+                        htmlJogos += `
+                            <div class="playhub-card" style="border-left: 3px solid ${corTema};">
+                                <div class="play-hora">${jogo.hora}<br><span style="font-size:0.7rem; color:#fff; font-family:'Segoe UI';">${dataDoJogo}</span></div>
+                                <div class="play-info">
+                                    <h3 class="play-title">${jogo.titulo}</h3>
+                                    <p class="play-sub">📍 ${jogo.quadra}</p>
+                                </div>
+                                <button class="btn-play" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', false)">▶️ ABRIR</button>
+                            </div>
+                        `;
+                    }
+                });
+
+                container.innerHTML += `
+                    <div class="torneio-grupo" style="border-color: ${corTema};">
+                        <div class="torneio-header" onclick="toggleTorneio('${domId}')">
+                            <h3>${dados.icone} Torneio de ${esporteNome}</h3>
+                            <div class="torneio-toggle">Ver Chaves (${dados.jogos.length}) ▼</div>
+                        </div>
+                        <div class="torneio-body" id="body-${domId}">
+                            ${htmlJogos}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Função para abrir/fechar as chaves
+        window.toggleTorneio = function(id) {
+            const body = document.getElementById(`body-${id}`);
+            if (body.style.display === 'block') {
+                body.style.display = 'none';
+            } else {
+                body.style.display = 'block';
+            }
+        };
+
+        function abrirSaaS(esporteNome, idJogo, lote, readonly) {
+            let arquivo = rotasSaaS[esporteNome] || 'geral'; 
+            window.location.href = `/matchsheet/${arquivo}.html?jogo=${idJogo}&lote=${lote}&read=${readonly}`;
+        }
+        
+        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+    </script>
+</body>
+</html>

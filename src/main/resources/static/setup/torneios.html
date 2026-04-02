@@ -13,7 +13,7 @@
         body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; transition: background 0.5s ease; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; }
 
@@ -26,21 +26,14 @@
 
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
         .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
-        .btn-acao:disabled { background: #555; color: #888; cursor: not-allowed; }
         .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
         .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
 
-        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-        .hub-item { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--theme-primary); background: rgba(0,0,0,0.4); }
-        .hub-status.pendente { color: #ff4500; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; }
-        .hub-status.concluido { color: #00ff00; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; }
-
-        .detalhe-painel { background: rgba(10, 10, 20, 0.8); border-radius: 15px; padding: 2rem; border-top: 4px solid var(--theme-primary); }
+        .detalhe-painel { background: rgba(10, 10, 20, 0.8); border-radius: 15px; padding: 2rem; margin-bottom: 2rem; border-top: 4px solid var(--theme-primary); }
         .config-section { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .config-section h4 { color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         
         .input-dark { width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; transition: 0.3s; margin-bottom: 10px; }
-        .input-dark:focus { border-color: var(--theme-primary); box-shadow: 0 0 10px var(--theme-glow); }
         .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         
@@ -52,15 +45,16 @@
         input:checked + .slider { background-color: var(--theme-primary); box-shadow: 0 0 10px var(--theme-glow); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* Estilos do Simulador Visual Inteligente */
         .simulador-box { background: rgba(0, 0, 0, 0.4); border: 1px dashed var(--theme-primary); border-radius: 10px; padding: 1.5rem; margin-top: 15px; font-family: 'Segoe UI'; }
-        .simulador-titulo { color: var(--theme-primary); font-size: 0.9rem; text-transform: uppercase; font-weight: bold; margin-bottom: 1rem; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
-        .simulador-content { display: flex; justify-content: space-around; align-items: center; text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.8); }
+        .simulador-titulo { color: var(--theme-primary); font-size: 0.9rem; text-transform: uppercase; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;}
+        .simulador-content { display: flex; justify-content: space-around; align-items: center; text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.8); overflow-x: auto; }
         .sim-chave { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-width: 120px; }
-        .sim-seta { color: var(--theme-primary); font-size: 1.5rem; }
+        .sim-seta { color: var(--theme-primary); font-size: 1.5rem; margin: 0 10px; }
         .sim-tabela { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .sim-tabela th { border-bottom: 1px solid var(--theme-primary); padding: 5px; color: var(--theme-primary); }
         .sim-tabela td { padding: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .badge-oficial { background: var(--theme-primary); color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: bold; vertical-align: middle; margin-left: 10px; }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -81,184 +75,123 @@
             <div class="stepper-step" id="step-5"><span>5.</span> Alunos</div>
         </div>
 
-        <div id="setup-step3-hub">
-            <h2 class="section-title">⚙️ Passo 3: Hub de Torneios (<span id="txt-genero-hub"></span>)</h2>
-            <div class="hub-grid" id="hub-container"></div>
-            <div style="display: flex; justify-content: space-between; margin-top: 3rem;">
-                <button class="btn-acao btn-secundario" onclick="window.location.href='/setup/modalidades'">🡨 Voltar Modalidades</button>
-                <button class="btn-acao" id="btn-finalizar-setup" disabled onclick="window.location.href='/setup/calendario'">Avançar para Calendário ➔</button>
-            </div>
-        </div>
+        <div id="setup-step3-container">
+            <h2 class="section-title">⚙️ Passo 3: Configuração dos Torneios (<span id="txt-genero-title"></span>)</h2>
+            <p style="margin-bottom: 2rem; color: rgba(255,255,255,0.7); font-family: 'Segoe UI';">Revise e ajuste as regras oficiais pré-carregadas para cada modalidade.</p>
 
-        <div id="setup-step4-form" style="display: none;">
-            <button class="btn-acao btn-secundario" style="padding: 5px 15px; margin-bottom: 1rem; font-size: 0.8rem;" onclick="voltarParaHub()">🡨 Voltar ao Hub</button>
-            <div class="detalhe-painel glass" id="detalhe-painel-content"></div>
+            <div id="formularios-lista"></div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 3rem;">
+                <button class="btn-acao btn-secundario" onclick="window.location.href='modalidades.html'">🡨 Voltar Modalidades</button>
+                <button class="btn-acao" onclick="avancarCalendario()">Salvar Regras e Avançar ➔</button>
+            </div>
         </div>
     </div> 
 
     <div id="footbar-placeholder"></div>
 
     <script>
-        const modalidadeDefs = [
-            { id: 1, nome: 'Futsal', icone: '⚽', cor: '#00f2fe' }, { id: 2, nome: 'Vôlei', icone: '🏐', cor: '#ff00de' },
-            { id: 3, nome: 'Basquete', icone: '🏀', cor: '#ffee00' }, { id: 4, nome: 'Handebol', icone: '🤾', cor: '#ff7300' },
-            { id: 5, nome: 'Queimada', icone: '☄️', cor: '#7f00ff' }, { id: 6, nome: 'Vôlei de Areia', icone: '🏖️', cor: '#f4a460' },
-            { id: 7, nome: 'Natação', icone: '🏊', cor: '#00bfff' }, { id: 8, nome: 'Atletismo', icone: '🏃', cor: '#32cd32' },
-            { id: 9, nome: 'Tênis de Mesa', icone: '🏓', cor: '#ff4500' }, { id: 10, nome: 'Xadrez', icone: '♟️', cor: '#ffffff' },
-            { id: 11, nome: 'Dama', icone: '🏁', cor: '#b22222' }, { id: 12, nome: 'E-Sports', icone: '🎮', cor: '#00ff00' }
-        ];
+        const dicionarioOficial = {
+            1: { nome: 'Futsal', icone: '⚽', cor: '#00f2fe', tipo: 'tempo', tempos: '2 Tempos', min: 15, faltas: 5, labelTempo: 'Duração (min)', labelFalta: 'Lim. Faltas Coletivas' },
+            2: { nome: 'Vôlei', icone: '🏐', cor: '#ff00de', tipo: 'sets', tempos: 'Melhor de 3', min: 25, faltas: 15, labelTempo: 'Pts por Set', labelFalta: 'Pts no Tie-Break (Desempate)' },
+            3: { nome: 'Basquete', icone: '🏀', cor: '#ffee00', tipo: 'tempo', tempos: '4 Tempos (Quartos)', min: 10, faltas: 4, labelTempo: 'Duração do Quarto', labelFalta: 'Faltas p/ Lance Livre' },
+            4: { nome: 'Handebol', icone: '🤾', cor: '#ff7300', tipo: 'tempo', tempos: '2 Tempos', min: 20, faltas: 0, labelTempo: 'Duração (min)', labelFalta: 'Exclusões p/ Vermelho (0=Desativar)' },
+            5: { nome: 'Queimada', icone: '☄️', cor: '#7f00ff', tipo: 'tempo', tempos: 'Tempo Único', min: 15, faltas: 0, labelTempo: 'Duração Máxima', labelFalta: 'Não aplicável' },
+            6: { nome: 'Vôlei de Areia', icone: '🏖️', cor: '#f4a460', tipo: 'sets', tempos: 'Melhor de 3', min: 21, faltas: 15, labelTempo: 'Pts por Set', labelFalta: 'Pts no Tie-Break' },
+            7: { nome: 'Natação', icone: '🏊', cor: '#00bfff', tipo: 'baterias', tempos: 'Bateria Única', min: 0, faltas: 0, labelTempo: 'Metros da Prova', labelFalta: 'Não aplicável' },
+            8: { nome: 'Atletismo', icone: '🏃', cor: '#32cd32', tipo: 'baterias', tempos: 'Bateria Única', min: 0, faltas: 0, labelTempo: 'Metros da Prova', labelFalta: 'Não aplicável' },
+            9: { nome: 'Tênis de Mesa', icone: '🏓', cor: '#ff4500', tipo: 'sets', tempos: 'Melhor de 3', min: 11, faltas: 0, labelTempo: 'Pts por Set', labelFalta: 'Não aplicável' },
+            10: { nome: 'Xadrez', icone: '♟️', cor: '#ffffff', tipo: 'tempo', tempos: 'Partida Única', min: 15, faltas: 0, labelTempo: 'Minutos no Relógio (p/ jogador)', labelFalta: 'Não aplicável' },
+            11: { nome: 'Dama', icone: '🏁', cor: '#b22222', tipo: 'tempo', tempos: 'Partida Única', min: 20, faltas: 0, labelTempo: 'Tempo Limite', labelFalta: 'Não aplicável' },
+            12: { nome: 'E-Sports', icone: '🎮', cor: '#00ff00', tipo: 'sets', tempos: 'Melhor de 3 (MD3)', min: 0, faltas: 0, labelTempo: 'Não aplicável', labelFalta: 'Não aplicável' }
+        };
 
         let setupData = null;
-        let modalidadeEditandoAtual = null;
 
         window.onload = () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
-            // TRAVA DE SEGURANÇA (Para testar sem passar pelo index)
             setupData = JSON.parse(localStorage.getItem('arenaSetup'));
-            if(!setupData || !setupData.genero) { 
-                console.warn("Gerando modo teste automático.");
-                setupData = { genero: 'masculino', esportes: [{ id: 1, configurado: false }] }; 
+            
+            if(!setupData || !setupData.esportes || setupData.esportes.length === 0) { 
+                setupData = { genero: 'masculino', esportes: [{ id: 1, configurado: false }, { id: 2, configurado: false }] }; 
             }
 
             if (setupData.genero === 'feminino') document.body.classList.add('theme-fem');
             if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
             
-            document.getElementById('txt-genero-hub').textContent = setupData.genero.toUpperCase();
-            atualizarHub();
+            document.getElementById('txt-genero-title').textContent = setupData.genero.toUpperCase();
+            
+            renderizarFormularios();
         };
 
-        function atualizarHub() {
-            const container = document.getElementById('hub-container');
+        function renderizarFormularios() {
+            const container = document.getElementById('formularios-lista');
             container.innerHTML = '';
-            let todosConfigurados = true;
 
             setupData.esportes.forEach(esp => {
-                const def = modalidadeDefs.find(m => m.id === esp.id);
-                const statusHtml = esp.configurado ? `<span class="hub-status concluido">✓ CONCLUÍDO</span>` : `<span class="hub-status pendente">⚠️ PENDENTE</span>`;
-                if(!esp.configurado) todosConfigurados = false;
+                const regras = dicionarioOficial[esp.id];
+                if(!regras) return; 
 
+                const disabledFaltas = regras.faltas === 0 ? "disabled opacity: 0.5;" : "";
+                
                 container.innerHTML += `
-                    <div class="hub-item glass">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <span style="font-size: 2rem;">${def.icone}</span>
+                    <div class="detalhe-painel glass" style="border-top-color: ${regras.cor};">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                            <span style="font-size: 2.5rem; background: rgba(0,0,0,0.5); border-radius: 50%; width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border: 2px solid ${regras.cor};">${regras.icone}</span>
                             <div>
-                                <h3 style="margin: 0; font-size: 1.1rem; color: var(--theme-primary);">${def.nome}</h3>
-                                ${statusHtml}
+                                <h2 style="color: white; text-transform: uppercase; font-size: 1.5rem; margin: 0; text-shadow: 0 0 10px ${regras.cor};">${regras.nome}</h2>
+                                <p style="color: ${regras.cor}; font-family: 'Segoe UI'; font-weight: bold; margin: 0; font-size: 0.8rem;">Padrão Oficial Carregado <span class="badge-oficial">✓</span></p>
                             </div>
                         </div>
-                        <button class="btn-acao btn-secundario" style="padding: 8px 15px; font-size: 0.8rem;" onclick="abrirConfigEspecifica(${def.id})">
-                            ${esp.configurado ? 'Editar Torneio' : 'Configurar Torneio'}
-                        </button>
+
+                        <div class="config-section">
+                            <h4>🏆 Formato da Competição</h4>
+                            <div class="grid-2-col" style="margin-bottom: 15px;">
+                                <div>
+                                    <label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Sistema Principal</label>
+                                    <select class="input-dark" id="select-formato-${esp.id}" onchange="atualizarSimulador(${esp.id})">
+                                        <option value="eliminatoria">Mata-Mata (Eliminatória Direta)</option>
+                                        <option value="liga">Pontos Corridos (Liga Pura)</option>
+                                        <option value="grupos">Estilo Copa do Mundo (Grupos + Mata-Mata)</option>
+                                        <option value="liga_playoffs">Liga com Playoffs (Grupos Único + Semifinal)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Quantidade de Times (Inscritos)</label>
+                                    <input type="number" class="input-dark" id="qtd-times-${esp.id}" placeholder="Ex: 8" value="4" oninput="atualizarSimulador(${esp.id})" min="2">
+                                </div>
+                            </div>
+
+                            <div class="simulador-box">
+                                <div class="simulador-titulo" id="simulador-titulo-${esp.id}">💡 Simulação Visual</div>
+                                <div id="simulador-render-${esp.id}" class="simulador-content"></div>
+                            </div>
+
+                            <div id="opcoes-eliminatoria-${esp.id}" class="grid-2-col" style="margin-top: 15px;">
+                                <div class="switch-container"><span>Partidas de Ida e Volta?</span><label class="switch"><input type="checkbox" id="check-ida-volta-${esp.id}"><span class="slider"></span></label></div>
+                                <div class="switch-container"><span>Disputa de 3º e 4º Lugar?</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
-            document.getElementById('btn-finalizar-setup').disabled = !todosConfigurados;
+
+            setupData.esportes.forEach(esp => { atualizarSimulador(esp.id); });
         }
 
-        function abrirConfigEspecifica(idModalidade) {
-            modalidadeEditandoAtual = idModalidade;
-            const def = modalidadeDefs.find(m => m.id === idModalidade);
-            
-            document.getElementById('setup-step3-hub').style.display = 'none';
-            document.getElementById('setup-step4-form').style.display = 'block';
-            
-            const painel = document.getElementById('detalhe-painel-content');
-            painel.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span style="font-size: 3rem; background: rgba(0,0,0,0.5); border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--theme-primary);">${def.icone}</span>
-                        <div>
-                            <h2 style="color: white; text-transform: uppercase; font-size: 1.8rem; margin: 0; text-shadow: 0 0 10px var(--theme-glow);">${def.nome}</h2>
-                            <p style="color: var(--theme-primary); font-family: 'Segoe UI'; font-weight: bold; margin: 0;">Categoria: ${setupData.genero.toUpperCase()}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <form>
-                    <div class="config-section">
-                        <h4>🏆 Formato da Competição</h4>
-                        <div class="grid-2-col" style="margin-bottom: 15px;">
-                            <div>
-                                <label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Sistema Principal</label>
-                                <select class="input-dark" id="select-formato" onchange="atualizarSimulador()">
-                                    <option value="eliminatoria">Mata-Mata (Eliminatória Direta)</option>
-                                    <option value="liga">Pontos Corridos (Liga Pura)</option>
-                                    <option value="grupos">Estilo Copa do Mundo (Grupos + Mata-Mata)</option>
-                                    <option value="liga_playoffs">Liga com Playoffs (Grupos Único + Semifinal)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Limite de Times (Altere para ver a simulação)</label>
-                                <input type="number" class="input-dark" id="qtd-times" placeholder="Ex: 8" value="4" oninput="atualizarSimulador()" min="2">
-                            </div>
-                        </div>
-
-                        <div class="simulador-box">
-                            <div class="simulador-titulo" id="simulador-titulo">💡 Simulação Visual</div>
-                            <div id="simulador-render" class="simulador-content"></div>
-                        </div>
-
-                        <div id="opcoes-eliminatoria" class="grid-2-col" style="margin-top: 15px;">
-                            <div class="switch-container"><span>Partidas de Ida e Volta?</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
-                            <div class="switch-container"><span>Disputa de 3º e 4º Lugar?</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-                        </div>
-                        
-                        <div id="opcoes-grupos" class="grid-2-col" style="display: none; margin-top: 15px;">
-                            <div>
-                                <label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Quantos classificam por grupo?</label>
-                                <select class="input-dark"><option>Apenas o 1º Colocado</option><option selected>1º e 2º Colocados</option></select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="config-section">
-                        <h4>⏱️ Regras de Jogo (Para a Súmula Digital)</h4>
-                        <div class="grid-3-col">
-                            <div>
-                                <label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Tempos de Jogo</label>
-                                <select class="input-dark"><option>Tempo Único</option><option selected>2 Tempos</option><option>4 Tempos (Quartos)</option></select>
-                            </div>
-                            <div><label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Duração (minutos)</label><input type="number" class="input-dark" value="15"></div>
-                            <div><label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); display:block; margin-bottom: 5px;">Lim. Faltas Coletivas</label><input type="number" class="input-dark" value="5"></div>
-                        </div>
-                    </div>
-
-                    <div class="config-section" id="secao-pontuacao" style="display: none;">
-                        <h4>📈 Regras de Pontuação</h4>
-                        <div class="grid-3-col" style="margin-bottom: 15px;">
-                            <div><label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #00ff00;">Vitória</label><input type="number" class="input-dark" value="3"></div>
-                            <div><label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffff00;">Empate</label><input type="number" class="input-dark" value="1"></div>
-                            <div><label style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ff4500;">Derrota</label><input type="number" class="input-dark" value="0"></div>
-                        </div>
-                    </div>
-
-                    <div style="text-align: right; margin-top: 2rem;">
-                        <button type="button" class="btn-acao" onclick="salvarConfigEspecifica()">Salvar Regras da Competição</button>
-                    </div>
-                </form>
-            `;
-            atualizarSimulador();
-        }
-
-        window.atualizarSimulador = function() {
-            const formato = document.getElementById('select-formato').value;
-            const inputTimes = document.getElementById('qtd-times');
+        window.atualizarSimulador = function(id) {
+            const formato = document.getElementById('select-formato-' + id).value;
+            const inputTimes = document.getElementById('qtd-times-' + id);
             
             let times = parseInt(inputTimes.value);
             if(isNaN(times) || times < 2) times = 4; 
 
-            const painelGrupos = document.getElementById('opcoes-grupos');
-            const painelEliminatoria = document.getElementById('opcoes-eliminatoria');
-            const painelPontuacao = document.getElementById('secao-pontuacao');
-            const simulador = document.getElementById('simulador-render');
-            
-            document.getElementById('simulador-titulo').innerHTML = `💡 Diagrama do Torneio (Simulação com ${times} Times)`;
+            const simulador = document.getElementById('simulador-render-' + id);
+            document.getElementById('simulador-titulo-' + id).innerHTML = `💡 Diagrama do Torneio (Simulação com ${times} Inscrições)`;
 
             if (formato === 'eliminatoria') {
-                painelGrupos.style.display = 'none'; painelEliminatoria.style.display = 'grid'; painelPontuacao.style.display = 'none';
-                
                 if (times <= 4) {
                     simulador.innerHTML = `<div class="sim-chave"><b>Semifinal</b><br><br>Jogo 1<br><hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:5px 0;">Jogo 2</div><div class="sim-seta">➔</div><div class="sim-chave"><b>A Grande Final</b><br><br>Vencedor 1<br>x<br>Vencedor 2</div>`;
                 } else if (times <= 8) {
@@ -267,7 +200,6 @@
                     simulador.innerHTML = `<div class="sim-chave"><b>Oitavas de Final</b><br><br>8 Jogos</div><div class="sim-seta">➔</div><div class="sim-chave"><b>Mata-Mata</b><br><br>Avançando...</div><div class="sim-seta">➔</div><div class="sim-chave"><b>Final</b></div>`;
                 }
             } else if (formato === 'liga') {
-                painelGrupos.style.display = 'none'; painelEliminatoria.style.display = 'none'; painelPontuacao.style.display = 'block';
                 simulador.innerHTML = `
                     <div style="width: 100%;">
                         <p style="margin-bottom: 10px; color: var(--theme-primary);"><b>Todos contra Todos</b> - O Campeão será o 1º Colocado ao final de ${times - 1} rodadas.</p>
@@ -275,13 +207,10 @@
                             <tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th></tr>
                             <tr><td>1º</td><td>Time A (Campeão)</td><td>...</td><td>${times - 1}</td></tr>
                             <tr><td>2º</td><td>Time B</td><td>...</td><td>${times - 1}</td></tr>
-                            <tr><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                            <tr><td>${times}º</td><td>Último Colocado</td><td>...</td><td>${times - 1}</td></tr>
                         </table>
                     </div>
                 `;
             } else if (formato === 'grupos') {
-                painelGrupos.style.display = 'grid'; painelEliminatoria.style.display = 'grid'; painelPontuacao.style.display = 'block';
                 let qtdGrupos = Math.ceil(times / 4);
                 simulador.innerHTML = `
                     <div class="sim-chave" style="width: 40%;"><b>Fase de Grupos</b><br><br>${qtdGrupos} Grupo(s)<br>com ~4 times<br><span style="color:var(--theme-primary); font-size:0.7rem;">(Avançam os melhores)</span></div>
@@ -289,9 +218,8 @@
                     <div class="sim-chave" style="width: 40%;"><b>Mata-Mata Final</b><br><br>Chaveamento com os<br>classificados.</div>
                 `;
             } else if (formato === 'liga_playoffs') {
-                painelGrupos.style.display = 'none'; painelEliminatoria.style.display = 'grid'; painelPontuacao.style.display = 'block';
                 simulador.innerHTML = `
-                    <div class="sim-chave" style="width: 30%;"><b>Tabela Geral</b><br><br>${times} Times lutando<br>pelo G4 (G-Quatro)</div>
+                    <div class="sim-chave" style="width: 30%;"><b>Tabela Geral</b><br><br>${times} Times lutando<br>pelo G4</div>
                     <div class="sim-seta">➔</div>
                     <div class="sim-chave" style="width: 30%;"><b>Semifinais</b><br><br>1º x 4º<br><hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:5px 0;">2º x 3º</div>
                     <div class="sim-seta">➔</div>
@@ -300,18 +228,37 @@
             }
         };
 
-        function voltarParaHub() {
-            document.getElementById('setup-step4-form').style.display = 'none';
-            document.getElementById('setup-step3-hub').style.display = 'block';
-        }
-
-        function salvarConfigEspecifica() {
-            const esp = setupData.esportes.find(e => e.id === modalidadeEditandoAtual);
-            if(esp) esp.configurado = true;
-            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
-            voltarParaHub();
-            atualizarHub(); 
-        }
+		function avancarCalendario() {
+		            try {
+		                // SALVA AS ESCOLHAS DE MATA-MATA E TIMES PARA O CALENDÁRIO LER!
+		                if(setupData && setupData.esportes) {
+		                    setupData.esportes.forEach(esp => {
+		                        let selectElement = document.getElementById('select-formato-' + esp.id);
+		                        
+		                        // Trava de segurança: Só tenta salvar se o painel do esporte estiver renderizado na tela
+		                        if(selectElement) {
+		                            esp.configurado = true;
+		                            esp.formato = selectElement.value;
+		                            
+		                            let inputQtd = document.getElementById('qtd-times-' + esp.id);
+		                            esp.qtdTimes = inputQtd ? (parseInt(inputQtd.value) || 4) : 4;
+		                            
+		                            let chkIdaVolta = document.getElementById('check-ida-volta-' + esp.id);
+		                            esp.idaEVolta = chkIdaVolta ? chkIdaVolta.checked : false;
+		                        }
+		                    });
+		                    localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+		                }
+		                
+		                // Caminho absoluto forçado para o Spring Boot carregar a página sem errar a rota
+		                window.location.href = '/setup/calendario.html';
+		                
+		            } catch (error) {
+		                console.error("Erro interno ao ler os campos, forçando o avanço:", error);
+		                // Fallback: Se der qualquer pane nas variáveis, ele te joga pro calendário mesmo assim!
+		                window.location.href = '/setup/calendario.html';
+		            }
+		        }
 
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });

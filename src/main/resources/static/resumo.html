@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resumo Oficial - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #ffd700; --theme-glow: rgba(255, 215, 0, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        .section-title { text-transform: uppercase; font-size: 1.4rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;}
+        
+        /* Grid de Status Geral */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 2rem; }
+        .stat-card { background: rgba(0,0,0,0.5); border-radius: 12px; padding: 1.5rem; text-align: center; border-bottom: 3px solid var(--theme-primary); }
+        .stat-valor { font-size: 3rem; font-family: 'Orbitron'; font-weight: bold; color: var(--theme-primary); text-shadow: 0 0 15px var(--theme-glow); line-height: 1; margin-bottom: 5px; }
+        .stat-label { font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Status por Modalidade (Mini) */
+        .modalidade-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+        .mod-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 10px; border-left: 4px solid var(--theme-primary); }
+        .mod-nome { font-size: 1rem; font-weight: bold; }
+        .mod-progresso { flex-grow: 1; margin: 0 20px; background: rgba(0,0,0,0.5); height: 8px; border-radius: 5px; overflow: hidden; position: relative; }
+        .mod-bar { background: var(--theme-primary); height: 100%; border-radius: 5px; transition: width 1s ease; box-shadow: 0 0 10px var(--theme-primary); }
+        .mod-status { font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; width: 100px; text-align: right;}
+
+        /* Filtro de Modalidades para os Rankings */
+        .filtros-area { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .filtro-botoes { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 1.5rem;}
+        .btn-filtro { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 20px; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s; white-space: nowrap;}
+        .btn-filtro:hover { background: rgba(255,255,255,0.1); }
+        .btn-filtro.active { background: var(--theme-primary); color: #000; box-shadow: 0 0 15px var(--theme-glow); border-color: var(--theme-primary); }
+
+        /* Tabela de Classificação */
+        .table-container { background: rgba(0,0,0,0.4); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,215,0,0.2); margin-bottom: 2rem; overflow-x: auto;}
+        .table-standings { width: 100%; border-collapse: collapse; text-align: center; font-family: 'Segoe UI'; font-size: 0.95rem; min-width: 500px;}
+        .table-standings th { border-bottom: 2px solid var(--theme-primary); padding: 12px; color: var(--theme-primary); text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem;}
+        .table-standings td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .table-standings tr:hover { background: rgba(255,255,255,0.03); }
+        .row-lider { background: rgba(255, 215, 0, 0.1); font-weight: bold; }
+        .row-lider td:first-child { color: #FFD700; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,215,0,0.5);}
+
+        /* Hall da Fama (Rankings de Jogadores) */
+        .ranking-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .ranking-box { background: rgba(0,0,0,0.4); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,215,0,0.2); }
+        .ranking-title { font-family: 'Orbitron'; color: var(--theme-primary); margin-bottom: 15px; font-size: 1.1rem; text-align: center; text-transform: uppercase; border-bottom: 1px solid rgba(255,215,0,0.2); padding-bottom: 10px;}
+        
+        .rank-row { display: flex; align-items: center; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 10px; margin-bottom: 8px; transition: 0.3s;}
+        .rank-row:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); }
+        
+        .rank-pos { font-size: 1.2rem; font-weight: bold; width: 30px; color: #aaa; font-family: 'Orbitron';}
+        .rank-row:nth-child(1) .rank-pos { color: #FFD700; text-shadow: 0 0 10px #FFD700; font-size: 1.5rem;} /* Ouro */
+        .rank-row:nth-child(2) .rank-pos { color: #C0C0C0; text-shadow: 0 0 10px #C0C0C0; font-size: 1.3rem;} /* Prata */
+        .rank-row:nth-child(3) .rank-pos { color: #cd7f32; text-shadow: 0 0 10px #cd7f32; font-size: 1.2rem;} /* Bronze */
+        
+        .rank-foto { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid rgba(255,255,255,0.2); }
+        .rank-info { flex-grow: 1; }
+        .rank-nome { font-family: 'Segoe UI'; font-weight: bold; font-size: 0.95rem; color: #fff; }
+        .rank-turma { font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+        .rank-score { font-size: 1.3rem; font-weight: bold; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); font-family: 'Orbitron'; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 8px;}
+
+        /* Ranking Negativo (Cartões) */
+        .box-red .ranking-title { color: #ff0000; border-bottom-color: rgba(255,0,0,0.2); text-shadow: 0 0 10px rgba(255,0,0,0.5);}
+        .box-red { border-color: rgba(255,0,0,0.2); }
+        .box-red .rank-score { color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        <div id="topbar-placeholder"></div>
+
+        <h2 class="section-title">🏆 Quadro de Medalhas e Parciais</h2>
+        <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 2rem;">Acompanhe o andamento geral e o desempenho por modalidade.</p>
+
+        <div class="stats-grid">
+            <div class="stat-card glass">
+                <div class="stat-valor" id="stat-jogos-totais">0</div>
+                <div class="stat-label">Súmulas Fechadas</div>
+            </div>
+            <div class="stat-card glass" style="border-bottom-color: #00ff00;">
+                <div class="stat-valor" id="stat-gols-totais" style="color:#00ff00; text-shadow:0 0 15px rgba(0,255,0,0.5);">0</div>
+                <div class="stat-label">Ações Positivas (Gols/Pts)</div>
+            </div>
+            <div class="stat-card glass" style="border-bottom-color: #ff0000;">
+                <div class="stat-valor" id="stat-cartoes-totais" style="color:#ff0000; text-shadow:0 0 15px rgba(255,0,0,0.5);">0</div>
+                <div class="stat-label">Faltas e Punições</div>
+            </div>
+        </div>
+
+        <div class="modalidade-list" id="lista-modalidades"></div>
+
+        <div class="filtros-area">
+            <h3 style="font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; margin-bottom: 15px; text-transform: uppercase;">🏅 Estatísticas por Esporte</h3>
+            
+            <div class="filtro-botoes" id="botoes-esportes">
+                </div>
+
+            <div class="table-container glass">
+                <div class="ranking-title" style="text-align: left; border: none; margin-bottom: 5px;">📋 Tabela de Classificação (<span id="lbl-tabela-esporte"></span>)</div>
+                <table class="table-standings" id="tabela-classificacao">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Pos</th>
+                            <th style="text-align: left;">Equipe / Turma</th>
+                            <th title="Pontos">Pts</th>
+                            <th title="Jogos">J</th>
+                            <th title="Vitórias">V</th>
+                            <th title="Empates">E</th>
+                            <th title="Derrotas">D</th>
+                            <th title="Pontos Pró">Pró</th>
+                            <th title="Pontos Contra">Con</th>
+                            <th title="Saldo de Pontos/Gols">SG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-classificacao">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="ranking-container">
+                <div class="ranking-box glass">
+                    <div class="ranking-title">⭐ Top 5: Artilheiros e MVPs</div>
+                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: #aaa; text-align: center; margin-top: -10px; margin-bottom: 15px;">Mais Pontos/Ações na Modalidade</p>
+                    <div id="rank-positivos"></div>
+                </div>
+
+                <div class="ranking-box box-red glass">
+                    <div class="ranking-title">🟥 Top 5: Indisciplinados</div>
+                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: #aaa; text-align: center; margin-top: -10px; margin-bottom: 15px;">Mais Faltas e Cartões na Modalidade</p>
+                    <div id="rank-negativos"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="footbar-placeholder"></div>
+
+    <script>
+        // Dicionários Globais de Dados
+        let dadosPorEsporte = {}; // { 'Futsal': { turmas: {}, atletas: {} } }
+        let esportesNomesGlobais = [];
+
+        // Ícones Mapeados (Para Inteligência de Soma)
+        const iconesPontos = ['⚽', '🏀', '🏐', '🤾', '🎯', '🔥', '☄️', '🏓', '✅', '🥇', '🥈', '🥉', '🎮', '🧱'];
+        const iconesFaltas = ['🛑', '🟨', '🟥', '✌️', '❌', '🕸️', '⚠️'];
+
+		// --- NOVA INICIALIZAÇÃO DA TELA DE RESUMO (API GET) ---
+		window.onload = async () => {
+		    fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+		    fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+		    
+		    // Mostra um aviso enquanto carrega do banco
+		    document.getElementById('lista-modalidades').innerHTML = '<p style="text-align: center;">⏳ Sincronizando dados com o Servidor Oficial...</p>';
+		    
+		    try {
+		        // No futuro, teremos um endpoint /api/estatisticas/geral no Spring Boot
+		        // que devolverá tudo já calculado pelo PostgreSQL (usando os Repositories que criamos).
+		        // Por enquanto, simulamos a busca dos relatórios para manter a tela rodando.
+		        
+		        // const response = await fetch('http://localhost:8080/api/estatisticas/geral');
+		        // const dados = await response.json();
+		        
+		        // Chama a função de mineração que você já tem no código
+		        minerarDadosEstatisticos(); 
+		        
+		    } catch (error) {
+		        console.error("Erro ao buscar dados:", error);
+		        document.getElementById('lista-modalidades').innerHTML = '<p style="color: red; text-align: center;">🚨 Erro ao conectar com o banco de dados.</p>';
+		    }
+		};
+
+        function minerarDadosEstatisticos() {
+            const calendarios = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+            const relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+
+            let totalJogosConcluidos = Object.keys(relatorios).length;
+            let globais = { pontos: 0, faltas: 0 };
+            let statusEsportes = {}; // Para barra de progresso
+            
+            // 1. Mapeamento Inicial do Calendário (Quantos jogos existem?)
+            for (let lote in calendarios) {
+                calendarios[lote].jogos.forEach(jogo => {
+                    let esp = jogo.esporte;
+                    if (!statusEsportes[esp]) statusEsportes[esp] = { agendados: 0, concluidos: 0, icone: jogo.icone };
+                    statusEsportes[esp].agendados++;
+
+                    // Prepara o banco de dados por esporte
+                    if (!dadosPorEsporte[esp]) {
+                        dadosPorEsporte[esp] = { turmas: {}, atletas: {} };
+                    }
+                });
+            }
+
+            // 2. Extração Intensa das Súmulas Fechadas
+            for (let idJogo in relatorios) {
+                let rel = relatorios[idJogo];
+                
+                // Acha de qual esporte foi esse jogo
+                let jogoInfo = null;
+                for (let lote in calendarios) {
+                    let achou = calendarios[lote].jogos.find(j => j.id == idJogo);
+                    if(achou) jogoInfo = achou;
+                }
+                
+                if (jogoInfo) {
+                    let esp = jogoInfo.esporte;
+                    statusEsportes[esp].concluidos++;
+
+                    // A: CÁLCULO DE TABELA DE CLASSIFICAÇÃO (TURMAS)
+                    if (rel.escalacao && rel.placar) {
+                        // Descobre o nome das turmas (ou Equipe A/B)
+                        let turmaA = rel.escalacao.A && rel.escalacao.A.length > 0 ? (rel.escalacao.A[0].turma || 'Equipe A') : 'Equipe A';
+                        let turmaB = rel.escalacao.B && rel.escalacao.B.length > 0 ? (rel.escalacao.B[0].turma || 'Equipe B') : 'Equipe B';
+
+                        let ptsA = rel.placar.A;
+                        let ptsB = rel.placar.B;
+
+                        // Inicializa na Tabela
+                        if(!dadosPorEsporte[esp].turmas[turmaA]) dadosPorEsporte[esp].turmas[turmaA] = { nome: turmaA, j:0, v:0, e:0, d:0, gp:0, gc:0, pts:0 };
+                        if(!dadosPorEsporte[esp].turmas[turmaB]) dadosPorEsporte[esp].turmas[turmaB] = { nome: turmaB, j:0, v:0, e:0, d:0, gp:0, gc:0, pts:0 };
+
+                        let tA = dadosPorEsporte[esp].turmas[turmaA];
+                        let tB = dadosPorEsporte[esp].turmas[turmaB];
+
+                        tA.j++; tB.j++;
+                        tA.gp += ptsA; tA.gc += ptsB;
+                        tB.gp += ptsB; tB.gc += ptsA;
+
+                        // Regra de Vitória (3 pts), Empate (1 pt), Derrota (0)
+                        if (ptsA > ptsB) {
+                            tA.v++; tA.pts += 3;
+                            tB.d++;
+                        } else if (ptsB > ptsA) {
+                            tB.v++; tB.pts += 3;
+                            tA.d++;
+                        } else {
+                            tA.e++; tA.pts += 1;
+                            tB.e++; tB.pts += 1;
+                        }
+                    }
+
+                    // B: CÁLCULO DE JOGADORES (MVPs e Faltas)
+                    if (rel.escalacao) {
+                        ['A', 'B'].forEach(timeId => {
+                            rel.escalacao[timeId].forEach(jog => {
+                                if (!dadosPorEsporte[esp].atletas[jog.id]) {
+                                    dadosPorEsporte[esp].atletas[jog.id] = { nome: jog.nome, foto: jog.foto, turma: jog.turma || "Sem Turma", pontos: 0, faltas: 0 };
+                                }
+                                
+                                if (jog.stats) {
+                                    jog.stats.forEach(iconeAcao => {
+                                        if (iconesPontos.includes(iconeAcao)) {
+                                            dadosPorEsporte[esp].atletas[jog.id].pontos++;
+                                            globais.pontos++;
+                                        }
+                                        if (iconesFaltas.includes(iconeAcao)) {
+                                            dadosPorEsporte[esp].atletas[jog.id].faltas++;
+                                            globais.faltas++;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+
+            // 3. Renderização Geral
+            document.getElementById('stat-jogos-totais').textContent = totalJogosConcluidos;
+            document.getElementById('stat-gols-totais').textContent = globais.pontos;
+            document.getElementById('stat-cartoes-totais').textContent = globais.faltas;
+
+            // Renderiza Barra de Progresso
+            let htmlMods = '';
+            if (Object.keys(statusEsportes).length === 0) {
+                htmlMods = `<p style="color: rgba(255,255,255,0.5); font-family: 'Segoe UI'; text-align: center;">Nenhum torneio agendado no Calendário.</p>`;
+                document.querySelector('.filtros-area').style.display = 'none';
+            } else {
+                esportesNomesGlobais = Object.keys(statusEsportes);
+                for (let esp in statusEsportes) {
+                    let d = statusEsportes[esp];
+                    let pct = Math.round((d.concluidos / d.agendados) * 100) || 0;
+                    let corBarra = pct === 100 ? '#00ff00' : '#ffd700';
+                    let lblStatus = pct === 100 ? `<span style="color:#00ff00;">FINALIZADO</span>` : `${d.concluidos}/${d.agendados} Jgs`;
+                    
+                    htmlMods += `
+                        <div class="mod-item glass">
+                            <div class="mod-nome">${d.icone} ${esp}</div>
+                            <div class="mod-progresso">
+                                <div class="mod-bar" style="width: ${pct}%; background-color: ${corBarra}; box-shadow: 0 0 10px ${corBarra};"></div>
+                            </div>
+                            <div class="mod-status">${lblStatus}</div>
+                        </div>
+                    `;
+                }
+                document.querySelector('.filtros-area').style.display = 'block';
+                gerarBotoesFiltro();
+            }
+            document.getElementById('lista-modalidades').innerHTML = htmlMods;
+        }
+
+        // --- SISTEMA DE FILTRO POR ESPORTE ---
+        function gerarBotoesFiltro() {
+            let container = document.getElementById('botoes-esportes');
+            container.innerHTML = '';
+            
+            esportesNomesGlobais.forEach((esp, index) => {
+                let active = index === 0 ? 'active' : '';
+                container.innerHTML += `<button class="btn-filtro ${active}" onclick="mudarEsporte(this, '${esp}')">${esp}</button>`;
+            });
+
+            // Força renderizar o primeiro
+            if(esportesNomesGlobais.length > 0) {
+                renderizarPainelPorEsporte(esportesNomesGlobais[0]);
+            }
+        }
+
+        function mudarEsporte(btnEl, esporte) {
+            Array.from(document.querySelectorAll('.btn-filtro')).forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            renderizarPainelPorEsporte(esporte);
+        }
+
+        function renderizarPainelPorEsporte(esporte) {
+            document.getElementById('lbl-tabela-esporte').textContent = esporte;
+            let dados = dadosPorEsporte[esporte];
+            
+            if(!dados) return;
+
+            // 1. RENDERIZAR TABELA DE CLASSIFICAÇÃO (TURMAS)
+            let turmasArray = Object.values(dados.turmas);
+            // Ordenação Oficial: 1º Pts, 2º Vitórias, 3º Saldo de Gols/Pts (GP - GC)
+            turmasArray.sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.v !== a.v) return b.v - a.v;
+                return (b.gp - b.gc) - (a.gp - a.gc);
+            });
+
+            let tbody = document.getElementById('body-classificacao');
+            tbody.innerHTML = '';
+            
+            if(turmasArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="color:#aaa;">Nenhuma súmula finalizada para ${esporte} ainda.</td></tr>`;
+            } else {
+                turmasArray.forEach((t, i) => {
+                    let classRow = i === 0 ? 'row-lider' : '';
+                    let saldo = t.gp - t.gc;
+                    tbody.innerHTML += `
+                        <tr class="${classRow}">
+                            <td>${i+1}º</td>
+                            <td style="text-align:left; font-weight:bold; color:#fff;">${t.nome}</td>
+                            <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
+                            <td>${t.j}</td>
+                            <td>${t.v}</td>
+                            <td>${t.e}</td>
+                            <td>${t.d}</td>
+                            <td>${t.gp}</td>
+                            <td>${t.gc}</td>
+                            <td style="color: ${saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff')}">${saldo > 0 ? '+'+saldo : saldo}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // 2. RENDERIZAR HALL DA FAMA (ATLETAS)
+            let atletasArray = Object.values(dados.atletas);
+
+            // Positivos (Artilheiros)
+            let topPositivos = [...atletasArray].filter(a => a.pontos > 0).sort((a,b) => b.pontos - a.pontos).slice(0, 5);
+            let htmlPos = '';
+            if(topPositivos.length === 0) htmlPos = `<p style="text-align:center; color:#aaa; font-family:'Segoe UI'; font-size:0.85rem; padding: 20px;">Nenhum ponto registrado.</p>`;
+            topPositivos.forEach((a, i) => {
+                htmlPos += `
+                    <div class="rank-row">
+                        <div class="rank-pos">${i+1}º</div>
+                        <img src="${a.foto}" class="rank-foto">
+                        <div class="rank-info">
+                            <div class="rank-nome">${a.nome}</div>
+                            <div class="rank-turma">${a.turma}</div>
+                        </div>
+                        <div class="rank-score">${a.pontos}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('rank-positivos').innerHTML = htmlPos;
+
+            // Negativos (Faltosos)
+            let topNegativos = [...atletasArray].filter(a => a.faltas > 0).sort((a,b) => b.faltas - a.faltas).slice(0, 5);
+            let htmlNeg = '';
+            if(topNegativos.length === 0) htmlNeg = `<p style="text-align:center; color:#aaa; font-family:'Segoe UI'; font-size:0.85rem; padding: 20px;">Nenhuma falta registrada.</p>`;
+            topNegativos.forEach((a, i) => {
+                htmlNeg += `
+                    <div class="rank-row">
+                        <div class="rank-pos" style="color:#ff0000; text-shadow:none;">${i+1}º</div>
+                        <img src="${a.foto}" class="rank-foto" style="border-color:#ff0000;">
+                        <div class="rank-info">
+                            <div class="rank-nome">${a.nome}</div>
+                            <div class="rank-turma">${a.turma}</div>
+                        </div>
+                        <div class="rank-score">${a.faltas}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('rank-negativos').innerHTML = htmlNeg;
+        }
+
+        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+    </script>
+</body>
+</html>

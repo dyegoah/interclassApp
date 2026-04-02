@@ -9,11 +9,46 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
         body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .section-title { text-transform: uppercase; font-size: 1.1rem; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
+        
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem;}
         .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
+        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
+        .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
+
+        .decisao-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .decisao-card { padding: 2.5rem; text-align: center; border-radius: 20px; border-top: 4px solid transparent; transition: 0.4s; cursor: pointer; position: relative; overflow: hidden;}
+        .decisao-card:hover { transform: translateY(-10px); }
+        .decisao-card.rota-direta { border-top-color: #00f2fe; }
+        .decisao-card.rota-direta:hover { box-shadow: 0 10px 40px rgba(0, 242, 254, 0.2); background: rgba(0, 242, 254, 0.05); }
+        .decisao-card.rota-inscricao { border-top-color: #ff00de; }
+        .decisao-card.rota-inscricao:hover { box-shadow: 0 10px 40px rgba(255, 0, 222, 0.2); background: rgba(255, 0, 222, 0.05); }
+
+        .decisao-icone { font-size: 4rem; margin-bottom: 1rem; }
+        .decisao-titulo { font-family: 'Orbitron'; font-size: 1.3rem; margin-bottom: 1rem; }
+        .decisao-desc { font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 2rem; }
+
+        .painel-link { display: none; background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 15px; border: 1px dashed #ff00de; margin-top: 2rem; text-align: left; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .link-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; font-family: monospace; color: #ff00de; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid rgba(255,0,222,0.3); }
+
+        /* Modal do Calendário */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 3000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-box { background: rgba(10,10,20,0.95); border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        .dia-card { background: rgba(0,0,0,0.4); border-left: 4px solid var(--theme-primary); border-radius: 10px; padding: 1rem; margin-bottom: 15px; }
+        .dia-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px; }
+        .dia-header h5 { color: var(--theme-primary); font-size: 1.1rem; margin: 0; }
+        .jogo-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-family: 'Segoe UI'; font-size: 0.9rem; border: 1px solid transparent; }
+        .jogo-hora { color: #00ff00; font-weight: bold; font-family: 'Orbitron'; width: 70px; line-height: 1.2; }
+        .jogo-desc { flex-grow: 1; padding: 0 15px; }
+        .jogo-quadra { color: rgba(255,255,255,0.5); font-size: 0.8rem; display: block;}
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 10px; }
+
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
@@ -21,41 +56,209 @@
     <div class="arena-container">
         <div id="topbar-placeholder"></div>
 
-        <div id="dashboard-view">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 class="section-title">📊 Status da Arena</h2>
-                <button class="btn-acao" onclick="window.location.href='/setup/modalidades'">+ Novo Lote de Gênero</button>
+        <div id="zero-state-view" style="display: none;">
+            <div style="text-align: center; margin-bottom: 3rem; margin-top: 1rem;">
+                <h2 style="font-family: 'Orbitron'; font-size: 2rem; color: #fff; text-transform: uppercase;">Bem-vindo à Arena</h2>
+                <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); font-size: 1.1rem; max-width: 600px; margin: 10px auto 0;">Para montar um calendário perfeito, precisamos saber a quantidade exata de times. Como você deseja começar?</p>
             </div>
-            <div id="active-modalidades-container">
+
+            <div class="decisao-grid">
+                <div class="decisao-card glass rota-direta" onclick="iniciarNovoLote()">
+                    <div class="decisao-icone">📋</div>
+                    <h3 class="decisao-titulo" style="color: #00f2fe;">1. Já tenho os times prontos</h3>
+                    <p class="decisao-desc">Eu já sei exatamente quantas equipes e alunos vão jogar em cada modalidade esportiva.</p>
+                    <button class="btn-acao" style="width: 100%;">Gerar Chaves Direto ➔</button>
                 </div>
+
+                <div class="decisao-card glass rota-inscricao" id="card-inscricao" onclick="mostrarPainelLink()">
+                    <div class="decisao-icone">📱</div>
+                    <h3 class="decisao-titulo" style="color: #ff00de;">2. Preciso abrir inscrições</h3>
+                    <p class="decisao-desc">Quero enviar um link para os alunos se cadastrarem. Depois eu vejo os números e gero os torneios.</p>
+                    <button class="btn-acao" style="background: #ff00de; width: 100%;">Gerar Link p/ Alunos ➔</button>
+                </div>
+            </div>
+
+            <div id="painel-inscricao" class="painel-link">
+                <h4 style="color: #ff00de; font-family: 'Orbitron'; margin-bottom: 10px;">🔗 Inscrições Abertas!</h4>
+                <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.8);">Copie o link abaixo e envie no grupo do WhatsApp da escola.</p>
+                <div class="link-box">
+                    <span id="link-texto">http://seusite.com/cadastro-aluno.html</span>
+                    <button class="btn-acao" style="background: transparent; border: 1px solid #ff00de; color: #ff00de; padding: 5px 15px;" onclick="copiarLink(event)">Copiar Link</button>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; gap: 15px;">
+                    <button class="btn-acao" style="background: #ff00de; flex: 1;" onclick="window.location.href='/alunos.html'">👥 Acompanhar Alunos Cadastrados</button>
+                    <button class="btn-acao btn-secundario" style="flex: 1;" onclick="esconderPainelLink()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-view" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 class="section-title">📊 Lotes da Arena</h2>
+                <button class="btn-acao" onclick="iniciarNovoLote()">+ Novo Lote de Gênero</button>
+            </div>
+            
+            <div id="active-modalidades-container"></div>
         </div>
     </div> 
+
+    <div id="modal-calendario" class="modal-overlay">
+        <div class="modal-box glass">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <h3 style="color: #00f2fe; font-family: 'Orbitron'; margin: 0; font-size: 1.2rem;" id="modal-cal-title">📅 Tabela Oficial</h3>
+                <button onclick="fecharCalendario()" style="background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <div id="conteudo-calendario"></div>
+        </div>
+    </div>
 
     <div id="footbar-placeholder"></div>
 
     <script>
         window.onload = () => {
-            // Repare na barra inicial '/' para sempre buscar na raiz
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
-            const setupData = JSON.parse(localStorage.getItem('arenaSetup'));
+            // Lógica de Lotes (Multi-Gêneros)
+            let arenaLotes = JSON.parse(localStorage.getItem('arenaLotes')) || {};
             
-            // Se não tem configuração, força a ir para a tela de setup
-            if(!setupData || !setupData.genero) {
-                window.location.href = '/setup/modalidades';
-                return;
+            // --- MIGRACÃO AUTOMÁTICA (Para atualizar o seu teste antigo pro novo formato) ---
+            const oldSetup = JSON.parse(localStorage.getItem('arenaSetup'));
+            const oldCal = JSON.parse(localStorage.getItem('calendarioOficial'));
+            
+            if (oldSetup && oldSetup.genero && Object.keys(arenaLotes).length === 0) {
+                arenaLotes[oldSetup.genero] = oldSetup;
+                localStorage.setItem('arenaLotes', JSON.stringify(arenaLotes));
+                
+                if(oldCal) {
+                    let cals = {};
+                    cals[oldSetup.genero] = oldCal;
+                    localStorage.setItem('calendariosOficiais', JSON.stringify(cals));
+                    localStorage.removeItem('calendarioOficial');
+                }
+                localStorage.removeItem('arenaSetup'); // Remove o formato velho
             }
+            // --------------------------------------------------------------------------------
 
-            // Exibe o resumo do lote no dashboard
-            document.getElementById('active-modalidades-container').innerHTML = `
-                <div class="glass" style="padding: 1.5rem; border-radius: 15px; border-left: 5px solid var(--theme-primary);">
-                    <h3 style="color: var(--theme-primary); margin-bottom: 10px; text-transform: uppercase;">Lotes Ativos: ${setupData.genero}</h3>
-                    <p style="font-family: 'Segoe UI'; font-size: 0.9rem;">${setupData.esportes.length} modalidades prontas. Aguardando a inscrição dos alunos para gerar chaves.</p>
-                </div>
-            `;
+            if(Object.keys(arenaLotes).length === 0) {
+                document.getElementById('zero-state-view').style.display = 'block';
+                document.getElementById('link-texto').textContent = window.location.origin + '/cadastro-aluno.html';
+            } else {
+                document.getElementById('dashboard-view').style.display = 'block';
+                renderizarLotesAtivos(arenaLotes);
+            }
         };
 
+        function renderizarLotesAtivos(arenaLotes) {
+            const container = document.getElementById('active-modalidades-container');
+            container.innerHTML = '';
+
+            for(let genero in arenaLotes) {
+                let lote = arenaLotes[genero];
+                // Define as cores por gênero!
+                let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+                let icone = genero === 'masculino' ? '🚹' : (genero === 'feminino' ? '🚺' : '🚻');
+
+                container.innerHTML += `
+                    <div class="glass" style="padding: 1.5rem; border-radius: 15px; border-left: 5px solid ${corTema}; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="font-size: 2.5rem;">${icone}</div>
+                                <div>
+                                    <h3 style="color: ${corTema}; margin-bottom: 5px; text-transform: uppercase;">Lote: ${genero}</h3>
+                                    <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.7);">${lote.esportes.length} modalidades prontas e agendadas.</p>
+                                </div>
+                            </div>
+                            <button class="btn-acao" style="background: rgba(255,69,0,0.1); border: 1px solid #ff4500; color: #ff4500; padding: 6px 12px; font-size: 0.75rem;" onclick="excluirLote('${genero}')">🗑️ Excluir Lote</button>
+                        </div>
+                        
+                        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: ${corTema}; color: ${corTema};" onclick="abrirCalendario('${genero}')">📅 Ver Calendário Deste Lote</button>
+                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: rgba(255,255,255,0.3); color: white;" onclick="window.location.href='/alunos.html'">👥 Ver Alunos Inscritos</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Limpa o rascunho temporário e manda o professor começar um novo Lote limpo
+        function iniciarNovoLote() {
+            localStorage.removeItem('arenaSetup');
+            window.location.href = '/setup/modalidades.html';
+        }
+
+        function excluirLote(genero) {
+            if(confirm(`⚠️ Tem certeza que deseja apagar todo o torneio e o calendário da categoria ${genero.toUpperCase()}?`)) {
+                let lotes = JSON.parse(localStorage.getItem('arenaLotes')) || {};
+                delete lotes[genero];
+                localStorage.setItem('arenaLotes', JSON.stringify(lotes));
+
+                let cals = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                delete cals[genero];
+                localStorage.setItem('calendariosOficiais', JSON.stringify(cals));
+
+                window.location.reload(); // Recarrega a página para atualizar a tela
+            }
+        }
+
+        // --- SISTEMA DE VISUALIZAÇÃO DO CALENDÁRIO NO DASHBOARD ---
+        function abrirCalendario(genero) {
+            const cals = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+            const calData = cals[genero];
+            const container = document.getElementById('conteudo-calendario');
+            
+            // Ajusta o título do Modal com a cor do gênero
+            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+            document.getElementById('modal-cal-title').style.color = corTema;
+            document.getElementById('modal-cal-title').innerHTML = `📅 Tabela Oficial - ${genero.toUpperCase()}`;
+
+            if(!calData || !calData.dias || calData.dias.length === 0) {
+                container.innerHTML = `<p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); text-align: center; padding: 2rem;">A tabela deste lote ainda não foi gerada.</p>`;
+            } else {
+                container.innerHTML = '';
+                calData.dias.forEach(dia => {
+                    let jogosDoDia = calData.jogos.filter(j => j.diaId === dia.idStr);
+                    jogosDoDia.sort((a, b) => a.hora.localeCompare(b.hora));
+
+                    if(jogosDoDia.length === 0) return;
+
+                    let jogosHtml = '';
+                    jogosDoDia.forEach(jogo => {
+                        jogosHtml += `
+                            <div class="jogo-item">
+                                <div class="jogo-hora">${jogo.hora}</div>
+                                <div class="jogo-desc">
+                                    <b>${jogo.icone} ${jogo.esporte}</b> <span style="opacity:0.7; font-size: 0.8rem;">- ${jogo.titulo}</span>
+                                    <span class="jogo-quadra">📍 ${jogo.quadra}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML += `
+                        <div class="dia-card" style="border-left-color: ${corTema};">
+                            <div class="dia-header">
+                                <h5 style="color: ${corTema};">${dia.titulo}</h5>
+                                <span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span>
+                            </div>
+                            ${jogosHtml}
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('modal-calendario').style.display = 'flex';
+        }
+
+        function fecharCalendario() {
+            document.getElementById('modal-calendario').style.display = 'none';
+        }
+
+        // Funções da Rota de Inscrição
+        function mostrarPainelLink() { document.getElementById('painel-inscricao').style.display = 'block'; document.getElementById('card-inscricao').style.borderTopColor = 'transparent'; }
+        function esconderPainelLink() { document.getElementById('painel-inscricao').style.display = 'none'; }
+        function copiarLink(event) { event.stopPropagation(); navigator.clipboard.writeText(document.getElementById('link-texto').textContent).then(() => { alert("Link copiado!"); }); }
+        
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
     </script>

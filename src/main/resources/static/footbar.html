@@ -1,23 +1,43 @@
-<nav class="footop-nav glass" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; border-radius: 40px; padding: 10px 20px; display: flex; justify-content: space-around; align-items: center; z-index: 1000;">
-    <button class="nav-btn" onclick="window.location.href='/index.html'">
+<nav class="footop-nav glass" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 500px; border-radius: 40px; padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; z-index: 1000;">
+    
+    <button class="nav-btn" id="nav-arena" onclick="window.location.href='/index.html'">
         <span class="nav-icon" style="font-size: 1.3rem;">📊</span>
         <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Arena</span>
     </button>
-    <button class="nav-btn" onclick="window.location.href='/tabelas.html'">
+    
+    <button class="nav-btn" id="nav-tabelas" onclick="window.location.href='/tabelas.html'">
         <span class="nav-icon" style="font-size: 1.3rem;">📅</span>
         <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Tabelas</span>
     </button>
-    <button class="nav-btn active" onclick="window.location.href='/alunos.html'">
+    
+    <button class="nav-btn" id="nav-resumo" onclick="window.location.href='/resumo.html'">
+        <span class="nav-icon" style="font-size: 1.3rem;">🏆</span>
+        <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Resumo</span>
+    </button>
+    
+    <button class="nav-btn" id="nav-alunos" onclick="window.location.href='/alunos.html'">
         <span class="nav-icon" style="font-size: 1.3rem;">👥</span>
         <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Alunos</span>
     </button>
-    <button class="nav-btn" onclick="window.location.href='/setup/modalidades.html'">
+    
+    <button class="nav-btn" id="nav-config" onclick="window.location.href='/setup/modalidades.html'">
         <span class="nav-icon" style="font-size: 1.3rem;">⚙️</span>
         <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Config</span>
     </button>
 </nav>
 
 <style>
-    .nav-btn { background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.3s; padding: 10px; border-radius: 20px; }
-    .nav-btn:hover, .nav-btn.active { color: #00f2fe; background: rgba(0, 242, 254, 0.1); text-shadow: 0 0 10px #00f2fe; }
+    .nav-btn { background: none; border: none; color: rgba(255,255,255,0.5); display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s; width: 60px;}
+    .nav-btn:hover, .nav-btn.active { color: #00f2fe; transform: translateY(-3px); }
+    .nav-btn.active { text-shadow: 0 0 10px rgba(0,242,254,0.5); }
 </style>
+
+<script>
+    // Ativa a cor do botão baseado na página atual
+    const path = window.location.pathname;
+    if(path.includes('index')) document.getElementById('nav-arena').classList.add('active');
+    else if(path.includes('tabelas') || path.includes('matchsheet')) document.getElementById('nav-tabelas').classList.add('active');
+    else if(path.includes('resumo')) document.getElementById('nav-resumo').classList.add('active');
+    else if(path.includes('alunos')) document.getElementById('nav-alunos').classList.add('active');
+    else if(path.includes('setup')) document.getElementById('nav-config').classList.add('active');
+</script>

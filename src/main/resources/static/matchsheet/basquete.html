@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Súmula Basquetebol - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #ff8c00; --team-a: #00f2fe; --team-b: #ff00de; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
+        
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        
+        .basquete-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid var(--theme-primary);}
+        .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
+        
+        .crono-box { text-align: center; }
+        .crono-periodo { color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase; font-weight: bold; cursor: pointer; padding: 5px; border: 1px dashed transparent; border-radius: 8px; transition: 0.3s;}
+        .crono-periodo:hover { border-color: var(--theme-primary); background: rgba(255,140,0,0.1); }
+        .crono-display { font-size: 3rem; font-weight: bold; letter-spacing: 2px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); line-height: 1;}
+        .crono-controls button { background: transparent; border: 1px solid #aaa; color: #fff; border-radius: 5px; padding: 5px 10px; cursor: pointer; margin: 0 3px;}
+        
+        .btn-finalizar { background: #00ff00; color: #000; font-weight: bold; font-family: 'Orbitron'; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;}
+
+        .placar-board { display: flex; justify-content: space-around; align-items: stretch; margin: 20px 0; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px;}
+        .team-col { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .team-name { font-size: 1.2rem; font-weight: bold; color: #fff; font-family: 'Segoe UI'; text-transform: uppercase; margin-bottom: 5px;}
+        
+        .team-score { font-size: 6rem; font-weight: bold; line-height: 1; text-shadow: 0 5px 15px rgba(0,0,0,0.8);}
+        .score-a { color: var(--team-a); } .score-b { color: var(--team-b); }
+        
+        .faltas-equipa { font-family: 'Segoe UI'; font-size: 0.85rem; margin-top: 10px; padding: 5px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; display: inline-block; margin-left: auto; margin-right: auto;}
+        .faltas-equipa span { font-weight: bold; font-size: 1.1rem; color: #ff0000;}
+        .bonus-alert { color: #ffea00; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; display: block; margin-top: 5px; opacity: 0; transition: 0.3s;}
+        .bonus-alert.active { opacity: 1; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .timeouts-area { font-family: 'Segoe UI'; font-size: 0.75rem; margin-top: 15px; color: #aaa;}
+        .timeout-dots { display: flex; gap: 5px; justify-content: center; margin-top: 5px; }
+        .timeout-dot { width: 25px; height: 8px; background: var(--theme-primary); border-radius: 3px; box-shadow: 0 0 5px var(--theme-primary); cursor: pointer;}
+        .timeout-dot.used { background: #333; box-shadow: none; cursor: default;}
+
+        .prancheta { display: flex; gap: 20px; flex-wrap: wrap; }
+        .time-list { flex: 1; min-width: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent;}
+        .time-list.a { border-top-color: var(--team-a); } .time-list.b { border-top-color: var(--team-b); }
+        
+        .player-row { display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
+        .player-row:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); transform: scale(1.02);}
+        .player-row.readonly { cursor: default; }
+        .player-row.readonly:hover { transform: none; background: rgba(0,0,0,0.4); border-color: transparent;}
+        
+        .player-photo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 2px solid #555;}
+        .player-num { font-size: 1.2rem; font-weight: bold; color: #fff; width: 30px; }
+        .player-info { flex-grow: 1; }
+        .player-name { font-family: 'Segoe UI'; font-weight: bold; font-size: 1rem; color: #fff; }
+        
+        .player-stats { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+        .stat-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; color: white; display: flex; align-items: center; gap: 4px; }
+        .stat-pill b { font-family: 'Orbitron'; color: var(--theme-primary); font-size: 0.9rem;}
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
+        .modal-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 15px 5px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-family: 'Segoe UI'; font-size: 0.85rem;}
+        .btn-pts { background: rgba(255, 140, 0, 0.2); border: 1px solid #ff8c00; color: #ff8c00;}
+        .btn-pts:hover { background: rgba(255, 140, 0, 0.4); }
+        .btn-falta { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
+        
+        .btn-acao-generico { background: transparent; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 10px; width: 100%;}
+
+        .timeline-box { margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; display: none; }
+        .timeline-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-family: 'Segoe UI'; font-size: 0.9rem; }
+        .timeline-time { color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        
+        <div class="basquete-header">
+            <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar PlayHub</button>
+            
+            <div class="crono-box" id="crono-area">
+                <div class="crono-periodo" id="periodo-lbl" onclick="avancarQuarto()" title="Clique para avançar o período">1º QUARTO 🔄</div>
+                <div class="crono-display" id="crono-display">10:00</div>
+                <div class="crono-controls">
+                    <button id="btn-start-crono" onclick="toggleCronometro()" style="border-color: #00ff00; color: #00ff00;">▶ Play</button>
+                    <button onclick="resetCronometro()">Reset</button>
+                </div>
+            </div>
+
+            <button class="btn-finalizar" id="btn-finalizar" onclick="finalizarPartida()">Finalizar ✓</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; font-family: 'Segoe UI'; color: #aaa; font-size: 0.85rem;" id="match-info">A Carregar Jogo...</div>
+
+        <div class="placar-board">
+            <div class="team-col team-a">
+                <div class="team-name" id="placar-nome-a">Equipa A</div>
+                <div class="team-score score-a" id="score-a">0</div>
+                
+                <div class="faltas-equipa">
+                    Faltas de Equipa: <span id="faltas-equipa-a">0</span>
+                    <div class="bonus-alert" id="bonus-a">⚠️ BÓNUS</div>
+                </div>
+
+                <div class="timeouts-area" id="box-timeouts-a">
+                    Tempos Descontados
+                    <div class="timeout-dots" id="timeouts-a"></div>
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction: column; justify-content: center; font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.2);">X</div>
+            
+            <div class="team-col team-b">
+                <div class="team-name" id="placar-nome-b">Equipa B</div>
+                <div class="team-score score-b" id="score-b">0</div>
+                
+                <div class="faltas-equipa">
+                    Faltas de Equipa: <span id="faltas-equipa-b">0</span>
+                    <div class="bonus-alert" id="bonus-b">⚠️ BÓNUS</div>
+                </div>
+
+                <div class="timeouts-area" id="box-timeouts-b">
+                    Tempos Descontados
+                    <div class="timeout-dots" id="timeouts-b"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;" id="manual-controls">
+            <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 15px; border-radius: 10px; cursor: pointer;" onclick="corrigirPlacar('A', -1)">-1 Ponto (A)</button>
+            <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 15px; border-radius: 10px; cursor: pointer;" onclick="corrigirPlacar('B', -1)">-1 Ponto (B)</button>
+        </div>
+
+        <div class="prancheta">
+            <div class="time-list a" id="lista-a"></div>
+            <div class="time-list b" id="lista-b"></div>
+        </div>
+
+        <div class="timeline-box" id="timeline-container">
+            <h3 style="color: #fff; font-family: 'Orbitron'; margin-bottom: 10px;">📄 Relatório Oficial da Partida</h3>
+            <div id="timeline-lista"></div>
+        </div>
+
+    </div>
+
+    <div id="modal-acao" class="modal-overlay">
+        <div class="modal-box">
+            <img id="acao-foto" src="">
+            <h3 id="acao-nome" style="color: white; font-family: 'Segoe UI';">Nome</h3>
+            <p id="acao-num" style="color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px;">Camisola 10</p>
+            
+            <div class="action-grid">
+                <button class="action-btn btn-pts" onclick="registrar('Lance Livre', '⛹️‍♂️', 1)"><span style="font-size:1.5rem;">+1</span> Lance Livre</button>
+                <button class="action-btn btn-pts" onclick="registrar('Cesta (2 pts)', '🏀', 2)"><span style="font-size:1.5rem;">+2</span> Cesta Normal</button>
+                <button class="action-btn btn-pts" onclick="registrar('Cesta de 3 pts', '🔥', 3)"><span style="font-size:1.5rem;">+3</span> Atrás da Linha</button>
+            </div>
+
+            <div class="action-grid" style="grid-template-columns: 1fr; margin-top: 10px;">
+                <button class="action-btn btn-falta" onclick="registrarFalta()"><span style="font-size:1.5rem;">🛑</span> Falta Pessoal</button>
+            </div>
+
+            <button class="btn-acao-generico" onclick="fecharModal()">Cancelar Acão</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const idJogo = parseInt(urlParams.get('jogo'));
+        const lote = urlParams.get('lote');
+        const isReadOnly = urlParams.get('read') === 'true';
+
+        let matchAtiva = null;
+        let placar = { A: 0, B: 0 };
+        let faltasEquipa = { A: 0, B: 0 };
+        let timeoutsUsados = { A: [false, false, false], B: [false, false, false] }; 
+        let escalacao = { A: [], B: [] };
+        let timeline = [];
+        
+        let jogadorAcao = null; let timeAcao = null;
+        
+        const periodosNomes = ["1º Quarto", "2º Quarto", "3º Quarto", "4º Quarto", "Prorrogação"];
+        let periodoIndex = 0; 
+        let cronoInterval = null;
+        let cronoSegundos = 600; 
+        let cronoRodando = false;
+
+        window.onload = () => {
+            const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+            if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
+            
+            if(!matchAtiva) { 
+                matchAtiva = { id: 999, esporte: 'Basquete', titulo: 'Amistoso de Teste', quadra: 'Ginásio Principal', icone: '🏀' };
+            }
+
+            document.getElementById('match-info').innerHTML = `${matchAtiva.icone} <b>${matchAtiva.esporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
+
+            if(isReadOnly) {
+                let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, escalacao:{A:[],B:[]}, timeline:[], faltasEquipa:{A:0,B:0}, periodoIndex:3 };
+                placar = rel.placar; escalacao = rel.escalacao; timeline = rel.timeline;
+                periodoIndex = rel.periodoIndex; faltasEquipa = rel.faltasEquipa;
+                
+                document.getElementById('manual-controls').style.display = 'none';
+                document.getElementById('btn-finalizar').style.display = 'none';
+                document.getElementById('crono-area').style.display = 'none';
+                document.getElementById('box-timeouts-a').style.display = 'none';
+                document.getElementById('box-timeouts-b').style.display = 'none';
+                
+                document.getElementById('timeline-container').style.display = 'block';
+                renderTimeline();
+                atualizarPlacarVisual(true);
+            } else {
+                escalarMock();
+                atualizarPlacarVisual();
+                document.getElementById('crono-display').textContent = formatTime(); 
+            }
+            renderizarListas();
+        };
+
+        function escalarMock() {
+            const nomes = ["Lucas", "Pedro", "João", "Gabriel", "Matheus", "Carlos", "Rafael", "Felipe", "Thiago", "Bruno"];
+            for(let i=0; i<7; i++) { 
+                escalacao.A.push({ id: 'A'+i, numero: i+4, nome: nomes[i], foto: `https://i.pravatar.cc/150?img=${i+10}`, stats: [] });
+                escalacao.B.push({ id: 'B'+i, numero: i+11, nome: nomes[i+3] || 'Atleta B', foto: `https://i.pravatar.cc/150?img=${i+20}`, stats: [] });
+            }
+        }
+
+        function avancarQuarto() {
+            if(periodoIndex < periodosNomes.length - 1) {
+                if(confirm(`Terminar o ${periodosNomes[periodoIndex]} e avançar para o próximo? As faltas de equipa serão zeradas.`)) {
+                    periodoIndex++;
+                    faltasEquipa.A = 0; faltasEquipa.B = 0; 
+                    cronoSegundos = 600; 
+                    resetCronometro();
+                    addTimeline(`🔄 Início do ${periodosNomes[periodoIndex]}`);
+                    atualizarPlacarVisual();
+                }
+            }
+        }
+
+        function atualizarPlacarVisual(leitura = false) {
+            document.getElementById('score-a').textContent = placar.A;
+            document.getElementById('score-b').textContent = placar.B;
+            document.getElementById('periodo-lbl').innerHTML = periodosNomes[periodoIndex] + (leitura ? "" : " 🔄");
+
+            const atualizarFaltas = (t) => {
+                let f = faltasEquipa[t];
+                document.getElementById(`faltas-equipa-${t.toLowerCase()}`).textContent = f;
+                let bonusEl = document.getElementById(`bonus-${t.toLowerCase()}`);
+                if(f >= 5) bonusEl.classList.add('active'); else bonusEl.classList.remove('active');
+            };
+            atualizarFaltas('A'); atualizarFaltas('B');
+
+            if(!leitura) {
+                const renderTimeouts = (t) => {
+                    let html = '';
+                    for(let i=0; i<3; i++) html += `<div class="timeout-dot ${timeoutsUsados[t][i] ? 'used' : ''}" onclick="pedirTempo('${t}', ${i})"></div>`;
+                    document.getElementById(`timeouts-${t.toLowerCase()}`).innerHTML = html;
+                };
+                renderTimeouts('A'); renderTimeouts('B');
+            }
+        }
+
+        function renderizarListas() {
+            const renderTime = (t, domId) => {
+                let html = '';
+                escalacao[t].forEach(j => {
+                    let contagemStats = {}; let faltasPessoais = 0;
+                    j.stats.forEach(icone => {
+                        contagemStats[icone] = (contagemStats[icone] || 0) + 1;
+                        if(icone === '🛑') faltasPessoais++;
+                    });
+                    
+                    let statsHtml = '';
+                    for(let icone in contagemStats) statsHtml += `<span class="stat-pill">${icone} <b>${contagemStats[icone]}</b></span>`;
+
+                    let estiloLinha = faltasPessoais >= 5 ? 'border-color: #ff0000; background: rgba(255,0,0,0.1);' : '';
+                    let pointer = isReadOnly || faltasPessoais >= 5 ? 'readonly' : '';
+                    let click = (isReadOnly || faltasPessoais >= 5) ? `onclick="alert('Este jogador atingiu o limite de faltas.')"` : `onclick="abrirModal('${j.id}', '${t}')"`;
+                    
+                    html += `
+                        <div class="player-row ${pointer}" ${click} style="${estiloLinha}">
+                            <img src="${j.foto}" class="player-photo">
+                            <div class="player-num">${j.numero}</div>
+                            <div class="player-info"><div class="player-name">${j.nome}</div></div>
+                            <div class="player-stats">${statsHtml}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById(domId).innerHTML = html;
+            };
+            renderTime('A', 'lista-a'); renderTime('B', 'lista-b');
+        }
+
+        function abrirModal(id, t) {
+            jogadorAcao = escalacao[t].find(j => j.id === id); timeAcao = t;
+            document.getElementById('acao-foto').src = jogadorAcao.foto;
+            document.getElementById('acao-nome').textContent = jogadorAcao.nome;
+            document.getElementById('acao-num').textContent = `Camisola ${jogadorAcao.numero}`;
+            document.getElementById('modal-acao').style.display = 'flex';
+        }
+        function fecharModal() { document.getElementById('modal-acao').style.display = 'none'; }
+
+        function registrar(nome, icone, pts) {
+            placar[timeAcao] += pts;
+            jogadorAcao.stats.push(icone);
+            addTimeline(`${icone} ${nome} (${pts}pts): ${jogadorAcao.nome} (Equipa ${timeAcao})`);
+            fecharModal(); atualizarPlacarVisual(); renderizarListas();
+        }
+
+        function registrarFalta() {
+            jogadorAcao.stats.push('🛑');
+            let totalFaltasIndividuais = jogadorAcao.stats.filter(s => s === '🛑').length;
+            faltasEquipa[timeAcao]++;
+
+            let alertaBoleto = "";
+            if (faltasEquipa[timeAcao] === 5) alertaBoleto = " \n⚠️ A Equipa entrou em BÓNUS!";
+            if (totalFaltasIndividuais >= 5) alertaBoleto += " \n🟥 JOGADOR DESQUALIFICADO (5 Faltas).";
+
+            addTimeline(`🛑 Falta Pessoal de ${jogadorAcao.nome}.${alertaBoleto}`);
+            fecharModal(); atualizarPlacarVisual(); renderizarListas();
+            if(alertaBoleto !== "") alert(alertaBoleto);
+        }
+
+        function corrigirPlacar(time, valor) {
+            placar[time] += valor; if(placar[time] < 0) placar[time] = 0;
+            addTimeline(`Correcção Manual: Placar Equipa ${time} ajustado.`);
+            atualizarPlacarVisual();
+        }
+
+        function pedirTempo(time, index) {
+            if(timeoutsUsados[time][index]) return; 
+            if(confirm(`Confirmar Pedido de Tempo (Timeout) para a Equipa ${time}?`)) {
+                timeoutsUsados[time][index] = true;
+                addTimeline(`⏱️ TIMEOUT: Solicitado pela Equipa ${time}.`);
+                atualizarPlacarVisual();
+            }
+        }
+
+        function formatTime() {
+            let m = Math.floor(cronoSegundos / 60).toString().padStart(2, '0');
+            let s = (cronoSegundos % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function toggleCronometro() {
+            const btn = document.getElementById('btn-start-crono');
+            if (cronoRodando) {
+                clearInterval(cronoInterval); cronoRodando = false;
+                btn.innerHTML = '▶ Play'; btn.style.borderColor = '#00ff00'; btn.style.color = '#00ff00';
+            } else {
+                cronoRodando = true;
+                btn.innerHTML = '⏸ Pause'; btn.style.borderColor = '#ffea00'; btn.style.color = '#ffea00';
+                cronoInterval = setInterval(() => {
+                    if(cronoSegundos > 0) {
+                        cronoSegundos--; document.getElementById('crono-display').textContent = formatTime();
+                    } else {
+                        clearInterval(cronoInterval); cronoRodando = false;
+                        btn.innerHTML = '▶ Play'; btn.style.borderColor = '#00ff00'; btn.style.color = '#00ff00';
+                        alert(`O tempo do ${periodosNomes[periodoIndex]} esgotou-se!`);
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetCronometro() {
+            clearInterval(cronoInterval); cronoRodando = false; cronoSegundos = 600; 
+            document.getElementById('crono-display').textContent = formatTime();
+            let btn = document.getElementById('btn-start-crono');
+            btn.innerHTML = '▶ Play'; btn.style.borderColor = '#00ff00'; btn.style.color = '#00ff00';
+        }
+
+        function addTimeline(txt) {
+            let tempoStr = document.getElementById('crono-display').textContent;
+            timeline.push({ periodo: periodosNomes[periodoIndex], tempo: tempoStr, placarStr: `${placar.A}x${placar.B}`, txt: txt });
+        }
+        
+        function renderTimeline() {
+            let html = '';
+            timeline.forEach(t => {
+                html += `<div class="timeline-item"><span class="timeline-time">[${t.periodo} - ${t.tempo} | ${t.placarStr}]</span> ${t.txt}</div>`;
+            });
+            document.getElementById('timeline-lista').innerHTML = html;
+        }
+
+        // --- INTEGRAÇÃO API SPRING BOOT ---
+        async function finalizarPartida() {
+            if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
+                
+                const sumulaFinalizadaDTO = { 
+                    placar: placar, 
+                    periodoIndex: periodoIndex, 
+                    escalacao: escalacao, 
+                    timeline: timeline 
+                };
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/sumulas/${idJogo}/finalizar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sumulaFinalizadaDTO)
+                    });
+
+                    if (response.ok) {
+                        alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
+                        
+                        let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                        rels[idJogo] = { placar: placar, faltasEquipa: faltasEquipa, periodoIndex: periodoIndex, escalacao: escalacao, timeline: timeline };
+                        localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                        
+                        window.location.href = '/tabelas.html';
+                    } else {
+                        const erroMsg = await response.text();
+                        alert(`⚠️ Erro ao salvar na base de dados: ${erroMsg}`);
+                    }
+                } catch (error) {
+                    console.error("Erro de conexão com a API:", error);
+                    alert("🚨 Falha de comunicação com o Servidor. Salvando offline por segurança.");
+                    
+                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                    rels[idJogo] = { placar: placar, faltasEquipa: faltasEquipa, periodoIndex: periodoIndex, escalacao: escalacao, timeline: timeline };
+                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                    window.location.href = '/tabelas.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
