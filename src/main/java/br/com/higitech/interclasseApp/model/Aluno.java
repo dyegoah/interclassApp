@@ -7,16 +7,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "tb_aluno")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @EqualsAndHashCode(of = "id")
 public class Aluno {
 
     @Id
@@ -37,14 +33,17 @@ public class Aluno {
     @Column(nullable = true)
     private String genero;
     
-    // Nossos novos campos de texto substituindo a antiga relação complexa
     @Column(nullable = false)
     private String esporte;
 
     @Column(nullable = false)
     private String iconeEsporte;
 
-    
+    // 🌟 A MÁGICA MULTI-TENANT AQUI: Quem é o dono deste aluno?
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
+
     // --- GETTERS E SETTERS ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -69,4 +68,7 @@ public class Aluno {
 
     public String getIconeEsporte() { return iconeEsporte; }
     public void setIconeEsporte(String iconeEsporte) { this.iconeEsporte = iconeEsporte; }
+
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
 }

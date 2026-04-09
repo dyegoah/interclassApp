@@ -14,24 +14,43 @@
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
         .section-title { text-transform: uppercase; font-size: 1.2rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;}
         
-        /* O NOVO ACORDEÃO (CHAVEAMENTO DO TORNEIO) */
+        /* O NOVO ACORDEÃO */
         .torneio-grupo { margin-bottom: 20px; background: rgba(0,0,0,0.4); border-radius: 15px; border-left: 5px solid var(--theme-primary); overflow: hidden; }
         .torneio-header { padding: 15px 20px; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
         .torneio-header:hover { background: rgba(255,255,255,0.1); }
         .torneio-header h3 { font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 10px; }
         .torneio-toggle { font-family: 'Segoe UI'; font-size: 0.85rem; color: var(--theme-primary); font-weight: bold; background: rgba(0,242,254,0.1); padding: 5px 10px; border-radius: 8px;}
         
-        .torneio-body { padding: 15px; display: none; border-top: 1px solid rgba(255,255,255,0.05); }
+        .torneio-body { padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
 
+        /* HEADER DE PROGRESSO E STATUS DO TORNEIO */
+        .torneio-status-bar { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed rgba(255,255,255,0.1); }
+        .progresso-bg { flex-grow: 1; height: 8px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; }
+        .progresso-fill { height: 100%; background: #00ff00; box-shadow: 0 0 10px #00ff00; transition: 1s ease; }
+        
+        /* TABELAS DE LIGA E PONTOS CORRIDOS (SÓ APARECE SE FOR LIGA) */
+        .table-wrapper { overflow-x: auto; margin-bottom: 20px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .tabela-brasileirao { width: 100%; border-collapse: collapse; text-align: center; font-family: 'Segoe UI'; font-size: 0.9rem; min-width: 600px;}
+        .tabela-brasileirao th { background: rgba(255,255,255,0.05); padding: 10px; color: var(--theme-primary); font-family: 'Orbitron'; font-size: 0.8rem; border-bottom: 2px solid var(--theme-primary); }
+        .tabela-brasileirao td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;}
+        .tabela-brasileirao tr:hover { background: rgba(255,255,255,0.03); }
+        .linha-campeao td { background: rgba(0, 255, 0, 0.1); font-weight: bold; }
+        .linha-campeao td:first-child { color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.5); font-size: 1.1rem;}
+        
+        /* LISTA DE JOGOS (AGENDA ÚNICA) */
+        .secao-agenda-titulo { font-family: 'Orbitron'; font-size: 1rem; color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;}
         .playhub-card { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;}
         .playhub-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
         .play-hora { font-size: 1.1rem; color: #00ff00; font-weight: bold; width: 100px; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); margin-right: 15px; padding-right: 15px;}
         .play-info { flex-grow: 1; }
-        .play-title { font-size: 1rem; margin: 0 0 5px 0; color: #fff; }
-        .play-sub { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-family: 'Segoe UI'; }
         
         .btn-play { background: #00ff00; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,0,0.2); transition: 0.3s;}
         .btn-play:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,0,0.5); }
+
+        /* BANNER DO CAMPEÃO NO FINAL */
+        .campeao-banner { background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); padding: 30px 20px; border-radius: 15px; text-align: center; margin-top: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4); border: 2px solid #fff; position: relative; overflow: hidden; }
+        .campeao-banner h2 { font-family: 'Orbitron'; color: #000; margin: 0; text-transform: uppercase; font-size: 1.4rem; font-weight: bold; }
+        .campeao-banner p { font-family: 'Segoe UI'; font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px; text-shadow: 2px 2px 4px #000; }
         
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -43,15 +62,14 @@
         <div id="playhub-view">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
                 <div>
-                    <h2 class="section-title">▶️ PlayHub e Chaveamentos</h2>
-                    <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Clique num torneio abaixo para ver a tabela de jogos e abrir a súmula.</p>
+                    <h2 class="section-title">▶️ PlayHub de Partidas</h2>
+                    <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Clique num torneio abaixo para ver a agenda de jogos e acessar as súmulas.</p>
                 </div>
             </div>
 
             <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;" id="filtros-lote"></div>
             
-            <div id="lista-jogos">
-                </div>
+            <div id="lista-jogos"></div>
         </div>
 
     </div>
@@ -61,6 +79,8 @@
     <script>
         let relatoriosSalvos = {}; 
         let loteAtualSelecionado = null;
+        let configuracoesLotesGlobais = {}; 
+        let listaAlunosGlobais = []; // Guarda as fotos e IDs de todos os alunos
 
         const rotasSaaS = {
             'Futsal': 'futsal', 'Handebol': 'handebol', 'Vôlei': 'volei', 'Vôlei de Areia': 'volei-areia',
@@ -68,22 +88,38 @@
             'Xadrez': 'geral', 'Dama': 'geral', 'E-Sports': 'geral', 'Natação': 'geral', 'Atletismo': 'geral'
         };
 
-        window.onload = () => {
+        window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
-            // Backup de relatórios locais caso o servidor esteja com delay
             relatoriosSalvos = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+            configuracoesLotesGlobais = JSON.parse(localStorage.getItem('arenaLotes')) || {};
             
+            // Busca a lista de alunos para podermos exibir a foto do campeão!
+            try {
+                const resAlunos = await fetch('/api/alunos');
+                if (resAlunos.ok) {
+                    listaAlunosGlobais = await resAlunos.json();
+                }
+            } catch (error) {
+                console.warn("Modo offline ativo para alunos.");
+            }
+
             carregarLotesDaAPI();
         };
 
         async function carregarLotesDaAPI() {
-            const generos = ['masculino', 'feminino', 'misto'];
             const container = document.getElementById('filtros-lote');
             container.innerHTML = '';
             
-            generos.forEach((genero, idx) => {
+            let calsOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+            let generosDisponiveis = Object.keys(calsOffline);
+            
+            if(generosDisponiveis.length === 0) {
+                generosDisponiveis = ['masculino', 'feminino', 'misto'];
+            }
+
+            generosDisponiveis.forEach((genero, idx) => {
                 let cor = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
                 let active = idx === 0 ? `border-bottom: 3px solid ${cor}; font-weight: bold; background: rgba(255,255,255,0.1);` : '';
                 if(idx === 0) loteAtualSelecionado = genero;
@@ -91,12 +127,14 @@
                 container.innerHTML += `
                     <button style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: ${cor}; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s; ${active}" 
                             onclick="mudarLotePlayHub('${genero}', this)">
-                        ${genero}
+                        LOTE: ${genero}
                     </button>
                 `;
             });
             
-            buscarJogosDoBanco(loteAtualSelecionado);
+            if(loteAtualSelecionado) {
+                buscarJogosDoBanco(loteAtualSelecionado);
+            }
         }
 
         function mudarLotePlayHub(genero, btnElement) {
@@ -111,24 +149,23 @@
             buscarJogosDoBanco(genero);
         }
 
-        async function buscarJogosDoBanco(genero) {
+		async function buscarJogosDoBanco(genero) {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '<p style="text-align: center; color: #00f2fe; margin-top: 50px;">⏳ A carregar torneios e chaves do servidor...</p>';
 
             try {
-                const response = await fetch(`http://localhost:8015/api/jogos/lote/${genero}`);
-                
+                const response = await fetch(`/api/jogos/lote/${genero}`);
                 if (!response.ok) throw new Error('Falha API');
                 const jogos = await response.json(); 
                 
-                renderizarJogosEmAcordeao(jogos, genero);
-
-            } catch (error) {
-                console.error(error);
+                if (jogos.length === 0) {
+                    throw new Error('Banco de dados vazio.');
+                }
                 
-                // MODO OFFLINE (Fallback caso o Java esteja desligado durante o teste)
+                renderizarJogosEmAcordeao(jogos, genero);
+            } catch (error) {
                 let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-                if(calOffline[genero] && calOffline[genero].jogos) {
+                if(calOffline[genero] && calOffline[genero].jogos && calOffline[genero].jogos.length > 0) {
                     renderizarJogosEmAcordeao(calOffline[genero].jogos, genero);
                 } else {
                     container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 50px;">Nenhum torneio agendado para a categoria ${genero}.</p>`;
@@ -136,7 +173,6 @@
             }
         }
 
-        // A MÁGICA: AGRUPA OS JOGOS POR TORNEIO (ESPORTE)
         function renderizarJogosEmAcordeao(todosJogos, genero) {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -146,75 +182,267 @@
                 return;
             }
 
-            // 1. Agrupa os dados
             let torneios = {};
             todosJogos.forEach(jogo => {
-                if(!torneios[jogo.esporte]) {
-                    torneios[jogo.esporte] = { icone: jogo.icone, jogos: [] };
-                }
+                if(!torneios[jogo.esporte]) torneios[jogo.esporte] = { icone: jogo.icone, jogos: [] };
                 torneios[jogo.esporte].jogos.push(jogo);
             });
 
             let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
 
-            // 2. Renderiza os Blocos
             for (let esporteNome in torneios) {
                 let dados = torneios[esporteNome];
                 let domId = esporteNome.replace(/\s+/g, '-').toLowerCase();
+                
+                let formato = 'eliminatoria'; 
+                if(configuracoesLotesGlobais[genero] && configuracoesLotesGlobais[genero].esportes) {
+                    let espConfig = configuracoesLotesGlobais[genero].esportes.find(e => e.nome === esporteNome);
+                    if(espConfig && espConfig.formato) formato = espConfig.formato;
+                }
+                formato = String(formato).toLowerCase();
 
-                let htmlJogos = '';
+                // Sincroniza o LocalStorage com os jogos que já acabaram no Java
+                dados.jogos.forEach(j => {
+                    if (j.status === 'FINALIZADO' && !relatoriosSalvos[j.id]) {
+                        relatoriosSalvos[j.id] = { placar: { A: j.placarA || 0, B: j.placarB || 0 } };
+                    }
+                });
+
+                // DESCOBRE O CAMPEÃO E RENDERIZA TABELA SE FOR LIGA
+                let painelObj = processarChaveECampeao(formato, dados.jogos);
+                let htmlTabelaLiga = painelObj.htmlTabela;
+                let campeaoNome = painelObj.campeaoNome;
+                let campeaoId = painelObj.campeaoId;
+
+                let htmlJogosAgenda = '';
+                let jogosConcluidos = 0;
+                
                 dados.jogos.forEach(jogo => {
                     let relatorio = relatoriosSalvos[jogo.id]; 
                     
-                    // Ajuste para o campo data que vem do DTO (diaId) ou do Fallback (dataJogo)
                     let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
+                    let dataCurta = dataDoJogo;
+                    if(dataCurta.includes('-')) {
+                        let p = dataCurta.split('-');
+                        if(p.length === 3) dataCurta = p[2] + '/' + p[1];
+                    }
+
+                    let partesTitulo = jogo.titulo.split(' | ');
+                    let faseTag = partesTitulo[0].replace('🏆', '').trim();
+                    let confrontoStr = partesTitulo.length > 1 ? partesTitulo[1].trim() : "Aguardando Vencedores";
 
                     if (relatorio) {
-                        htmlJogos += `
-                            <div class="playhub-card" style="border-left: 3px solid #555;">
-                                <div class="play-hora" style="color: #aaa; font-size: 0.9rem;">FINAL<br><span style="font-size:0.7rem;">${dataDoJogo}</span></div>
-                                <div class="play-info">
-                                    <h3 class="play-title" style="color: #ccc;">${jogo.titulo}</h3>
-                                    <p style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.1rem; color: #fff; margin-top: 5px;">${relatorio.placar.A} <span style="color:#555; font-size:0.8rem;">X</span> ${relatorio.placar.B}</p>
+                        jogosConcluidos++;
+                        htmlJogosAgenda += `
+                            <div class="playhub-card" style="border-left: 4px solid #555; background: rgba(0,0,0,0.5);">
+                                <div class="play-hora" style="color: #aaa; font-size: 0.85rem; border-right: 1px solid rgba(255,255,255,0.1);">
+                                    ✔️ ENCERRADO<br>
+                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: var(--theme-primary);">${dataCurta} às ${jogo.hora}</span>
                                 </div>
-                                <button class="btn-play" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); box-shadow: none;" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', true)">📄 Súmula</button>
+                                <div class="play-info">
+                                    <h3 style="color: var(--theme-primary); font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 3px;">${faseTag}</h3>
+                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #ccc;">${confrontoStr}</p>
+                                    <div style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.3rem; color: #fff; margin-top: 8px; background: rgba(255,255,255,0.05); display: inline-block; padding: 2px 10px; border-radius: 5px;">
+                                        ${relatorio.placar.A} <span style="color:#555; font-size:0.9rem; margin: 0 5px;">X</span> ${relatorio.placar.B}
+                                    </div>
+                                </div>
+                                <button class="btn-play" style="background: transparent; color: #aaa; border: 1px solid #555; box-shadow: none;" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', true)">📄 Súmula</button>
                             </div>
                         `;
                     } else {
-                        htmlJogos += `
-                            <div class="playhub-card" style="border-left: 3px solid ${corTema};">
-                                <div class="play-hora">${jogo.hora}<br><span style="font-size:0.7rem; color:#fff; font-family:'Segoe UI';">${dataDoJogo}</span></div>
-                                <div class="play-info">
-                                    <h3 class="play-title">${jogo.titulo}</h3>
-                                    <p class="play-sub">📍 ${jogo.quadra}</p>
+                        htmlJogosAgenda += `
+                            <div class="playhub-card" style="border-left: 4px solid ${corTema};">
+                                <div class="play-hora" style="border-right: 1px solid rgba(255,255,255,0.1);">
+                                    <span style="font-size:1.1rem; color: #fff;">${jogo.hora}</span><br>
+                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corTema};">${dataCurta}</span>
                                 </div>
-                                <button class="btn-play" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', false)">▶️ ABRIR</button>
+                                <div class="play-info">
+                                    <h3 style="color: ${corTema}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 3px;">${faseTag}</h3>
+                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${confrontoStr}</p>
+                                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra}</p>
+                                </div>
+                                <button class="btn-play" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', false)">▶️ SÚMULA</button>
                             </div>
                         `;
                     }
                 });
 
+                // RENDERIZA A FOTO E O PÓDIO DO CAMPEÃO SE O TORNEIO ESTIVER 100%
+                let campeaoHtml = '';
+                if (campeaoNome) {
+                    let fotoHtml = '';
+                    let esportesIndividuais = ['Xadrez', 'Tênis de Mesa', 'Dama', 'E-Sports', 'Natação', 'Atletismo'];
+                    
+                    if (esportesIndividuais.includes(esporteNome)) {
+                        // Tenta encontrar o aluno real no banco de dados para puxar a foto
+                        let aluno = listaAlunosGlobais.find(a => a.id == campeaoId);
+                        let fotoUrl = (aluno && aluno.fotoUrl) ? aluno.fotoUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(campeaoNome)}&background=222&color=fff&size=128`;
+                        fotoHtml = `<img src="${fotoUrl}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; margin: 10px auto 5px auto; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5);">`;
+                    }
+
+                    campeaoHtml = `
+                        <div class="campeao-banner">
+                            <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(255,255,255,0.8); line-height: 1;">🏆</div>
+                            ${fotoHtml}
+                            <h2 style="margin-top: 10px;">Grande Campeão</h2>
+                            <p>${campeaoNome}</p>
+                        </div>
+                    `;
+                }
+
+                let pctConcluido = dados.jogos.length > 0 ? Math.round((jogosConcluidos / dados.jogos.length) * 100) : 0;
+                let corBarra = pctConcluido === 100 ? '#00ff00' : '#ffd700';
+                
+                // TODOS OS PAINÉIS FECHADOS POR PADRÃO AQUI!
+                let displayStyle = 'none'; 
+                let setaText = '▼';
+
                 container.innerHTML += `
                     <div class="torneio-grupo" style="border-color: ${corTema};">
-                        <div class="torneio-header" onclick="toggleTorneio('${domId}')">
-                            <h3>${dados.icone} Torneio de ${esporteNome}</h3>
-                            <div class="torneio-toggle">Ver Chaves (${dados.jogos.length}) ▼</div>
+                        <div class="torneio-header" onclick="toggleTorneio('${domId}', this)">
+                            <h3>${dados.icone} Torneio de ${esporteNome} <span style="font-family:'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: normal; margin-left: 10px;">(${formato.toUpperCase()})</span></h3>
+                            <div class="torneio-toggle">Painel Completo <span class="seta-toggle">${setaText}</span></div>
                         </div>
-                        <div class="torneio-body" id="body-${domId}">
-                            ${htmlJogos}
+                        <div class="torneio-body" id="body-${domId}" style="display: ${displayStyle};">
+                            
+                            <div class="torneio-status-bar">
+                                <span style="font-family: 'Orbitron'; font-size: 0.8rem; color: ${corBarra};">STATUS DO TORNEIO</span>
+                                <div class="progresso-bg"><div class="progresso-fill" style="width: ${pctConcluido}%; background: ${corBarra}; box-shadow: 0 0 10px ${corBarra};"></div></div>
+                                <span style="font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold;">${jogosConcluidos} / ${dados.jogos.length} Partidas</span>
+                            </div>
+
+                            ${htmlTabelaLiga}
+                            
+                            <div class="secao-agenda-titulo" style="margin-top: 20px;">📋 Agenda de Confrontos e Súmulas</div>
+                            ${htmlJogosAgenda}
+
+                            ${campeaoHtml}
                         </div>
                     </div>
                 `;
             }
         }
 
-        // Função para abrir/fechar as chaves
-        window.toggleTorneio = function(id) {
+        // =========================================================================
+        // MOTOR DE PROCESSAMENTO (GERA TABELA DE LIGA E DESCOBRE CAMPEÃO + ID)
+        // =========================================================================
+        function processarChaveECampeao(formato, jogos) {
+            let campeaoFinal = null;
+            let campeaoIdFinal = null;
+            let htmlTabela = '';
+
+            if (formato === 'liga' || formato === 'grupos' || formato.includes('pontos')) {
+                let tabela = {};
+
+                jogos.forEach(j => {
+                    let partes = j.titulo.split(' | ');
+                    if(partes.length < 2) return;
+                    let confronto = partes[1].split(' x ');
+                    if(confronto.length < 2) return;
+                    
+                    let tA = confronto[0].trim();
+                    let tB = confronto[1].trim();
+
+                    if(!tA.includes('Vencedor') && !tA.includes('A Definir') && !tA.includes('Colocado') && !tA.includes('Sorteio')) {
+                        if(!tabela[tA]) tabela[tA] = { nome: tA, id: j.equipeAId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
+                    }
+                    if(!tB.includes('Vencedor') && !tB.includes('A Definir') && !tB.includes('Colocado') && !tB.includes('Sorteio')) {
+                        if(!tabela[tB]) tabela[tB] = { nome: tB, id: j.equipeBId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
+                    }
+
+                    let rel = relatoriosSalvos[j.id];
+                    if(rel && rel.placar && tabela[tA] && tabela[tB]) {
+                        let placarA = parseInt(rel.placar.A); let placarB = parseInt(rel.placar.B);
+                        tabela[tA].j++; tabela[tB].j++;
+                        tabela[tA].gp += placarA; tabela[tA].gc += placarB;
+                        tabela[tB].gp += placarB; tabela[tB].gc += placarA;
+
+                        if(placarA > placarB) { tabela[tA].v++; tabela[tB].d++; tabela[tA].pts += 3; }
+                        else if(placarB > placarA) { tabela[tB].v++; tabela[tA].d++; tabela[tB].pts += 3; }
+                        else { tabela[tA].e++; tabela[tB].e++; tabela[tA].pts += 1; tabela[tB].pts += 1; }
+                    }
+                });
+
+                let timesOrdenados = Object.values(tabela).sort((a,b) => {
+                    if(b.pts !== a.pts) return b.pts - a.pts;
+                    if(b.v !== a.v) return b.v - a.v;
+                    return (b.gp - b.gc) - (a.gp - a.gc);
+                });
+
+                if(timesOrdenados.length > 0) {
+                    let jogosEncerrados = jogos.filter(j => relatoriosSalvos[j.id]).length;
+                    
+                    if (jogosEncerrados === jogos.length && jogos.length > 0) {
+                        campeaoFinal = timesOrdenados[0].nome;
+                        campeaoIdFinal = timesOrdenados[0].id;
+                    }
+
+                    let trs = '';
+                    timesOrdenados.forEach((t, i) => {
+                        let classe = i === 0 ? 'linha-campeao' : '';
+                        let saldo = t.gp - t.gc;
+                        let corSaldo = saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff');
+                        trs += `
+                            <tr class="${classe}">
+                                <td>${i+1}º</td>
+                                <td style="text-align:left; font-weight:bold;">${t.nome}</td>
+                                <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
+                                <td>${t.j}</td>
+                                <td>${t.v}</td>
+                                <td>${t.e}</td>
+                                <td>${t.d}</td>
+                                <td>${t.gp}</td>
+                                <td>${t.gc}</td>
+                                <td style="color: ${corSaldo};">${saldo > 0 ? '+'+saldo : saldo}</td>
+                            </tr>
+                        `;
+                    });
+
+                    htmlTabela = `
+                        <div class="secao-agenda-titulo">📊 Tabela de Classificação Atualizada</div>
+                        <div class="table-wrapper">
+                            <table class="tabela-brasileirao">
+                                <thead><tr><th style="width:40px;">Pos</th><th style="text-align:left;">Turma / Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>Pró</th><th>Con</th><th>SG</th></tr></thead>
+                                <tbody>${trs}</tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                return { htmlTabela: htmlTabela, campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+
+            } else {
+                // LÓGICA DE DESCUBERTA DO CAMPEÃO DO MATA-MATA (Agora captura o ID também!)
+                let jogosEncerrados = jogos.filter(j => relatoriosSalvos[j.id]).length;
+                if (jogosEncerrados === jogos.length && jogos.length > 0) {
+                    let jogoFinal = jogos.find(j => j.titulo.includes('FINAL') && !j.titulo.includes('Ida')) || jogos[jogos.length - 1];
+                    let rel = relatoriosSalvos[jogoFinal.id];
+                    if (rel) {
+                        let pA = parseInt(rel.placar.A); let pB = parseInt(rel.placar.B);
+                        let eqA = jogoFinal.equipeANome || jogoFinal.titulo.split(' | ')[1].split(' x ')[0].trim();
+                        let eqB = jogoFinal.equipeBNome || jogoFinal.titulo.split(' | ')[1].split(' x ')[1].trim();
+                        
+                        if (pA > pB) { 
+                            campeaoFinal = eqA; 
+                            campeaoIdFinal = jogoFinal.equipeAId; 
+                        } else if (pB > pA) { 
+                            campeaoFinal = eqB; 
+                            campeaoIdFinal = jogoFinal.equipeBId; 
+                        }
+                    }
+                }
+                return { htmlTabela: '', campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+            }
+        }
+
+        window.toggleTorneio = function(id, headerEl) {
             const body = document.getElementById(`body-${id}`);
+            const seta = headerEl.querySelector('.seta-toggle');
             if (body.style.display === 'block') {
                 body.style.display = 'none';
+                if(seta) seta.textContent = '▼';
             } else {
                 body.style.display = 'block';
+                if(seta) seta.textContent = '▲';
             }
         };
 

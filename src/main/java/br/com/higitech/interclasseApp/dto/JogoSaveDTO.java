@@ -1,8 +1,8 @@
 package br.com.higitech.interclasseApp.dto;
 
-public record JogoDTO(
+public record JogoSaveDTO(
     Long id,
-    String dataJogo,
+    String diaId,
     String hora,
     String esporte,
     String icone,

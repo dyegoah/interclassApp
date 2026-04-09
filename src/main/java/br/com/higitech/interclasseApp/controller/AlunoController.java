@@ -2,7 +2,6 @@ package br.com.higitech.interclasseApp.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,37 +13,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.higitech.interclasseApp.model.Aluno;
-import br.com.higitech.interclasseApp.repositories.AlunoRepository;
+import br.com.higitech.interclasseApp.service.AlunoService;
 
 @RestController
 @RequestMapping("/api/alunos")
 @CrossOrigin(origins = "*")
 public class AlunoController {
 
-    private final AlunoRepository alunoRepository;
+    private final AlunoService alunoService;
 
-    public AlunoController(AlunoRepository alunoRepository) {
-        this.alunoRepository = alunoRepository;
+    public AlunoController(AlunoService alunoService) {
+        this.alunoService = alunoService;
     }
 
-    // Grava o aluno no PostgreSQL
     @PostMapping
-    public ResponseEntity<Aluno> salvarAluno(@RequestBody Aluno aluno) {
-        Aluno salvo = alunoRepository.save(aluno);
-        System.out.println("Novo Aluno Inserido: " + salvo.getNome());
-        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+    public ResponseEntity<Aluno> cadastrar(@RequestBody Aluno aluno) {
+        return ResponseEntity.ok(alunoService.salvarComTenant(aluno));
     }
 
-    // Busca todos os alunos do PostgreSQL
     @GetMapping
-    public ResponseEntity<List<Aluno>> listarAlunos() {
-        return ResponseEntity.ok(alunoRepository.findAll());
+    public ResponseEntity<List<Aluno>> listar() {
+        return ResponseEntity.ok(alunoService.listarPorProfessor());
     }
 
-    // Apaga um aluno do PostgreSQL
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarAluno(@PathVariable Long id) {
-        alunoRepository.deleteById(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        alunoService.excluirSePertencerAoProfessor(id);
         return ResponseEntity.noContent().build();
     }
 }

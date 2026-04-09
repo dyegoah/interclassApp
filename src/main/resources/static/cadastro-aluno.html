@@ -4,12 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscrição Atleta - InterclassApp</title>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 2rem; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        body { 
+            /* AQUI ESTÁ A MÁGICA DO FUNDO DE TELA */
+            /* A película escura (rgba) garante que o formulário fique legível por cima da foto */
+            background: linear-gradient(rgba(2, 1, 17, 0.75), rgba(25, 25, 112, 0.75)), url('/img/fundo.png') no-repeat center center fixed; 
+            background-size: cover; 
+            color: #ffffff; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 2rem; 
+        }
         
         .glass-form { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid #00f2fe; }
         h2 { font-family: 'Orbitron'; text-align: center; color: #00f2fe; margin-bottom: 0.5rem; text-transform: uppercase; }
@@ -146,7 +157,6 @@
 
 		            let html = '<option value="">Selecione...</option>';
 		            modalidades.forEach(mod => {
-		                // Aqui usamos o ID real que o banco gerou, seja ele 1, 10 ou 54!
 		                html += `<option value="${mod.id}">${mod.icone} ${mod.nomeEsporte}</option>`;
 		            });
 		            
@@ -194,12 +204,10 @@
 		        fotoFinal = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=random&color=fff`;
 		    }
 
-		    // CAPTURANDO O NOME DO ESPORTE E O ÍCONE DA OPÇÃO SELECIONADA
 		    const optionSelecionada = selectMod.options[selectMod.selectedIndex];
 		    const nomeEsporte = optionSelecionada.value;
 		    const iconeEsporte = optionSelecionada.getAttribute('data-icone');
 
-		    // JSON formatado para a sua classe Aluno.java
 		    const novoAluno = {
 		        nome: nome,
 		        turma: turmaSelect.value,

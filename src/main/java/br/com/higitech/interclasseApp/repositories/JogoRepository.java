@@ -1,17 +1,15 @@
 package br.com.higitech.interclasseApp.repositories;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import br.com.higitech.interclasseApp.model.Jogo;
 
-@Repository
 public interface JogoRepository extends JpaRepository<Jogo, Long> {
     
-    // A mágica do Spring: Navega de Jogo -> Modalidade -> Lote -> Genero!
-    List<Jogo> findByModalidadeLoteGeneroOrderByDataJogoAscHorarioAsc(String genero);
+    // 🔒 TRAVA SAAS: Traz todos os jogos deste professor
+    List<Jogo> findByProfessorId(Long professorId);
     
-    List<Jogo> findByModalidadeId(Long modalidadeId);
+    // 🔒 TRAVA SAAS: Traz os jogos do professor, filtrados pelo gênero (Lote), em ordem cronológica
+    List<Jogo> findByProfessorIdAndGeneroOrderByDataJogoAscHorarioAsc(Long professorId, String genero);
+    
 }

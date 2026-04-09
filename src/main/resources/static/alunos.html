@@ -28,12 +28,18 @@
         .stat-valor { font-size: 2.5rem; font-family: 'Orbitron'; font-weight: bold; color: #ff00de; text-shadow: 0 0 10px rgba(255,0,222,0.5); margin: 10px 0; }
         .stat-label { font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px; }
 
-        .ranking-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 2rem; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); }
-        .ranking-pill { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; font-family: 'Segoe UI'; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
-        .ranking-pill:hover { background: rgba(0, 242, 254, 0.1); border-color: #00f2fe; transform: translateY(-2px); }
-        .ranking-count { background: #00f2fe; color: black; font-weight: bold; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
-        .ranking-icone-acao { font-size: 1.1rem; opacity: 0.7; transition: 0.3s; }
-        .ranking-pill:hover .ranking-icone-acao { opacity: 1; text-shadow: 0 0 10px #00f2fe; }
+        .ranking-container { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 2rem; padding: 15px; border-radius: 15px; background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.1); }
+        .ranking-pill { background: linear-gradient(45deg, rgba(0,0,0,0.6), rgba(20,20,40,0.8)); border: 1px solid rgba(0, 242, 254, 0.3); padding: 10px 20px; border-radius: 30px; font-family: 'Segoe UI'; font-size: 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .ranking-pill:hover { background: linear-gradient(45deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 222, 0.2)); border-color: #00f2fe; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0, 242, 254, 0.4); }
+        .ranking-count { background: #00f2fe; color: #000; font-weight: bold; padding: 3px 10px; border-radius: 12px; font-size: 0.9rem; }
+        .ranking-icone-acao { font-size: 0.85rem; color: #ff00de; font-family: 'Orbitron'; font-weight: bold; margin-left: 5px; opacity: 0.7; transition: 0.3s; }
+        .ranking-pill:hover .ranking-icone-acao { opacity: 1; text-shadow: 0 0 10px #ff00de; }
+
+        /* ESTILO DAS NOVAS ABAS DE NAVEGAÇÃO */
+        .abas-nav-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .aba-mod { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); padding: 8px 18px; border-radius: 8px 8px 0 0; font-family: 'Orbitron'; font-size: 0.9rem; cursor: pointer; transition: 0.3s; white-space: nowrap; border-bottom: none;}
+        .aba-mod:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .aba-mod.active { background: rgba(0, 242, 254, 0.1); border-color: #00f2fe; color: #00f2fe; text-shadow: 0 0 8px rgba(0, 242, 254, 0.5); font-weight: bold; border-bottom: 2px solid #00f2fe; }
 
         .alunos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         .aluno-card { border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 15px; border-left: 4px solid #00f2fe; transition: transform 0.3s; background: rgba(10,10,20,0.6); }
@@ -89,6 +95,12 @@
         <h3 style="font-family: 'Orbitron'; font-size: 1rem; color: #fff; margin-bottom: 10px;">⚡ Modalidades Ativas (Clique para Gerar Torneio)</h3>
         <div class="ranking-container" id="ranking-modalidades"></div>
 
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 15px;">
+            <h3 style="font-family: 'Orbitron'; font-size: 1.2rem; color: #00f2fe; margin: 0;">📋 Lista de Inscritos</h3>
+        </div>
+        
+        <div class="abas-nav-container" id="abas-modalidades"></div>
+
         <div class="alunos-grid" id="grid-alunos"></div>
 
     </div>
@@ -108,168 +120,217 @@
 
     <div id="footbar-placeholder"></div>
 
-	<script>
-	        window.onload = async () => {
-	            await fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-	            await fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
-	            
-	            inicializarBancoDeDadosLocal();
-	        };
+    <script>
+        let listaAlunos = [];
+        let abaAtiva = 'Todos'; // Guarda a aba atual selecionada
 
-	        let listaAlunos = [];
+        window.onload = async () => {
+            await fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+            await fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+            
+            inicializarBancoDeDadosLocal();
+        };
 
-	        async function inicializarBancoDeDadosLocal() {
-	            try {
-	                // Rota relativa, evita o erro da porta 8080/8015
-	                const response = await fetch('/api/alunos');
-	                if (response.ok) {
-	                    listaAlunos = await response.json();
-	                    atualizarTela(); 
-	                } else {
-	                    console.error("Falha ao ler os alunos do banco.");
-	                }
-	            } catch (error) {
-	                console.error("Erro na API:", error);
-	                document.getElementById('grid-alunos').innerHTML = `<p style="color:red; text-align:center; grid-column: 1 / -1;">🚨 Erro de conexão com o servidor. Verifique se o Spring Boot está rodando.</p>`;
-	            }
-	        }
+        async function inicializarBancoDeDadosLocal() {
+            try {
+                const response = await fetch('/api/alunos');
+                if (response.ok) {
+                    listaAlunos = await response.json();
+                    atualizarTela(); 
+                } else {
+                    console.error("Falha ao ler os alunos do banco.");
+                }
+            } catch (error) {
+                console.error("Erro na API:", error);
+                document.getElementById('grid-alunos').innerHTML = `<p style="color:red; text-align:center; grid-column: 1 / -1;">🚨 Erro de conexão com o servidor. Verifique se o Spring Boot está rodando.</p>`;
+            }
+        }
 
-	        function atualizarTela() {
-	            renderizarGrid(listaAlunos);
-	            calcularEstatisticasEGerarBotoes();
-	        }
+        function atualizarTela() {
+            renderizarAbasNavegacao();
+            filtrarAlunos(); // Aplica aba + pesquisa e renderiza o grid
+            calcularEstatisticasEGerarBotoes();
+        }
 
-	        function renderizarGrid(alunos) {
-	            const container = document.getElementById('grid-alunos');
-	            container.innerHTML = '';
-	            
-	            if(!alunos || alunos.length === 0) {
-	                container.innerHTML = `<p style="font-family:'Segoe UI'; color: rgba(255,255,255,0.5); text-align: center; grid-column: 1 / -1; padding: 20px;">Nenhuma inscrição encontrada no Banco de Dados. Utilize o link público para cadastrar atletas.</p>`;
-	                return;
-	            }
+        // ====================================================
+        // GERA AS ABAS COM BASE NAS MODALIDADES EXISTENTES
+        // ====================================================
+        function renderizarAbasNavegacao() {
+            const container = document.getElementById('abas-modalidades');
+            let html = `<button class="aba-mod ${abaAtiva === 'Todos' ? 'active' : ''}" onclick="mudarAba('Todos')">🌐 Todos</button>`;
+            
+            // Pega todos os esportes únicos
+            let esportesUnicos = [...new Set(listaAlunos.map(a => a.esporte || 'Sem Esporte'))].filter(e => e !== 'Sem Esporte');
+            esportesUnicos.sort(); // Organiza em ordem alfabética
 
-	            alunos.forEach(aluno => {
-	                // Ajuste para ler as informações vindas do Java corretamente
-	                let generoSeguro = aluno.genero ? String(aluno.genero) : 'não definido';
-	                let iconeGenero = generoSeguro === 'feminino' ? '🚺' : (generoSeguro === 'masculino' ? '🚹' : '🚻');
-	                let corGenero = generoSeguro === 'feminino' ? '#ff00de' : (generoSeguro === 'masculino' ? '#00f2fe' : '#b200ff');
-	                let corPrincipal = '#00f2fe'; 
-	                
-	                // O Java retorna fotoUrl, não foto
-	                let fotoSegura = aluno.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome || 'Atleta')}&background=222&color=fff`;
+            esportesUnicos.forEach(esp => {
+                // Tenta achar o ícone procurando um aluno que tenha esse esporte
+                let alunoExemplo = listaAlunos.find(a => a.esporte === esp);
+                let icone = alunoExemplo ? (alunoExemplo.iconeEsporte || '🏅') : '🏅';
+                
+                html += `<button class="aba-mod ${abaAtiva === esp ? 'active' : ''}" onclick="mudarAba('${esp}')">${icone} ${esp}</button>`;
+            });
 
-	                // O esporte e o ícone estão dentro do objeto modalidade
-					let nomeEsporte = aluno.esporte || 'N/A';
-					let iconeEsporte = aluno.iconeEsporte || '🏅';
-	                container.innerHTML += `
-	                    <div class="aluno-card glass" style="border-left-color: ${corPrincipal};">
-	                        <img src="${fotoSegura}" alt="Foto" class="aluno-foto" style="border-color: ${corPrincipal};">
-	                        <div class="aluno-info" style="flex-grow: 1;">
-	                            <h4>${aluno.nome || 'Sem Nome'}</h4>
-	                            <p>Turma: <b>${aluno.turma || 'N/A'}</b></p>
-	                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-	                                <span class="aluno-badge" style="color: ${corPrincipal}; border: 1px solid rgba(255,255,255,0.1);">${iconeEsporte} ${nomeEsporte}</span>
-	                                <span class="aluno-badge" style="color: ${corGenero}; background: rgba(0,0,0,0.5);">${iconeGenero} ${generoSeguro.toUpperCase()}</span>
-	                            </div>
-	                        </div>
-	                        <div class="aluno-actions">
-	                            <button class="btn-action delete" onclick="abrirModalExclusao(${aluno.id}, '${aluno.nome}')" title="Remover Inscrição">🗑️</button>
-	                        </div>
-	                    </div>
-	                `;
-	            });
-	        }
+            container.innerHTML = html;
+        }
 
-	        function calcularEstatisticasEGerarBotoes() {
-	            document.getElementById('stat-total').textContent = listaAlunos.length;
-	            const containerRanking = document.getElementById('ranking-modalidades');
-	            
-	            if(listaAlunos.length === 0) {
-	                document.getElementById('stat-top-esporte').textContent = '-';
-	                document.getElementById('stat-top-turma').textContent = '-';
-	                containerRanking.innerHTML = '<span style="font-family: \'Segoe UI\'; font-size: 0.85rem; color: rgba(255,255,255,0.5);">Nenhum esporte com inscritos no momento.</span>';
-	                return;
-	            }
+        function mudarAba(nomeEsporte) {
+            abaAtiva = nomeEsporte;
+            renderizarAbasNavegacao(); // Pinta a aba certa de azul
+            filtrarAlunos(); // Filtra a grade
+        }
 
-	            let contagemEsportes = {};
-	            let contagemTurmas = {};
+        // ====================================================
+        // FILTRO APRIMORADO (LÊ A ABA + A BARRA DE PESQUISA)
+        // ====================================================
+        function filtrarAlunos() {
+            const termo = document.getElementById('busca-aluno').value.toLowerCase();
+            
+            const filtrados = listaAlunos.filter(a => {
+                let nomeEsporte = a.esporte || (a.modalidade ? a.modalidade.nomeEsporte : '');
+                
+                // Regra 1: Tem de pertencer à aba atual (ou aba Todos)
+                let matchAba = (abaAtiva === 'Todos') || (nomeEsporte === abaAtiva);
+                
+                // Regra 2: Tem de bater com o texto da barra de pesquisa
+                let matchBusca = (a.nome || '').toLowerCase().includes(termo) || 
+                                 (a.turma || '').toLowerCase().includes(termo) || 
+                                 nomeEsporte.toLowerCase().includes(termo) || 
+                                 (a.genero || '').toLowerCase().includes(termo);
+                
+                return matchAba && matchBusca;
+            });
+            
+            renderizarGrid(filtrados);
+        }
 
-	            listaAlunos.forEach(a => {
-	                // Lê o nome do esporte de dentro do objeto modalidade
-	                let esp = a.modalidade ? a.modalidade.nomeEsporte : 'Sem Esporte';
-	                let tur = a.turma || 'Sem Turma';
-	                contagemEsportes[esp] = (contagemEsportes[esp] || 0) + 1;
-	                contagemTurmas[tur] = (contagemTurmas[tur] || 0) + 1;
-	            });
+        function renderizarGrid(alunos) {
+            const container = document.getElementById('grid-alunos');
+            container.innerHTML = '';
+            
+            if(!alunos || alunos.length === 0) {
+                container.innerHTML = `<p style="font-family:'Segoe UI'; color: rgba(255,255,255,0.5); text-align: center; grid-column: 1 / -1; padding: 20px;">Nenhum atleta encontrado nesta seção.</p>`;
+                return;
+            }
 
-	            document.getElementById('stat-top-esporte').textContent = Object.keys(contagemEsportes).reduce((a, b) => contagemEsportes[a] > contagemEsportes[b] ? a : b);
-	            document.getElementById('stat-top-turma').textContent = Object.keys(contagemTurmas).reduce((a, b) => contagemTurmas[a] > contagemTurmas[b] ? a : b);
+            alunos.forEach(aluno => {
+                let generoSeguro = aluno.genero ? String(aluno.genero) : 'não definido';
+                let iconeGenero = generoSeguro === 'feminino' ? '🚺' : (generoSeguro === 'masculino' ? '🚹' : '🚻');
+                let corGenero = generoSeguro === 'feminino' ? '#ff00de' : (generoSeguro === 'masculino' ? '#00f2fe' : '#b200ff');
+                let corPrincipal = '#00f2fe'; 
+                
+                let fotoSegura = aluno.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome || 'Atleta')}&background=222&color=fff`;
 
-	            containerRanking.innerHTML = '';
-	            
-	            for (let [esporte, qtd] of Object.entries(contagemEsportes)) {
-	                if (esporte === 'Sem Esporte') continue;
-	                containerRanking.innerHTML += `
-	                    <div class="ranking-pill" onclick="criarTorneioDireto('${esporte}')" title="Criar torneio de ${esporte}">
-	                        ${esporte} <span class="ranking-count">${qtd}</span> <span class="ranking-icone-acao">⚡</span>
-	                    </div>
-	                `;
-	            }
-	        }
+                let nomeEsporte = aluno.esporte || 'N/A';
+                let iconeEsporte = aluno.iconeEsporte || '🏅';
+                
+                container.innerHTML += `
+                    <div class="aluno-card glass" style="border-left-color: ${corPrincipal};">
+                        <img src="${fotoSegura}" alt="Foto" class="aluno-foto" style="border-color: ${corPrincipal};">
+                        <div class="aluno-info" style="flex-grow: 1;">
+                            <h4>${aluno.nome || 'Sem Nome'}</h4>
+                            <p>Turma: <b>${aluno.turma || 'N/A'}</b></p>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <span class="aluno-badge" style="color: ${corPrincipal}; border: 1px solid rgba(255,255,255,0.1);">${iconeEsporte} ${nomeEsporte}</span>
+                                <span class="aluno-badge" style="color: ${corGenero}; background: rgba(0,0,0,0.5);">${iconeGenero} ${generoSeguro.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        <div class="aluno-actions">
+                            <button class="btn-action delete" onclick="abrirModalExclusao(${aluno.id}, '${aluno.nome}')" title="Remover Inscrição">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-	        function criarTorneioDireto(esporteNome) {
-	            // Ajuste para ler modalidade.nomeEsporte
-	            const alunosDoEsporte = listaAlunos.filter(a => a.modalidade && a.modalidade.nomeEsporte === esporteNome);
-	            
-	            if(alunosDoEsporte.length < 2) {
-	                alert(`Atenção: É necessário pelo menos 2 inscritos para gerar uma chave de ${esporteNome}. Aguarde mais inscrições!`);
-	                return;
-	            }
-	            
-	            const mapIds = { 'Futsal':1, 'Vôlei':2, 'Basquete':3, 'Handebol':4, 'Queimada':5, 'Vôlei de Areia':6, 'Natação':7, 'Atletismo':8, 'Tênis de Mesa':9, 'Xadrez':10, 'Dama':11, 'E-Sports':12 };
-	            let esporteId = mapIds[esporteNome] || 99;
+        // ====================================================
+        // GERA AS ESTATÍSTICAS E OS BOTÕES DE CRIAR TORNEIO
+        // ====================================================
+        function calcularEstatisticasEGerarBotoes() {
+            document.getElementById('stat-total').textContent = listaAlunos.length;
+            const containerRanking = document.getElementById('ranking-modalidades');
+            
+            if(listaAlunos.length === 0) {
+                document.getElementById('stat-top-esporte').textContent = '-';
+                document.getElementById('stat-top-turma').textContent = '-';
+                containerRanking.innerHTML = '<span style="font-family: \'Segoe UI\'; font-size: 0.9rem; color: rgba(255,255,255,0.5);">Nenhuma inscrição no momento. Os esportes aparecerão aqui.</span>';
+                return;
+            }
 
-	            let generos = [...new Set(alunosDoEsporte.map(a => a.genero))];
-	            let generoTorneio = generos.length === 1 && generos[0] ? generos[0] : 'misto';
+            let contagemEsportes = {};
+            let contagemTurmas = {};
+            let iconesEsportes = {};
 
-	            const setupData = { 
-	                genero: generoTorneio, 
-	                esportes: [{ id: esporteId, nome: esporteNome, configurado: false }] 
-	            };
-	            
-	            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
-	            window.location.href = '/setup/torneios.html';
-	        }
+            listaAlunos.forEach(a => {
+                let esp = a.esporte || 'Sem Esporte';
+                let tur = a.turma || 'Sem Turma';
+                let icone = a.iconeEsporte || '🏅';
 
-	        function filtrarAlunos() {
-	            const termo = document.getElementById('busca-aluno').value.toLowerCase();
-	            const filtrados = listaAlunos.filter(a => {
-	                let nomeEsporte = a.modalidade ? a.modalidade.nomeEsporte : '';
-	                return (a.nome || '').toLowerCase().includes(termo) || 
-	                       (a.turma || '').toLowerCase().includes(termo) || 
-	                       nomeEsporte.toLowerCase().includes(termo) || 
-	                       (a.genero || '').toLowerCase().includes(termo);
-	            });
-	            renderizarGrid(filtrados);
-	        }
+                contagemEsportes[esp] = (contagemEsportes[esp] || 0) + 1;
+                contagemTurmas[tur] = (contagemTurmas[tur] || 0) + 1;
+                iconesEsportes[esp] = icone;
+            });
 
-	        function abrirModalExclusao(id, nome) { document.getElementById('id-exclusao').value = id; document.getElementById('nome-exclusao').textContent = nome; document.getElementById('modal-exclusao').style.display = 'flex'; }
-	        function fecharModal() { document.getElementById('modal-exclusao').style.display = 'none'; }
+            document.getElementById('stat-top-esporte').textContent = Object.keys(contagemEsportes).reduce((a, b) => contagemEsportes[a] > contagemEsportes[b] ? a : b);
+            document.getElementById('stat-top-turma').textContent = Object.keys(contagemTurmas).reduce((a, b) => contagemTurmas[a] > contagemTurmas[b] ? a : b);
 
-	        async function confirmarExclusao() {
-	            const id = parseInt(document.getElementById('id-exclusao').value);
-	            try {
-	                // Caminho relativo para exclusão
-	                const response = await fetch(`/api/alunos/${id}`, { method: 'DELETE' });
-	                if (response.ok) {
-	                    listaAlunos = listaAlunos.filter(a => a.id !== id);
-	                    fecharModal(); atualizarTela();
-	                }
-	            } catch (error) { console.error(error); alert("Erro ao excluir do banco de dados."); }
-	        }
+            containerRanking.innerHTML = '';
+            
+            for (let [esporte, qtd] of Object.entries(contagemEsportes)) {
+                if (esporte === 'Sem Esporte') continue;
+                let iconeDaVez = iconesEsportes[esporte];
 
-	        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
-	        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
-	    </script>
+                containerRanking.innerHTML += `
+                    <div class="ranking-pill" onclick="criarTorneioDireto('${esporte}')" title="Criar torneio de ${esporte}">
+                        <span style="font-size: 1.3rem;">${iconeDaVez}</span>
+                        <b>${esporte}</b> 
+                        <span class="ranking-count">${qtd}</span> 
+                        <span class="ranking-icone-acao">⚡ Gerar Tabela</span>
+                    </div>
+                `;
+            }
+        }
+
+        function criarTorneioDireto(esporteNome) {
+            const alunosDoEsporte = listaAlunos.filter(a => a.esporte === esporteNome);
+            
+            if(alunosDoEsporte.length < 2) {
+                alert(`Atenção: É necessário pelo menos 2 inscritos para gerar uma chave de ${esporteNome}. Aguarde mais inscrições!`);
+                return;
+            }
+            
+            const mapIds = { 'Futsal':1, 'Vôlei':2, 'Basquete':3, 'Handebol':4, 'Queimada':5, 'Vôlei de Areia':6, 'Natação':7, 'Atletismo':8, 'Tênis de Mesa':9, 'Xadrez':10, 'Dama':11, 'E-Sports':12 };
+            let esporteId = mapIds[esporteNome] || 99;
+
+            let generos = [...new Set(alunosDoEsporte.map(a => a.genero))];
+            let generoTorneio = generos.length === 1 && generos[0] ? generos[0] : 'misto';
+
+            const setupData = { 
+                genero: generoTorneio, 
+                esportes: [{ id: esporteId, nome: esporteNome, qtdTimes: alunosDoEsporte.length, configurado: false }] 
+            };
+            
+            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+            window.location.href = '/setup/torneios.html';
+        }
+        
+        function abrirModalExclusao(id, nome) { document.getElementById('id-exclusao').value = id; document.getElementById('nome-exclusao').textContent = nome; document.getElementById('modal-exclusao').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modal-exclusao').style.display = 'none'; }
+
+        async function confirmarExclusao() {
+            const id = parseInt(document.getElementById('id-exclusao').value);
+            try {
+                const response = await fetch(`/api/alunos/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    listaAlunos = listaAlunos.filter(a => a.id !== id);
+                    fecharModal(); 
+                    atualizarTela(); // A tela atualizará mantendo você na aba que você já estava!
+                }
+            } catch (error) { console.error(error); alert("Erro ao excluir do banco de dados."); }
+        }
+
+        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+    </script>
 </body>
 </html>

@@ -18,17 +18,13 @@ public class SumulaController {
 
     private final SumulaService sumulaService;
 
-    // CONSTRUTOR MANUAL
     public SumulaController(SumulaService sumulaService) {
         this.sumulaService = sumulaService;
     }
 
-    @PostMapping("/{jogoId}/finalizar")
-    public ResponseEntity<String> finalizarPartida(
-            @PathVariable Long jogoId, 
-            @RequestBody SumulaFinalizadaDTO sumulaDTO) {
-        
-        sumulaService.processarSumula(jogoId, sumulaDTO);
-        return ResponseEntity.ok("Súmula processada e gravada no PostgreSQL com sucesso!");
+    @PostMapping("/{id}/finalizar")
+    public ResponseEntity<Void> finalizarSumula(@PathVariable Long id, @RequestBody SumulaFinalizadaDTO dto) {
+        sumulaService.processarSumula(id, dto);
+        return ResponseEntity.ok().build();
     }
 }

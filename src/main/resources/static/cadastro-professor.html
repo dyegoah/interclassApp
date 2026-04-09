@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - InterclassApp</title>
+    <style>
+
+        :root { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        
+        body { 
+            /* A NOVA TEXTURA CIBERNÉTICA */
+            background-color: #05050f;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
+                linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            animation: moveGrid 20s linear infinite;
+
+            /* AS REGRAS QUE MANTÊM O FORMULÁRIO CENTRADO NA TELA (NÃO APAGAR) */
+            color: #ffffff; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 2rem; 
+        }
+
+        /* O MOTOR QUE FAZ A GRADE SE MOVER */
+        @keyframes moveGrid {
+            0% { background-position: center center, 0 0, 0 0; }
+            100% { background-position: center center, 40px 40px, 40px 40px; }
+        }
+        
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); }
+        
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); text-align: center;}
+        p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 25px; font-size: 0.95rem; text-align: center; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+        .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
+        .form-group input:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
+
+        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 30px; color: #fff; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 15px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 0, 222, 0.8); }
+
+        .links-rodape { margin-top: 20px; font-size: 0.9rem; text-align: center;}
+        .links-rodape a { color: #00f2fe; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .links-rodape a:hover { text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); text-decoration: underline; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+
+    <div class="glass-form">
+        <h1>Criar Conta</h1>
+        <p class="subtitle">Faça a gestão dos torneios da sua escola.</p>
+
+        <form id="form-cadastro" onsubmit="criarConta(event)">
+            <div class="form-group">
+                <label>Nome do Professor / Gestor</label>
+                <input type="text" id="nome" required placeholder="Seu nome completo">
+            </div>
+
+            <div class="form-group">
+                <label>Nome da Escola / Instituição</label>
+                <input type="text" id="escola" required placeholder="Ex: Colégio Estadual Modelo">
+            </div>
+
+            <div class="form-group">
+                <label>E-mail Institucional ou Pessoal</label>
+                <input type="email" id="email" required placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Criar Senha</label>
+                <input type="password" id="senha" required placeholder="Mínimo de 6 caracteres">
+            </div>
+
+            <button type="submit" class="btn-submit">Criar Minha Conta</button>
+        </form>
+
+        <div class="links-rodape">
+            <span style="color: rgba(255,255,255,0.5);">Já possui uma conta? <a href="/login.html">Faça Login</a></span>
+        </div>
+    </div>
+
+    <script>
+        function criarConta(event) {
+            event.preventDefault();
+            
+            // Pega os valores digitados
+            const nome = document.getElementById('nome').value;
+            const escola = document.getElementById('escola').value;
+            const email = document.getElementById('email').value;
+            
+            // Pega a data de hoje formatada (Ex: 10/04/2026)
+            const hoje = new Date();
+            const dataAtual = hoje.toLocaleDateString('pt-BR');
+
+            // Cria o objeto do novo professor
+            const novoProf = {
+                id: Math.floor(Math.random() * 1000) + 100, // Gera um ID falso aleatório
+                nome: nome,
+                escola: escola,
+                email: email,
+                data: dataAtual,
+                status: "ativo"
+            };
+
+            // Salva na memória do navegador (Mock)
+            let listaProfessores = JSON.parse(localStorage.getItem('mockProfessores')) || [];
+            listaProfessores.push(novoProf);
+            localStorage.setItem('mockProfessores', JSON.stringify(listaProfessores));
+
+            alert("Conta criada com sucesso! Você pode usar o e-mail cadastrado para entrar.");
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

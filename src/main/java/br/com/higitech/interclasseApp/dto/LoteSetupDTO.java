@@ -4,5 +4,5 @@ import java.util.List;
 
 public record LoteSetupDTO(
     String genero, 
-    List<ModalidadeSetupDTO> esportes
+    List<EsporteSetupDTO> esportes // <-- Aqui estava ModalidadeSetupDTO no seu código
 ) {}

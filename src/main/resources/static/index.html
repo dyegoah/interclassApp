@@ -4,11 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - InterclassApp</title>
+    <link rel="stylesheet" href="/css/estilo-global.css">
     <style>
-        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        body { 
+            /* 🌟 O SEGREDO ESTÁ AQUI: Tudo na mesma linha e com luzes mais fortes (0.4 de força) */
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(0, 242, 254, 0.35) 0%, transparent 60%),
+                radial-gradient(circle at 100% 100%, rgba(255, 0, 222, 0.3) 0%, transparent 60%),
+                #05050f !important;
+            
+            background-attachment: fixed !important;
+            
+            /* Configurações padrão para o texto não sumir */
+            color: #ffffff; 
+            min-height: 100vh; 
+            margin: 0;
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
+
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .section-title { text-transform: uppercase; font-size: 1.1rem; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
@@ -94,11 +111,13 @@
 
         <div id="dashboard-view" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 class="section-title">📊 Lotes da Arena</h2>
-                <button class="btn-acao" onclick="iniciarNovoLote()">+ Novo Lote de Gênero</button>
+                <h2 class="section-title">📊 Lotes da Arena (Categorias)</h2>
+                <button class="btn-acao" onclick="iniciarNovoLote()">+ Iniciar Nova Categoria</button>
             </div>
             
-            <div id="active-modalidades-container"></div>
+            <div id="active-modalidades-container">
+                <p style="text-align: center; color: #00f2fe; margin-top: 2rem;">⏳ A sincronizar categorias com o servidor...</p>
+            </div>
         </div>
     </div> 
 
@@ -115,49 +134,81 @@
     <div id="footbar-placeholder"></div>
 
     <script>
-        window.onload = () => {
+        // Variável global para guardar os dados frescos que vêm do PostgreSQL
+        let lotesDoBancoDeDados = {};
+
+        window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
-            // Lógica de Lotes (Multi-Gêneros)
-            let arenaLotes = JSON.parse(localStorage.getItem('arenaLotes')) || {};
-            
-            // --- MIGRACÃO AUTOMÁTICA (Para atualizar o seu teste antigo pro novo formato) ---
-            const oldSetup = JSON.parse(localStorage.getItem('arenaSetup'));
-            const oldCal = JSON.parse(localStorage.getItem('calendarioOficial'));
-            
-            if (oldSetup && oldSetup.genero && Object.keys(arenaLotes).length === 0) {
-                arenaLotes[oldSetup.genero] = oldSetup;
-                localStorage.setItem('arenaLotes', JSON.stringify(arenaLotes));
-                
-                if(oldCal) {
-                    let cals = {};
-                    cals[oldSetup.genero] = oldCal;
-                    localStorage.setItem('calendariosOficiais', JSON.stringify(cals));
-                    localStorage.removeItem('calendarioOficial');
-                }
-                localStorage.removeItem('arenaSetup'); // Remove o formato velho
-            }
-            // --------------------------------------------------------------------------------
-
-            if(Object.keys(arenaLotes).length === 0) {
-                document.getElementById('zero-state-view').style.display = 'block';
-                document.getElementById('link-texto').textContent = window.location.origin + '/cadastro-aluno.html';
-            } else {
-                document.getElementById('dashboard-view').style.display = 'block';
-                renderizarLotesAtivos(arenaLotes);
-            }
+            await sincronizarLotesComServidorJava();
         };
 
-        function renderizarLotesAtivos(arenaLotes) {
+        async function sincronizarLotesComServidorJava() {
+            const generos = ['masculino', 'feminino', 'misto'];
+            let temLoteNoBanco = false;
+
+            for (let genero of generos) {
+                try {
+                    let response = await fetch(`/api/jogos/lote/${genero}`);
+                    if (response.ok) {
+                        let jogos = await response.json();
+                        if (jogos && jogos.length > 0) {
+                            let esportesUnicos = [...new Set(jogos.map(j => j.esporte))];
+                            
+                            lotesDoBancoDeDados[genero] = {
+                                genero: genero,
+                                esportes: esportesUnicos,
+                                totalJogos: jogos.length,
+                                jogos: jogos 
+                            };
+                            temLoteNoBanco = true;
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Aviso: Não foi possível buscar o lote ${genero}.`);
+                }
+            }
+
+            if (temLoteNoBanco) {
+                document.getElementById('dashboard-view').style.display = 'block';
+                document.getElementById('zero-state-view').style.display = 'none';
+                renderizarLotesNaTela(lotesDoBancoDeDados);
+            } else {
+                let lotesOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                if (Object.keys(lotesOffline).length > 0) {
+                    document.getElementById('dashboard-view').style.display = 'block';
+                    document.getElementById('zero-state-view').style.display = 'none';
+                    
+                    let lotesAdaptados = {};
+                    for(let gen in lotesOffline) {
+                        let jgs = lotesOffline[gen].jogos || [];
+                        lotesAdaptados[gen] = {
+                            genero: gen,
+                            esportes: [...new Set(jgs.map(j => j.esporte))],
+                            totalJogos: jgs.length,
+                            jogos: jgs
+                        };
+                    }
+                    lotesDoBancoDeDados = lotesAdaptados; 
+                    renderizarLotesNaTela(lotesAdaptados);
+                } else {
+                    document.getElementById('dashboard-view').style.display = 'none';
+                    document.getElementById('zero-state-view').style.display = 'block';
+                    document.getElementById('link-texto').textContent = window.location.origin + '/cadastro-aluno.html';
+                }
+            }
+        }
+
+        function renderizarLotesNaTela(lotesObj) {
             const container = document.getElementById('active-modalidades-container');
             container.innerHTML = '';
 
-            for(let genero in arenaLotes) {
-                let lote = arenaLotes[genero];
-                // Define as cores por gênero!
+            for(let genero in lotesObj) {
+                let lote = lotesObj[genero];
                 let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
                 let icone = genero === 'masculino' ? '🚹' : (genero === 'feminino' ? '🚺' : '🚻');
+                let descEsportes = lote.esportes.join(', ');
 
                 container.innerHTML += `
                     <div class="glass" style="padding: 1.5rem; border-radius: 15px; border-left: 5px solid ${corTema}; margin-bottom: 1.5rem;">
@@ -165,70 +216,67 @@
                             <div style="display: flex; align-items: center; gap: 15px;">
                                 <div style="font-size: 2.5rem;">${icone}</div>
                                 <div>
-                                    <h3 style="color: ${corTema}; margin-bottom: 5px; text-transform: uppercase;">Lote: ${genero}</h3>
-                                    <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.7);">${lote.esportes.length} modalidades prontas e agendadas.</p>
+                                    <h3 style="color: ${corTema}; margin-bottom: 5px; text-transform: uppercase;">Lote da Categoria: ${genero}</h3>
+                                    <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.7);"><b>${lote.esportes.length} Modalidades Ativas:</b> ${descEsportes}</p>
                                 </div>
                             </div>
-                            <button class="btn-acao" style="background: rgba(255,69,0,0.1); border: 1px solid #ff4500; color: #ff4500; padding: 6px 12px; font-size: 0.75rem;" onclick="excluirLote('${genero}')">🗑️ Excluir Lote</button>
+                            <span style="background: rgba(0,255,0,0.1); color: #00ff00; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; border: 1px solid #00ff00; height: max-content;">✔️ Sincronizado</span>
                         </div>
                         
                         <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: ${corTema}; color: ${corTema};" onclick="abrirCalendario('${genero}')">📅 Ver Calendário Deste Lote</button>
-                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: rgba(255,255,255,0.3); color: white;" onclick="window.location.href='/alunos.html'">👥 Ver Alunos Inscritos</button>
+                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: ${corTema}; color: ${corTema};" onclick="abrirCalendario('${genero}')">📅 Ver Calendário Completo</button>
+                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: rgba(255,255,255,0.3); color: white;" onclick="window.location.href='/tabelas.html'">🏆 Acessar PlayHub / Partidas</button>
+                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: rgba(255,255,255,0.3); color: white;" onclick="window.location.href='/alunos.html'">👥 Ver Atletas Inscritos</button>
                         </div>
                     </div>
                 `;
             }
         }
 
-        // Limpa o rascunho temporário e manda o professor começar um novo Lote limpo
         function iniciarNovoLote() {
             localStorage.removeItem('arenaSetup');
             window.location.href = '/setup/modalidades.html';
         }
 
-        function excluirLote(genero) {
-            if(confirm(`⚠️ Tem certeza que deseja apagar todo o torneio e o calendário da categoria ${genero.toUpperCase()}?`)) {
-                let lotes = JSON.parse(localStorage.getItem('arenaLotes')) || {};
-                delete lotes[genero];
-                localStorage.setItem('arenaLotes', JSON.stringify(lotes));
-
-                let cals = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-                delete cals[genero];
-                localStorage.setItem('calendariosOficiais', JSON.stringify(cals));
-
-                window.location.reload(); // Recarrega a página para atualizar a tela
-            }
-        }
-
-        // --- SISTEMA DE VISUALIZAÇÃO DO CALENDÁRIO NO DASHBOARD ---
         function abrirCalendario(genero) {
-            const cals = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-            const calData = cals[genero];
+            const loteAtual = lotesDoBancoDeDados[genero];
             const container = document.getElementById('conteudo-calendario');
             
-            // Ajusta o título do Modal com a cor do gênero
             let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
             document.getElementById('modal-cal-title').style.color = corTema;
             document.getElementById('modal-cal-title').innerHTML = `📅 Tabela Oficial - ${genero.toUpperCase()}`;
 
-            if(!calData || !calData.dias || calData.dias.length === 0) {
-                container.innerHTML = `<p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); text-align: center; padding: 2rem;">A tabela deste lote ainda não foi gerada.</p>`;
+            if(!loteAtual || !loteAtual.jogos || loteAtual.jogos.length === 0) {
+                container.innerHTML = `<p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); text-align: center; padding: 2rem;">A tabela deste lote ainda não foi gerada no sistema.</p>`;
             } else {
                 container.innerHTML = '';
-                calData.dias.forEach(dia => {
-                    let jogosDoDia = calData.jogos.filter(j => j.diaId === dia.idStr);
-                    jogosDoDia.sort((a, b) => a.hora.localeCompare(b.hora));
+                
+                let jogosPorDia = {};
+                loteAtual.jogos.forEach(j => {
+                    let diaChave = j.diaId || j.dataJogo || "Data Indefinida";
+                    if(!jogosPorDia[diaChave]) jogosPorDia[diaChave] = [];
+                    jogosPorDia[diaChave].push(j);
+                });
 
-                    if(jogosDoDia.length === 0) return;
+                let diasOrdenados = Object.keys(jogosPorDia).sort();
+
+                diasOrdenados.forEach(diaChave => {
+                    let jogosDesteDia = jogosPorDia[diaChave];
+                    jogosDesteDia.sort((a, b) => a.hora.localeCompare(b.hora));
+
+                    let dataFormatada = diaChave;
+                    if(dataFormatada.includes('-')) {
+                        let partes = dataFormatada.split('-');
+                        if(partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    }
 
                     let jogosHtml = '';
-                    jogosDoDia.forEach(jogo => {
+                    jogosDesteDia.forEach(jogo => {
                         jogosHtml += `
                             <div class="jogo-item">
                                 <div class="jogo-hora">${jogo.hora}</div>
                                 <div class="jogo-desc">
-                                    <b>${jogo.icone} ${jogo.esporte}</b> <span style="opacity:0.7; font-size: 0.8rem;">- ${jogo.titulo}</span>
+                                    <b>${jogo.icone || '🏅'} ${jogo.esporte}</b> <span style="opacity:0.7; font-size: 0.8rem;">- ${jogo.titulo}</span>
                                     <span class="jogo-quadra">📍 ${jogo.quadra}</span>
                                 </div>
                             </div>
@@ -238,8 +286,8 @@
                     container.innerHTML += `
                         <div class="dia-card" style="border-left-color: ${corTema};">
                             <div class="dia-header">
-                                <h5 style="color: ${corTema};">${dia.titulo}</h5>
-                                <span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span>
+                                <h5 style="color: ${corTema};">Dia: ${dataFormatada}</h5>
+                                <span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDesteDia.length} Partidas</span>
                             </div>
                             ${jogosHtml}
                         </div>
@@ -250,14 +298,10 @@
             document.getElementById('modal-calendario').style.display = 'flex';
         }
 
-        function fecharCalendario() {
-            document.getElementById('modal-calendario').style.display = 'none';
-        }
-
-        // Funções da Rota de Inscrição
+        function fecharCalendario() { document.getElementById('modal-calendario').style.display = 'none'; }
         function mostrarPainelLink() { document.getElementById('painel-inscricao').style.display = 'block'; document.getElementById('card-inscricao').style.borderTopColor = 'transparent'; }
         function esconderPainelLink() { document.getElementById('painel-inscricao').style.display = 'none'; }
-        function copiarLink(event) { event.stopPropagation(); navigator.clipboard.writeText(document.getElementById('link-texto').textContent).then(() => { alert("Link copiado!"); }); }
+        function copiarLink(event) { event.stopPropagation(); navigator.clipboard.writeText(document.getElementById('link-texto').textContent).then(() => { alert("Link copiado para a Área de Transferência!"); }); }
         
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });

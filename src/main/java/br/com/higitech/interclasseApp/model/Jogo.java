@@ -4,10 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,134 +12,91 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "tb_jogo")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @EqualsAndHashCode(of = "id")
 public class Jogo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String titulo; // Ex: Semifinal, Rodada 1
+    private String titulo;
+    private String quadra;
+    private String status;
+    private String genero; 
 
     private LocalDate dataJogo;
-    
     private LocalTime horario;
-    
-    private String quadra;
 
-    @Column(nullable = false)
-    private String status; // PENDENTE, EM_ANDAMENTO, FINALIZADO
+    @ManyToOne
+    @JoinColumn(name = "modalidade_id")
+    private Modalidade modalidade;
 
+    private Long equipeAId;
+    private String equipeANome;
+    private Long equipeBId;
+    private String equipeBNome;
     private Integer placarA = 0;
     private Integer placarB = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modalidade_id", nullable = false)
-    private Modalidade modalidade;
-
-    @OneToMany(mappedBy = "jogo", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "jogo")
     private List<Escalacao> escalacoes;
 
-    @OneToMany(mappedBy = "jogo", cascade = CascadeType.ALL)
-    private List<EventoSumula> eventos;
+    // 🌟 A MÁGICA MULTI-TENANT AQUI: Quem é o dono deste jogo?
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
 
-	public Long getId() {
-		return id;
-	}
+    // ==========================================
+    // GETTERS E SETTERS
+    // ==========================================
 
-	public String getTitulo() {
-		return titulo;
-	}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public LocalDate getDataJogo() {
-		return dataJogo;
-	}
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
-	public LocalTime getHorario() {
-		return horario;
-	}
+    public String getQuadra() { return quadra; }
+    public void setQuadra(String quadra) { this.quadra = quadra; }
 
-	public String getQuadra() {
-		return quadra;
-	}
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getGenero() { return genero; }
+    public void setGenero(String genero) { this.genero = genero; }
 
-	public Integer getPlacarA() {
-		return placarA;
-	}
+    public LocalDate getDataJogo() { return dataJogo; }
+    public void setDataJogo(LocalDate dataJogo) { this.dataJogo = dataJogo; }
 
-	public Integer getPlacarB() {
-		return placarB;
-	}
+    public LocalTime getHorario() { return horario; }
+    public void setHorario(LocalTime horario) { this.horario = horario; }
 
-	public Modalidade getModalidade() {
-		return modalidade;
-	}
+    public Modalidade getModalidade() { return modalidade; }
+    public void setModalidade(Modalidade modalidade) { this.modalidade = modalidade; }
 
-	public List<Escalacao> getEscalacoes() {
-		return escalacoes;
-	}
+    public Long getEquipeAId() { return equipeAId; }
+    public void setEquipeAId(Long equipeAId) { this.equipeAId = equipeAId; }
 
-	public List<EventoSumula> getEventos() {
-		return eventos;
-	}
+    public String getEquipeANome() { return equipeANome; }
+    public void setEquipeANome(String equipeANome) { this.equipeANome = equipeANome; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getEquipeBId() { return equipeBId; }
+    public void setEquipeBId(Long equipeBId) { this.equipeBId = equipeBId; }
 
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
+    public String getEquipeBNome() { return equipeBNome; }
+    public void setEquipeBNome(String equipeBNome) { this.equipeBNome = equipeBNome; }
 
-	public void setDataJogo(LocalDate dataJogo) {
-		this.dataJogo = dataJogo;
-	}
+    public Integer getPlacarA() { return placarA; }
+    public void setPlacarA(Integer placarA) { this.placarA = placarA; }
 
-	public void setHorario(LocalTime horario) {
-		this.horario = horario;
-	}
+    public Integer getPlacarB() { return placarB; }
+    public void setPlacarB(Integer placarB) { this.placarB = placarB; }
 
-	public void setQuadra(String quadra) {
-		this.quadra = quadra;
-	}
+    public List<Escalacao> getEscalacoes() { return escalacoes; }
+    public void setEscalacoes(List<Escalacao> escalacoes) { this.escalacoes = escalacoes; }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public void setPlacarA(Integer placarA) {
-		this.placarA = placarA;
-	}
-
-	public void setPlacarB(Integer placarB) {
-		this.placarB = placarB;
-	}
-
-	public void setModalidade(Modalidade modalidade) {
-		this.modalidade = modalidade;
-	}
-
-	public void setEscalacoes(List<Escalacao> escalacoes) {
-		this.escalacoes = escalacoes;
-	}
-
-	public void setEventos(List<EventoSumula> eventos) {
-		this.eventos = eventos;
-	}
-    
-    
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
 }
-

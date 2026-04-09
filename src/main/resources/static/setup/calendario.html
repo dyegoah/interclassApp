@@ -71,22 +71,18 @@
         .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; }
         .tab-btn.active { background: rgba(0, 242, 254, 0.1); color: var(--theme-primary); border-color: rgba(0, 242, 254, 0.3); border-bottom: 2px solid var(--theme-primary); text-shadow: 0 0 5px var(--theme-glow); }
 
-        /* A MÁGICA DA TABELA OFICIAL DE IMPRESSÃO - LIMPA E BRANCA */
         #tabela-impressao { display: none; }
         
         @media print {
             body > * { display: none !important; }
             body { background: white !important; color: black !important; }
             #tabela-impressao { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-            
             .print-header { text-align: center; margin-bottom: 20px; color: black; font-family: Arial, sans-serif;}
             .print-header h2 { margin: 0 0 5px 0; text-transform: uppercase; border-bottom: 2px solid black; padding-bottom: 10px;}
-            
             .print-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px; margin-bottom: 30px;}
             .print-table th, .print-table td { border: 1px solid #000; padding: 10px; text-align: left; }
             .print-table th { background-color: #e0e0e0; font-weight: bold; text-transform: uppercase; }
             .print-table tr:nth-child(even) { background-color: #f9f9f9; }
-            
             .print-esporte-title { background: #d0d0d0 !important; text-align: center !important; font-size: 14px; text-transform: uppercase;}
         }
 
@@ -258,22 +254,26 @@
         let setupData = null;
         let diasGeradosGlobais = []; 
         let jogosGeradosGlobais = []; 
+        let listaAlunosGlobais = [];
 
-        window.onload = () => {
+        window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
             setupData = JSON.parse(localStorage.getItem('arenaSetup'));
             if (!setupData || !setupData.esportes) {
-                // Mock de teste para garantir a visualização (Vôlei Liga e Xadrez Grupos)
-                setupData = { genero: 'masculino', esportes: [
-                    {id: 2, formato: 'liga', qtdTimes: 4, idaEVolta: true},
-                    {id: 10, formato: 'grupos', qtdTimes: 8, idaEVolta: false}
-                ]};
+                setupData = { genero: 'masculino', esportes: [{id: 10, formato: 'eliminatoria', qtdTimes: 2, idaEVolta: false}] };
             }
 
             if (setupData.genero === 'feminino') document.body.classList.add('theme-fem');
             if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
+
+            try {
+                const response = await fetch('/api/alunos');
+                if(response.ok) {
+                    listaAlunosGlobais = await response.json();
+                }
+            } catch (e) { console.warn("Modo offline ativo."); }
 
             let hoje = new Date();
             let semanaQueVem = new Date();
@@ -298,66 +298,20 @@
             }
         }
 
-        // --- SISTEMA DE IMPRESSÃO LIMPA OFICIAL EM TABELA ---
-        function imprimirTabelaOficial() {
-            const abaAtiva = document.querySelector('.tab-btn.active').id;
-            const divPrint = document.getElementById('tabela-impressao');
-            
-            let html = `
-                <div class="print-header">
-                    <h2>Tabela Oficial - Arena Interclass (${setupData.genero ? setupData.genero.toUpperCase() : 'GERAL'})</h2>
-                    <p>${abaAtiva === 'tab-geral' ? 'Cronograma Geral da Escola' : 'Cronograma por Modalidade'}</p>
-                </div>
-            `;
-
-            if (abaAtiva === 'tab-geral') {
-                html += `<table class="print-table"><thead><tr><th>Data</th><th>Horário</th><th>Modalidade</th><th>Fase / Partida</th><th>Local da Partida</th></tr></thead><tbody>`;
-                
-                diasGeradosGlobais.forEach(dia => {
-                    let jogos = jogosGeradosGlobais.filter(j => j.diaId === dia.idStr);
-                    if(jogos.length === 0) return;
-                    
-                    jogos.sort((a,b) => a.hora.localeCompare(b.hora));
-                    jogos.forEach(j => {
-                        html += `<tr>
-                            <td><b>${dia.titulo.split('-')[0].trim()}</b></td>
-                            <td>${j.hora}</td>
-                            <td>${j.icone} ${j.esporte}</td>
-                            <td>${j.titulo}</td>
-                            <td>${j.quadra}</td>
-                        </tr>`;
-                    });
-                });
-                html += `</tbody></table>`;
-            } else {
-                let esportesNomes = [...new Set(jogosGeradosGlobais.map(j => j.esporte))];
-                esportesNomes.forEach(esp => {
-                    html += `<table class="print-table"><thead>
-                                <tr><th colspan="5" class="print-esporte-title">⚽ TABELA DO ${esp.toUpperCase()} ⚽</th></tr>
-                                <tr><th>Data</th><th>Horário</th><th>Modalidade</th><th>Fase / Partida</th><th>Local da Partida</th></tr>
-                             </thead><tbody>`;
-                    
-                    let jogos = jogosGeradosGlobais.filter(j => j.esporte === esp);
-                    jogos.sort((a,b) => a.diaId.localeCompare(b.diaId) || a.hora.localeCompare(b.hora));
-                    
-                    jogos.forEach(j => {
-                        let diaObj = diasGeradosGlobais.find(d => d.idStr === j.diaId);
-                        let dataCurta = diaObj ? diaObj.titulo.split('-')[0].trim() : j.diaId;
-                        html += `<tr><td><b>${dataCurta}</b></td><td>${j.hora}</td><td>${j.icone} ${j.esporte}</td><td>${j.titulo}</td><td>${j.quadra}</td></tr>`;
-                    });
-                    html += `</tbody></table><br>`;
-                });
-            }
-            
-            divPrint.innerHTML = html;
-            window.print();
-        }
-
-        // --- GERAÇÃO INTELIGENTE (COM FINAL GARANTIDA NO ÚLTIMO DIA) ---
         function formatarMinutos(minTotais) {
             let h = Math.floor(minTotais / 60);
             let m = minTotais % 60;
             return h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0');
+        }
+
+        function embaralharAlunos(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
         }
 
         function getQuadraAdequada(nomeEsporte, quadrasDisponiveis) {
@@ -407,8 +361,7 @@
             
             let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
             let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
-            let intervaloBase = parseInt(document.getElementById('intervalo-jogos').value) || 5;
-            let tempoPorJogo = 30 + intervaloBase; 
+            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
 
             let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
             if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
@@ -421,13 +374,12 @@
             let dataFim = new Date(strFim + "T12:00:00");
             const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
 
-            // 1. Gera os dias de competição dentro do período (Ignorando dias não selecionados)
             while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
                 if(diasPermitidos.includes(dataAtual.getDay())) {
                     diasGeradosGlobais.push({
                         idStr: dataAtual.toISOString().split('T')[0],
                         titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
-                        partidasPendentes: [] // Usado para armazenar a lista diária do algoritmo
+                        partidasPendentes: []
                     });
                 }
                 dataAtual.setDate(dataAtual.getDate() + 1);
@@ -440,7 +392,6 @@
 
             let totalDiasGerados = diasGeradosGlobais.length;
 
-            // 2. Calcula as partidas e empurra de Trás para Frente para garantir a Final no último dia!
             setupData.esportes.forEach(esp => {
                 let def = modalidadeDefs.find(m => m.id === esp.id);
                 if(!def) return;
@@ -448,53 +399,117 @@
                 let nTimes = esp.qtdTimes || 4;
                 let multIdaVolta = esp.idaEVolta ? 2 : 1;
                 let formato = esp.formato || 'eliminatoria';
-                
                 let jogosDesteEsporte = [];
                 
-                if (formato === 'eliminatoria') {
-                    let numJogos = (nTimes - 1) * multIdaVolta; 
-                    for(let i=1; i<=numJogos; i++) {
-                        let titulo = i === numJogos ? "🏆 GRANDE FINAL" : (i === numJogos - 1 ? "Semifinal" : `Eliminatória - Jogo ${i}`);
-                        jogosDesteEsporte.push({ espObj: def, titulo: titulo });
+                let inscritos = listaAlunosGlobais.filter(a => a.esporte === esp.nome && a.genero === setupData.genero);
+                inscritos = embaralharAlunos(inscritos);
+
+                if(inscritos.length > 0) { nTimes = inscritos.length; }
+
+                if (nTimes === 2) {
+                    let p1 = inscritos[0]; let p2 = inscritos[1];
+                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
+                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
+                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+
+                    if (multIdaVolta === 1) {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                    } else {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
                     }
                 } 
-                else if (formato === 'liga') {
-                    let numJogos = ((nTimes * (nTimes - 1)) / 2) * multIdaVolta; 
-                    for(let i=1; i<=numJogos; i++) {
-                        let titulo = i === numJogos ? "🏆 ÚLTIMA RODADA (Decisão)" : `Rodada de Liga - Jogo ${i}`;
-                        jogosDesteEsporte.push({ espObj: def, titulo: titulo });
+                else if (nTimes === 3) {
+                    let p1 = inscritos[0]; let p2 = inscritos[1]; let p3 = inscritos[2];
+                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
+                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
+                    let n3 = p3 ? `${p3.turma} (${p3.nome.split(' ')[0]})` : "Equipe 3";
+                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
+
+                    if (formato === 'eliminatoria') {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
+                    } else {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
                     }
-                } 
-                else if (formato === 'grupos') {
-                    let numGrupos = Math.ceil(nTimes / 4);
-                    let numJogos = (numGrupos * 6 * multIdaVolta) + (numGrupos * 2 - 1); 
-                    for(let i=1; i<=numJogos; i++) {
-                        let titulo = i === numJogos ? "🏆 GRANDE FINAL" : (i >= numJogos - 2 ? "Mata-Mata" : `Fase de Grupos - Jogo ${i}`);
-                        jogosDesteEsporte.push({ espObj: def, titulo: titulo });
+                }
+                else {
+                    // AQUI INSERIMOS OS IDs PARA O MATA-MATA MAIOR!
+                    let paresSorteados = [];
+                    for(let i=0; i < inscritos.length; i+=2) {
+                        let p1 = inscritos[i]; let p2 = inscritos[i+1];
+                        let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "A Definir";
+                        let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "A Definir";
+                        let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+                        
+                        paresSorteados.push({ tituloStr: `${n1} x ${n2}`, nA: n1, nB: n2, idA: id1, idB: id2 });
                     }
-                } 
-                else { 
-                    let numJogos = ((nTimes * (nTimes - 1)) / 2 * multIdaVolta) + 3;
-                    for(let i=1; i<=numJogos; i++) {
-                        let titulo = i === numJogos ? "🏆 GRANDE FINAL" : (i >= numJogos - 2 ? "Playoffs" : `Fase Regular - Jogo ${i}`);
-                        jogosDesteEsporte.push({ espObj: def, titulo: titulo });
+
+                    if (formato === 'eliminatoria') {
+                        let numJogos = (nTimes - 1);
+                        let idFaseAtual = 1;
+                        let filaJogos = [];
+
+                        for (let i = 0; i < paresSorteados.length; i++) {
+                            let nomeFase = numJogos === 1 ? "🏆 GRANDE FINAL" :
+                                           (paresSorteados.length === 2 ? "Semifinal" :
+                                           (paresSorteados.length === 4 ? "Quartas de Final" : "Eliminatória"));
+
+                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${paresSorteados[i].tituloStr}`;
+                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: paresSorteados[i].idA, equipeANome: paresSorteados[i].nA, equipeBId: paresSorteados[i].idB, equipeBNome: paresSorteados[i].nB });
+                            idFaseAtual++;
+                        }
+
+                        let inicioFaseAnterior = 1;
+                        let fimFaseAnterior = paresSorteados.length;
+
+                        while (fimFaseAnterior < numJogos) {
+                            let qtdJogosNovaFase = (fimFaseAnterior - inicioFaseAnterior + 1) / 2;
+                            let novoInicio = idFaseAtual;
+
+                            for (let i = 0; i < qtdJogosNovaFase; i++) {
+                                let j1 = inicioFaseAnterior + (i * 2);
+                                let j2 = inicioFaseAnterior + (i * 2) + 1;
+
+                                let nomeFase = qtdJogosNovaFase === 1 ? "🏆 GRANDE FINAL" :
+                                               (qtdJogosNovaFase === 2 ? "Semifinal" :
+                                               (qtdJogosNovaFase === 4 ? "Quartas de Final" : "Eliminatória"));
+                                
+                                let nomeA = `Vencedor do Jogo ${j1}`;
+                                let nomeB = `Vencedor do Jogo ${j2}`;
+                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${nomeA} x ${nomeB}`;
+                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: null, equipeANome: nomeA, equipeBId: null, equipeBNome: nomeB });
+                                idFaseAtual++;
+                            }
+                            inicioFaseAnterior = novoInicio;
+                            fimFaseAnterior = idFaseAtual - 1;
+                        }
+
+                        filaJogos.forEach(fj => {
+                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
+                        });
+                    } 
+                    else { 
+                        for(let i=1; i<=3; i++) {
+                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase Regular | Sorteio da Tabela ${i}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
+                        }
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | 1º Colocado x 4º Colocado`, equipeAId: null, equipeANome: "1º Colocado", equipeBId: null, equipeBNome: "4º Colocado" });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 2) | 2º Colocado x 3º Colocado`, equipeAId: null, equipeANome: "2º Colocado", equipeBId: null, equipeBNome: "3º Colocado" });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
                     }
                 }
 
-                // O NOVO ALGORITMO: Pula dias para forçar o término exato no último dia (data-fim)
                 let indexJogo = 0;
                 for(let d = 0; d < totalDiasGerados; d++) {
                     let diasSobrando = totalDiasGerados - d;
                     let jogosSobrando = jogosDesteEsporte.length - indexJogo;
                     
                     if (jogosSobrando === 0) break;
+                    if (jogosSobrando < diasSobrando) continue;
                     
-                    // Se a matemática mostrar que tem mais dias do que jogos, pula a quadra hoje!
-                    if (jogosSobrando < diasSobrando) {
-                        continue;
-                    }
-                    
-                    // Divide o peso dos jogos igualitariamente até a grande final
                     let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
                     for(let k = 0; k < qtdParaEsteDia; k++) {
                         diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
@@ -503,66 +518,42 @@
                 }
             });
 
-            // 3. Agendamento Físico de Horário e Quadra para cada dia
             let idJogoGlobal = 1;
-            let matchIndexGlobal = 0;
-            let totalPartidasNecessarias = diasGeradosGlobais.reduce((acc, dia) => acc + dia.partidasPendentes.length, 0);
-
             for(let d = 0; d < diasGeradosGlobais.length; d++) {
                 let dia = diasGeradosGlobais[d];
-                
                 let trackersDeQuadra = {};
                 quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
-
                 let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
                 let jogosAlocadosNesteDia = 0;
 
                 for (let i = 0; i < dia.partidasPendentes.length; i++) {
-                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; // O dia encheu
-
+                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
                     let partida = dia.partidasPendentes[i];
                     let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
                     
-                    // Verifica se a quadra ideal encheu
                     if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
                         if (simultaneo) {
                             let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
-                            if(quadraLivre) { quadraAlvo = quadraLivre; } 
-                            else { continue; } 
-                        } else {
-                            continue;
-                        }
+                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
+                        } else { continue; }
                     }
 
                     let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
-                    
-                    if (simultaneo) {
-                        trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
-                    } else {
-                        quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
-                    }
+                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
+                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
 
+                    // GRAVA OS IDS NA MEMÓRIA DE EXPORTAÇÃO!
                     jogosGeradosGlobais.push({
-                        id: idJogoGlobal++,
-                        diaId: dia.idStr,
-                        hora: horaDoJogo,
-                        esporte: partida.espObj.nome,
-                        icone: partida.espObj.icone,
-                        titulo: partida.titulo,
-                        quadra: quadraAlvo
+                        id: idJogoGlobal++, diaId: dia.idStr, hora: horaDoJogo, esporte: partida.espObj.nome,
+                        icone: partida.espObj.icone, titulo: partida.titulo, quadra: quadraAlvo,
+                        equipeAId: partida.equipeAId, equipeANome: partida.equipeANome, 
+                        equipeBId: partida.equipeBId, equipeBNome: partida.equipeBNome
                     });
-
                     jogosAlocadosNesteDia++;
-                    matchIndexGlobal++;
                 }
-            }
-
-            if (matchIndexGlobal < totalPartidasNecessarias) {
-                alert(`⚠️ ATENÇÃO: Faltou espaço! Você configurou torneios muito longos para uma carga horária ou período muito curtos. Alguns jogos da fase inicial foram ignorados. Aumente a data final ou adicione quadras!`);
             }
         }
 
-        // --- RENDERIZAÇÃO NA TELA ---
         function renderizarVisualizacoes() {
             renderizarAbaGeral();
             renderizarAbaPorEsporte();
@@ -571,11 +562,9 @@
         function renderizarAbaGeral() {
             const container = document.getElementById('calendario-dias-container');
             container.innerHTML = '';
-
             diasGeradosGlobais.forEach(dia => {
                 let jogosDoDia = jogosGeradosGlobais.filter(j => j.diaId === dia.idStr);
                 jogosDoDia.sort((a, b) => a.hora.localeCompare(b.hora));
-
                 if(jogosDoDia.length === 0) return; 
 
                 let jogosHtml = '';
@@ -589,13 +578,9 @@
                         </div>
                     `;
                 });
-
                 container.innerHTML += `
                     <div class="dia-card">
-                        <div class="dia-header">
-                            <h5>${dia.titulo}</h5>
-                            <span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span>
-                        </div>
+                        <div class="dia-header"><h5>${dia.titulo}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
                         ${jogosHtml}
                     </div>
                 `;
@@ -605,7 +590,6 @@
         function renderizarAbaPorEsporte() {
             const container = document.getElementById('calendario-esportes-container');
             container.innerHTML = '';
-
             let esportesNomes = [...new Set(jogosGeradosGlobais.map(j => j.esporte))];
 
             esportesNomes.forEach(nomeEsp => {
@@ -614,7 +598,6 @@
                     if (a.diaId === b.diaId) return a.hora.localeCompare(b.hora);
                     return a.diaId.localeCompare(b.diaId);
                 });
-
                 if(jogosDoEsporte.length === 0) return;
 
                 let jogosHtml = '';
@@ -631,21 +614,16 @@
                         </div>
                     `;
                 });
-
                 let iconeEsp = jogosDoEsporte[0].icone;
                 container.innerHTML += `
                     <div class="dia-card">
-                        <div class="dia-header">
-                            <h5>${iconeEsp} ${nomeEsp}</h5>
-                            <span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoEsporte.length} Partidas</span>
-                        </div>
+                        <div class="dia-header"><h5>${iconeEsp} ${nomeEsp}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoEsporte.length} Partidas</span></div>
                         ${jogosHtml}
                     </div>
                 `;
             });
         }
 
-        // --- EDITOR MANUAL ---
         function abrirModalEdicao(jogoId) {
             const jogo = jogosGeradosGlobais.find(j => j.id === jogoId);
             if(!jogo) return;
@@ -672,9 +650,7 @@
             document.getElementById('modal-edicao').style.display = 'flex';
         }
 
-        function fecharModal() {
-            document.getElementById('modal-edicao').style.display = 'none';
-        }
+        function fecharModal() { document.getElementById('modal-edicao').style.display = 'none'; }
 
         function salvarEdicaoJogo() {
             const id = parseInt(document.getElementById('edit-jogo-id').value);
@@ -695,75 +671,39 @@
             document.getElementById('calendario-config').style.display = 'block';
         }
 
-		// --- NOVA FUNÇÃO DE SALVAMENTO DE CALENDÁRIO NA API ---
-		async function finalizarSetupInteiro() {
-		            if(jogosGeradosGlobais.length === 0) {
-		                alert("Você precisa clicar em 'Gerar Calendário Inteligente' antes de salvar!");
-		                return;
-		            }
+        async function finalizarSetupInteiro() {
+            if(jogosGeradosGlobais.length === 0) {
+                alert("Você precisa clicar em 'Gerar Calendário Inteligente' antes de salvar!");
+                return;
+            }
 
-		            const loteSetupDTO = {
-		                genero: setupData.genero,
-		                esportes: setupData.esportes
-		            };
+            const calendarioSaveDTO = { genero: setupData.genero, dias: diasGeradosGlobais, jogos: jogosGeradosGlobais };
 
-		            const calendarioSaveDTO = {
-		                dias: diasGeradosGlobais,
-		                jogos: jogosGeradosGlobais
-		            };
+            document.getElementById('ai-loading').style.display = 'block';
+            document.getElementById('calendario-result').style.display = 'none';
 
-		            // Prepara a tela de Loading
-		            document.getElementById('ai-loading').style.display = 'block';
-		            document.getElementById('calendario-result').style.display = 'none';
+            try {
+                const resCalendario = await fetch('http://localhost:8015/api/jogos/calendario', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(calendarioSaveDTO)
+                });
 
-		            try {
-		                // 1. Tenta enviar o Setup (Modalidades e Gênero) para o Spring Boot
-		                const resSetup = await fetch('http://localhost:8015/api/setup', {
-		                    method: 'POST',
-		                    headers: { 'Content-Type': 'application/json' },
-		                    body: JSON.stringify(loteSetupDTO)
-		                });
+                if (!resCalendario.ok) {
+                    throw new Error("O Servidor Java recusou os dados.");
+                }
 
-		                if (!resSetup.ok) throw new Error("Falha ao salvar as modalidades no banco.");
+                localStorage.removeItem('arenaSetup');
+                localStorage.removeItem('calendariosOficiais'); 
+                
+                alert(`🏆 Tabela oficial do Lote gravada no PostgreSQL com sucesso!`);
+                window.location.href = '/tabelas.html'; 
 
-		                // 2. Tenta enviar os Jogos para o PostgreSQL
-		                const resCalendario = await fetch('http://localhost:8015/api/jogos/calendario', {
-		                    method: 'POST',
-		                    headers: { 'Content-Type': 'application/json' },
-		                    body: JSON.stringify(calendarioSaveDTO)
-		                });
-
-		                if (!resCalendario.ok) throw new Error("Falha ao salvar os jogos no calendário do banco.");
-
-		                localStorage.removeItem('arenaSetup');
-		                alert(`🏆 Tabela oficial do Lote ${setupData.genero.toUpperCase()} gravada no SERVIDOR OFICIAL com sucesso!`);
-		                window.location.href = '/index.html';
-
-		            } catch (error) {
-		                console.error("Erro na API (Servidor Desligado):", error);
-		                
-		                // MODO OFFLINE (FALLBACK) - Salva no LocalStorage para não travar a tela!
-		                alert("🚨 O Spring Boot (Servidor Java) não está a responder na porta 8080.\nSalvando no modo OFFLINE para você poder continuar os testes!");
-		                
-		                // Salva o lote offline
-		                let lotesAtivos = JSON.parse(localStorage.getItem('arenaLotes')) || {};
-		                lotesAtivos[setupData.genero] = setupData;
-		                localStorage.setItem('arenaLotes', JSON.stringify(lotesAtivos));
-
-		                // Salva o calendário offline
-		                let calendariosSalvos = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-		                calendariosSalvos[setupData.genero] = {
-		                    dias: diasGeradosGlobais,
-		                    jogos: jogosGeradosGlobais
-		                };
-		                localStorage.setItem('calendariosOficiais', JSON.stringify(calendariosSalvos));
-
-		                localStorage.removeItem('arenaSetup');
-		                
-		                // Libera o usuário para a página inicial
-		                window.location.href = '/index.html';
-		            }
-		        }
+            } catch (error) {
+                console.error("ERRO:", error);
+                document.getElementById('ai-loading').style.display = 'none';
+                document.getElementById('calendario-result').style.display = 'block';
+                alert("🚨 Falha ao salvar. Verifique o console do STS.");
+            }
+        }
     </script>
 </body>
 </html>

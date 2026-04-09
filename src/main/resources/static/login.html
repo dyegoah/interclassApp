@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Interclass Arena</title>
+    <style>
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        
+        body { 
+            /* 1. Cor de fundo base (Deep Dark/Space) */
+            background-color: #05050f; 
+            
+            /* 2. As camadas da textura matemática (Malha Cibernética) */
+            background-image: 
+                /* Luz de fundo central para dar profundidade */
+                radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
+                /* Linhas Horizontais da Grade */
+                linear-gradient(rgba(0, 242, 254, 0.06) 1px, transparent 1px),
+                /* Linhas Verticais da Grade */
+                linear-gradient(90deg, rgba(0, 242, 254, 0.06) 1px, transparent 1px);
+            
+            /* Tamanho dos quadrados da grade (40x40px) */
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            
+            /* A animação contínua para a grade rolar pelo fundo */
+            animation: moveGrid 20s linear infinite;
+
+            /* Regras de alinhamento originais da página de login */
+            color: #ffffff; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 2rem; 
+        }
+
+        /* 3. O Motor da Animação do Jogo */
+        @keyframes moveGrid {
+            0% { background-position: center center, 0 0, 0 0; }
+            100% { background-position: center center, 40px 40px, 40px 40px; }
+        }
+        
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 3rem; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); text-align: center; }
+        
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); }
+        p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 30px; font-size: 0.95rem; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+        .form-group input { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
+        .form-group input:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
+
+        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 30px; color: #000; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(0, 242, 254, 0.8); background: #fff; }
+
+        .links-rodape { margin-top: 25px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 10px; }
+        .links-rodape a { color: var(--theme-primary); text-decoration: none; transition: 0.3s; }
+        .links-rodape a:hover { text-shadow: 0 0 10px var(--theme-glow); text-decoration: underline; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+
+    <div class="glass-form">
+        <h1>Interclass Arena</h1>
+        <p class="subtitle">Acesse o seu painel de gestão esportiva.</p>
+
+        <form id="form-login" onsubmit="fazerLogin(event)">
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="email" required placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="senha" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-submit">Entrar na Arena</button>
+        </form>
+
+        <div class="links-rodape">
+            <a href="#">Esqueceu a sua senha?</a>
+            <span style="color: rgba(255,255,255,0.5);">Ainda não tem conta? <a href="/cadastro-professor.html" style="font-weight: bold; color: #ff00de;">Cadastre-se aqui</a></span>
+        </div>
+    </div>
+
+    <script>
+        function fazerLogin(event) {
+            event.preventDefault();
+            
+            const emailDigitado = document.getElementById('email').value.trim();
+            const senhaDigitada = document.getElementById('senha').value.trim();
+
+            if (emailDigitado === 'admin@interclass.com' && senhaDigitada === 'admin123') {
+                window.location.href = '/admin.html';
+                return;
+            }
+
+            let professoresSalvos = JSON.parse(localStorage.getItem('mockProfessores')) || [];
+            let profEncontrado = professoresSalvos.find(p => p.email === emailDigitado);
+
+            if (profEncontrado) {
+                if (profEncontrado.status === 'bloqueado') {
+                    alert("🚨 Sua conta está bloqueada por falta de pagamento ou violação de termos. Entre em contato com o suporte Interclass Arena.");
+                    return;
+                }
+                alert(`Bem-vindo(a) de volta, ${profEncontrado.nome}!`);
+                window.location.href = '/index.html';
+            } else {
+                alert("❌ E-mail não encontrado ou senha incorreta. Se não tem conta, clique em Cadastre-se.");
+            }
+        }
+    </script>
+</body>
+</html>

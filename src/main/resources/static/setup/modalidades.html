@@ -4,15 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Setup Modalidades - InterclassApp</title>
+    
     <style>
-        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
-        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
-        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); --bg-gradient: linear-gradient(-45deg, #0a001a, #2a004d, #000000, #1f0033); }
+        /* 1. VARIÁVEIS GLOBAIS E CORES (MASCULINO PADRÃO) */
+        :root { 
+            --theme-primary: #00f2fe; 
+            --theme-glow: rgba(0, 242, 254, 0.5); 
+            --bg-deep: #05050f;
+            --grid-color: rgba(0, 242, 254, 0.05);
+            --glow-color: rgba(0, 242, 254, 0.15);
+        }
+        
+        /* 2. REGRAS MUTANTES: FEMININO */
+        body.theme-fem { 
+            --theme-primary: #ff00de; 
+            --theme-glow: rgba(255, 0, 222, 0.5); 
+            --grid-color: rgba(255, 0, 222, 0.05);
+            --glow-color: rgba(255, 0, 222, 0.15);
+        }
+        
+        /* 3. REGRAS MUTANTES: MISTO */
+        body.theme-misto { 
+            --theme-primary: #b200ff; 
+            --theme-glow: rgba(178, 0, 255, 0.5); 
+            --grid-color: rgba(178, 0, 255, 0.05);
+            --glow-color: rgba(178, 0, 255, 0.15);
+        }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; transition: background 0.5s ease; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        /* 4. APLICAÇÃO DO FUNDO DE TELA COM O EFEITO NEON/GRID */
+        body { 
+            background-color: var(--bg-deep) !important;
+            background-image: 
+                radial-gradient(circle at 50% 30%, var(--glow-color) 0%, transparent 70%),
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px) !important;
+            background-size: 100% 100%, 40px 40px, 40px 40px !important;
+            animation: moveGrid 20s linear infinite;
+            
+            color: #ffffff;
+            min-height: 100vh; 
+            padding-bottom: 100px; 
+            overflow-x: hidden; 
+            transition: background-image 0.5s ease-in-out; /* Suaviza a troca de cores */
+        }
 
+        @keyframes moveGrid {
+            0% { background-position: center center, 0 0, 0 0; }
+            100% { background-position: center center, 40px 40px, 40px 40px; }
+        }
+
+        /* ESTILOS DOS COMPONENTES (Mantidos exatamente os seus) */
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; transition: color 0.5s, text-shadow 0.5s; }
@@ -39,6 +82,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
+
 <body>
     <div class="arena-container">
         <div id="topbar-placeholder"></div>
@@ -159,8 +203,7 @@
             const setupData = { genero: generoSelecionado, esportes: esportesArray };
             localStorage.setItem('arenaSetup', JSON.stringify(setupData));
             
-            // Chama a ROTA LIMPA DA API JAVA
-            window.location.href = '/setup/torneios';
+            window.location.href = '/setup/torneios.html';
         }
 
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };

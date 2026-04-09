@@ -1,6 +1,7 @@
 package br.com.higitech.interclasseApp.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,6 @@ public class JogoController {
 
     private final JogoService jogoService;
 
-    // CONSTRUTOR MANUAL
     public JogoController(JogoService jogoService) {
         this.jogoService = jogoService;
     }
@@ -36,7 +36,13 @@ public class JogoController {
 
     @GetMapping("/lote/{genero}")
     public ResponseEntity<List<JogoDTO>> listarJogosDoPlayHub(@PathVariable String genero) {
-        List<JogoDTO> jogos = jogoService.buscarJogosParaPlayHub(genero);
-        return ResponseEntity.ok(jogos);
+        return ResponseEntity.ok(jogoService.buscarJogosParaPlayHub(genero));
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> buscarJogoEspecifico(@PathVariable Long id) {
+        // A MÁGICA ESTÁ AQUI: Ele agora chama a função segura que criamos no Service,
+        // que trata dados vazios e impede o Erro 500!
+        return ResponseEntity.ok(jogoService.buscarJogoDetalhadoParaSumula(id));
     }
 }
