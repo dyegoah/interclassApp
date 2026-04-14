@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         
         body { 
-            /* A NOVA TEXTURA CIBERNÉTICA */
             background-color: #05050f;
             background-image: 
                 radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
@@ -18,8 +17,6 @@
                 linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
             background-size: 100% 100%, 40px 40px, 40px 40px;
             animation: moveGrid 20s linear infinite;
-
-            /* AS REGRAS QUE MANTÊM O FORMULÁRIO CENTRADO NA TELA (NÃO APAGAR) */
             color: #ffffff; 
             min-height: 100vh; 
             display: flex; 
@@ -28,13 +25,12 @@
             padding: 2rem; 
         }
 
-        /* O MOTOR QUE FAZ A GRADE SE MOVER */
         @keyframes moveGrid {
             0% { background-position: center center, 0 0, 0 0; }
             100% { background-position: center center, 40px 40px, 40px 40px; }
         }
         
-        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); }
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); }
         
         h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); text-align: center;}
         p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 25px; font-size: 0.95rem; text-align: center; }
@@ -90,35 +86,41 @@
     </div>
 
     <script>
-        function criarConta(event) {
+        async function criarConta(event) {
             event.preventDefault();
             
-            // Pega os valores digitados
-            const nome = document.getElementById('nome').value;
-            const escola = document.getElementById('escola').value;
-            const email = document.getElementById('email').value;
+            const nome = document.getElementById('nome').value.trim();
+            const escola = document.getElementById('escola').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value.trim();
             
-            // Pega a data de hoje formatada (Ex: 10/04/2026)
-            const hoje = new Date();
-            const dataAtual = hoje.toLocaleDateString('pt-BR');
+            const btnSubmit = document.querySelector('.btn-submit');
+            const textoOriginal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = "⏳ Forjando Cofre...";
+            btnSubmit.disabled = true;
 
-            // Cria o objeto do novo professor
-            const novoProf = {
-                id: Math.floor(Math.random() * 1000) + 100, // Gera um ID falso aleatório
-                nome: nome,
-                escola: escola,
-                email: email,
-                data: dataAtual,
-                status: "ativo"
-            };
+            try {
+                // 🛡️ AGORA SIM: Manda os dados para o PostgreSQL!
+                const response = await fetch('/api/auth/registrar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: nome, escola: escola, email: email, senha: senha })
+                });
 
-            // Salva na memória do navegador (Mock)
-            let listaProfessores = JSON.parse(localStorage.getItem('mockProfessores')) || [];
-            listaProfessores.push(novoProf);
-            localStorage.setItem('mockProfessores', JSON.stringify(listaProfessores));
-
-            alert("Conta criada com sucesso! Você pode usar o e-mail cadastrado para entrar.");
-            window.location.href = '/login.html';
+                if (response.ok) {
+                    alert("✅ Conta criada com sucesso! Você já pode fazer login.");
+                    window.location.href = '/login.html';
+                } else {
+                    const msgErro = await response.text();
+                    alert("❌ Falha no cadastro: " + msgErro);
+                }
+            } catch (error) {
+                console.error("Erro de comunicação:", error);
+                alert("⚠️ Erro ao tentar se conectar ao servidor da HighTech.");
+            } finally {
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+            }
         }
     </script>
 </body>

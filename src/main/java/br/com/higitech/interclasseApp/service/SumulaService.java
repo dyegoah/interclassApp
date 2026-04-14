@@ -29,7 +29,7 @@ public class SumulaService {
         Jogo jogoAtual = jogoRepository.findById(jogoId).orElseThrow();
         jogoAtual.setPlacarA(dto.placarA());
         jogoAtual.setPlacarB(dto.placarB());
-        jogoAtual.setStatus("FINALIZADO");
+        jogoAtual.setStatus("FINALIZADO"); 
         jogoRepository.save(jogoAtual);
 
         String vencedorNome = null;
@@ -52,13 +52,13 @@ public class SumulaService {
 
         String tagBusca = "Vencedor do Jogo " + numJogoAtual;
         
-        // 🔒 Inteligência Multi-Tenant: Lê o ID do dono do jogo atual
+        // 🔒 Inteligência Multi-Tenant (Segurança): Lê o ID do dono do jogo atual
         Long profId = jogoAtual.getProfessor().getId();
 
-        // 3. Procura a partida filtrando SOMENTE pelas partidas DESTE professor!
+        // 🚀 LÓGICA ORIGINAL RESTAURADA: Filtra usando o getModalidade() em vez de getEsporte()
         List<Jogo> proximos = jogoRepository.findByProfessorId(profId).stream()
-            .filter(j -> j.getModalidade() != null && j.getModalidade().getId().equals(jogoAtual.getModalidade().getId()))
-            .filter(j -> j.getStatus().equals("PENDENTE") && j.getTitulo().contains(tagBusca))
+            .filter(j -> j.getModalidade() != null && jogoAtual.getModalidade() != null && j.getModalidade().getId().equals(jogoAtual.getModalidade().getId()))
+            .filter(j -> "PENDENTE".equalsIgnoreCase(j.getStatus()) && j.getTitulo().contains(tagBusca))
             .toList();
 
         for (Jogo proximo : proximos) {

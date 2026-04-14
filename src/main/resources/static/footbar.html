@@ -19,11 +19,7 @@
         <span class="nav-icon" style="font-size: 1.3rem;">👥</span>
         <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Alunos</span>
     </button>
-    
-    <button class="nav-btn" id="nav-config" onclick="window.location.href='/config.html'">
-        <span class="nav-icon" style="font-size: 1.3rem;">⚙️</span>
-        <span class="nav-text" style="font-size: 0.65rem; text-transform: uppercase; font-family: 'Segoe UI'; font-weight: bold;">Config</span>
-    </button>
+     
 </nav>
 
 <style>
@@ -39,6 +35,4 @@
     else if(path.includes('tabelas') || path.includes('matchsheet')) document.getElementById('nav-tabelas').classList.add('active');
     else if(path.includes('resumo')) document.getElementById('nav-resumo').classList.add('active');
     else if(path.includes('alunos')) document.getElementById('nav-alunos').classList.add('active');
-    // ATUALIZADO: Fica azul tanto na página 'config.html' quanto nas pastas 'setup'
-    else if(path.includes('setup') || path.includes('config')) document.getElementById('nav-config').classList.add('active');
 </script>

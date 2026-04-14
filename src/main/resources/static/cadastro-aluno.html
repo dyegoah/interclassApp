@@ -141,33 +141,46 @@
             select.innerHTML = html;
         }
 
-		// BUSCA AS MODALIDADES ATIVAS NO BANCO DE DADOS
-		async function carregarModalidadesDoBanco() {
-		    const selectMod = document.getElementById('modalidade');
-		    try {
-		        const response = await fetch('/api/modalidades');
-		        if (response.ok) {
-		            const modalidades = await response.json();
+		// BUSCA AS MODALIDADES ATIVAS NO BANCO DE DADOS (DA ESCOLA CORRETA)
+		        async function carregarModalidadesDoBanco() {
+		            const selectMod = document.getElementById('modalidade');
 		            
-		            if (modalidades.length === 0) {
-		                selectMod.innerHTML = '<option value="">Nenhum torneio ativo ainda!</option>';
+		            // 1. Pega o ID do professor na URL (O "ref" que geramos no painel)
+		            const urlParams = new URLSearchParams(window.location.search);
+		            const professorId = urlParams.get('ref');
+
+		            if (!professorId) {
+		                selectMod.innerHTML = '<option value="">Link de inscrição inválido!</option>';
 		                selectMod.disabled = true;
 		                return;
 		            }
 
-		            let html = '<option value="">Selecione...</option>';
-		            modalidades.forEach(mod => {
-		                html += `<option value="${mod.id}">${mod.icone} ${mod.nomeEsporte}</option>`;
-		            });
-		            
-		            selectMod.innerHTML = html;
-		            selectMod.disabled = false;
+		            try {
+		                // 2. Chama a nova rota pública filtrando pela escola!
+		                const response = await fetch(`/api/modalidades/public/${professorId}`);
+		                
+		                if (response.ok) {
+		                    const modalidades = await response.json();
+		                    
+		                    if (modalidades.length === 0) {
+		                        selectMod.innerHTML = '<option value="">Nenhum torneio ativo ainda!</option>';
+		                        selectMod.disabled = true;
+		                        return;
+		                    }
+
+		                    let html = '<option value="">Selecione...</option>';
+		                    modalidades.forEach(mod => {
+		                        html += `<option value="${mod.nomeEsporte}" data-icone="${mod.icone}">${mod.icone} ${mod.nomeEsporte}</option>`;
+		                    });
+		                    
+		                    selectMod.innerHTML = html;
+		                    selectMod.disabled = false;
+		                }
+		            } catch (error) {
+		                console.error("Erro ao buscar modalidades:", error);
+		                selectMod.innerHTML = '<option value="">Erro ao conectar no servidor</option>';
+		            }
 		        }
-		    } catch (error) {
-		        console.error("Erro ao buscar modalidades:", error);
-		        selectMod.innerHTML = '<option value="">Erro ao conectar no servidor</option>';
-		    }
-		}
 		
 		
         // LÊ A FOTO DO CELULAR/PC E MOSTRA NA BOLINHA
@@ -187,57 +200,68 @@
         }
 
 		async function enviarCadastro() {
-		    const nome = document.getElementById('nome').value;
-		    const dataNasc = document.getElementById('dataNascimento').value;
-		    const turmaSelect = document.getElementById('turma');
-		    const generoSelect = document.getElementById('genero');
-		    const selectMod = document.getElementById('modalidade');
+				    const nome = document.getElementById('nome').value;
+				    const dataNasc = document.getElementById('dataNascimento').value;
+				    const turmaSelect = document.getElementById('turma');
+				    const generoSelect = document.getElementById('genero');
+				    const selectMod = document.getElementById('modalidade');
 
-		    if(!nome) { alert("Digite o seu nome."); return; }
-		    if(!dataNasc) { alert("Informe a data de nascimento."); return; }
-		    if(turmaSelect.value === "") { alert("Selecione a sua turma!"); return; }
-		    if(generoSelect.value === "") { alert("Selecione a sua categoria/gênero!"); return; }
-		    if(selectMod.value === "") { alert("Selecione um esporte!"); return; }
+				    if(!nome) { alert("Digite o seu nome."); return; }
+				    if(!dataNasc) { alert("Informe a data de nascimento."); return; }
+				    if(turmaSelect.value === "") { alert("Selecione a sua turma!"); return; }
+				    if(generoSelect.value === "") { alert("Selecione a sua categoria/gênero!"); return; }
+				    if(selectMod.value === "") { alert("Selecione um esporte!"); return; }
 
-		    let fotoFinal = fotoBase64;
-		    if (!fotoFinal) {
-		        fotoFinal = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=random&color=fff`;
-		    }
+				    let fotoFinal = fotoBase64;
+				    if (!fotoFinal) {
+				        fotoFinal = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=random&color=fff`;
+				    }
 
-		    const optionSelecionada = selectMod.options[selectMod.selectedIndex];
-		    const nomeEsporte = optionSelecionada.value;
-		    const iconeEsporte = optionSelecionada.getAttribute('data-icone');
+				    const optionSelecionada = selectMod.options[selectMod.selectedIndex];
+				    const nomeEsporte = optionSelecionada.value;
+				    const iconeEsporte = optionSelecionada.getAttribute('data-icone');
 
-		    const novoAluno = {
-		        nome: nome,
-		        turma: turmaSelect.value,
-		        dataNascimento: dataNasc,
-		        fotoUrl: fotoFinal,
-		        genero: generoSelect.value,
-		        esporte: nomeEsporte,
-		        iconeEsporte: iconeEsporte
-		    };
+				    const novoAluno = {
+				        nome: nome,
+				        turma: turmaSelect.value,
+				        dataNascimento: dataNasc,
+				        fotoUrl: fotoFinal,
+				        genero: generoSelect.value,
+				        esporte: nomeEsporte,
+				        iconeEsporte: iconeEsporte
+				    };
 
-		    try {
-		        const response = await fetch('/api/alunos', {
-		            method: 'POST',
-		            headers: { 'Content-Type': 'application/json' },
-		            body: JSON.stringify(novoAluno)
-		        });
+		            // 🚀 PEGA O ID DO PROFESSOR NO LINK (Ex: ?ref=1)
+		            const urlParams = new URLSearchParams(window.location.search);
+		            const professorId = urlParams.get('ref');
 
-		        if(response.ok) {
-		            alert("Inscrição gravada com sucesso no Banco de Dados!");
-		            document.getElementById('form-cadastro-aluno').reset();
-		            fotoBase64 = null;
-		            document.getElementById('preview-foto').src = "https://ui-avatars.com/api/?name=Atleta&background=222&color=fff";
-		        } else {
-		            alert("⚠️ Erro ao salvar no Servidor. Verifique os dados.");
-		        }
-		    } catch (error) {
-		        console.error(error);
-		        alert("🚨 Falha de comunicação com o servidor.");
-		    }
-		}
+		            if (!professorId) {
+		                alert("🚨 Link de inscrição inválido! Peça o link correto ao seu professor.");
+		                return;
+		            }
+
+				    try {
+		                // 🚀 ENVIA PARA A NOSSA NOVA ROTA PÚBLICA!
+				        const response = await fetch(`/api/alunos/public/${professorId}`, {
+				            method: 'POST',
+				            headers: { 'Content-Type': 'application/json' },
+				            body: JSON.stringify(novoAluno)
+				        });
+
+				        if(response.ok) {
+				            alert("Inscrição gravada com sucesso na Base de Dados da Escola!");
+				            document.getElementById('form-cadastro-aluno').reset();
+				            fotoBase64 = null;
+				            document.getElementById('preview-foto').src = "https://ui-avatars.com/api/?name=Atleta&background=222&color=fff";
+				        } else {
+		                    const msgErro = await response.text();
+				            alert("⚠️ Erro ao salvar: " + msgErro);
+				        }
+				    } catch (error) {
+				        console.error(error);
+				        alert("🚨 Falha de comunicação com o servidor.");
+				    }
+				}
     </script>
 </body>
 </html>

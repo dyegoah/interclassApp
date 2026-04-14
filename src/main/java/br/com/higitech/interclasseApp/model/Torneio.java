@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,6 +20,11 @@ public class Torneio {
     
     private String status;
 
+    // 🔒 SEGURANÇA: Garante o Isolamento de Dados (SaaS)
+    @ManyToOne
+    @JoinColumn(name = "professor_id", nullable = false)
+    private Professor professor;
+
     // ==========================
     // GETTERS E SETTERS
     // ==========================
@@ -29,4 +36,7 @@ public class Torneio {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
 }

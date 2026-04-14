@@ -168,8 +168,14 @@
 
         window.onload = async () => {
             if (!jogoId) { alert("Partida não encontrada."); return; }
+            
             try {
-                const resposta = await fetch(`http://localhost:8015/api/jogos/${jogoId}`);
+                // 🔥 SEGURANÇA APLICADA AQUI PARA CARREGAR OS DADOS
+                const token = localStorage.getItem('interclassToken');
+                const resposta = await fetch(`/api/jogos/${jogoId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
                 if (!resposta.ok) throw new Error("Erro de comunicação com a API.");
                 const jogo = await resposta.json();
                 processarDadosDoJogo(jogo);
@@ -383,9 +389,14 @@
             if (isTimerRunning) toggleTimer(); 
 
             try {
-                const resposta = await fetch(`http://localhost:8015/api/sumulas/${jogoId}/finalizar`, {
+                // 🔥 SEGURANÇA APLICADA AQUI PARA SALVAR A SÚMULA
+                const token = localStorage.getItem('interclassToken');
+                const resposta = await fetch(`/api/sumulas/${jogoId}/finalizar`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
                     body: JSON.stringify({ placarA: placarGlobal.A, placarB: placarGlobal.B })
                 });
 

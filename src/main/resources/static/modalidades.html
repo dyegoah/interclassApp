@@ -55,7 +55,6 @@
             100% { background-position: center center, 40px 40px, 40px 40px; }
         }
 
-        /* ESTILOS DOS COMPONENTES (Mantidos exatamente os seus) */
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; transition: color 0.5s, text-shadow 0.5s; }
@@ -192,19 +191,20 @@
             atualizarMapa(2);
         }
 
-        function irParaPaginaTorneios() {
-            const selecionados = document.querySelectorAll('.config-card.selected');
-            if (selecionados.length === 0) { alert("Selecione pelo menos um esporte!"); return; }
+		function irParaPaginaTorneios() {
+		            // 🛡️ CORREÇÃO BUG 1: Busca as cartas APENAS dentro do #setup-container (Ignorando os Gêneros)
+		            const selecionados = document.querySelectorAll('#setup-container .config-card.selected');
+		            if (selecionados.length === 0) { alert("Selecione pelo menos um esporte!"); return; }
 
-            const esportesArray = Array.from(selecionados).map(card => {
-                return { id: parseInt(card.getAttribute('data-id')), configurado: false };
-            });
+		            const esportesArray = Array.from(selecionados).map(card => {
+		                return { id: parseInt(card.getAttribute('data-id')), configurado: false };
+		            });
 
-            const setupData = { genero: generoSelecionado, esportes: esportesArray };
-            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
-            
-            window.location.href = '/setup/torneios.html';
-        }
+		            const setupData = { genero: generoSelecionado, esportes: esportesArray };
+		            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+		            
+		            window.location.href = '/torneios.html';
+		        }
 
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });

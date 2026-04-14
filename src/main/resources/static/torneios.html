@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configuração de Torneios - InterclassApp</title>
+    <style>
+        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
+        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); --bg-gradient: linear-gradient(-45deg, #0a001a, #2a004d, #000000, #1f0033); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
+
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); }
+        .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); }
+        .stepper-step.active { color: var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); }
+        .stepper-step.completed { color: #00ff00; text-shadow: 0 0 8px rgba(0,255,0,0.4); }
+        .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; }
+        .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
+
+        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
+        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
+        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); padding: 10px 20px; }
+
+        .torneio-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--theme-primary); }
+        .torneio-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
+        .form-group select, .form-group input { width: 100%; padding: 10px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; }
+        .form-group select:focus, .form-group input:focus { border-color: var(--theme-primary); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="arena-container">
+        <div id="topbar-placeholder"></div>
+
+        <div class="stepper-container glass">
+            <div class="stepper-step completed" id="step-1"><span>1.</span> Gênero</div>
+            <div class="stepper-line active" id="line-1"></div>
+            <div class="stepper-step completed" id="step-2"><span>2.</span> Modalidades</div>
+            <div class="stepper-line active" id="line-2"></div>
+            <div class="stepper-step active" id="step-3"><span>3.</span> Torneios</div>
+            <div class="stepper-line" id="line-3"></div>
+            <div class="stepper-step" id="step-4"><span>4.</span> Calendário</div>
+            <div class="stepper-line" id="line-4"></div>
+            <div class="stepper-step" id="step-5"><span>5.</span> Alunos</div>
+        </div>
+
+        <div class="glass" style="padding: 2rem; border-radius: 15px; border-top: 4px solid var(--theme-primary);">
+            <h2 class="section-title">⚙️ Passo 3: Configuração de Chaves</h2>
+            <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Defina as regras e a quantidade de equipes para cada modalidade que você ativou.</p>
+
+            <div id="torneios-container">
+                <p style="text-align: center; color: var(--theme-primary);">⏳ Carregando modalidades escolhidas...</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
+                <button class="btn-acao btn-secundario" onclick="window.location.href='/modalidades.html'">🡨 Voltar para Modalidades</button>
+                <button class="btn-acao" onclick="salvarConfiguracoes()">Gravar Configurações e Avançar ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footbar-placeholder"></div>
+
+    <script>
+        const modalidadeDefs = [
+            { id: 1, nome: 'Futsal', icone: '⚽' }, { id: 2, nome: 'Vôlei', icone: '🏐' },
+            { id: 3, nome: 'Basquete', icone: '🏀' }, { id: 4, nome: 'Handebol', icone: '🤾' },
+            { id: 5, nome: 'Queimada', icone: '☄️' }, { id: 6, nome: 'Vôlei de Areia', icone: '🏖️' },
+            { id: 7, nome: 'Natação', icone: '🏊' }, { id: 8, nome: 'Atletismo', icone: '🏃' },
+            { id: 9, nome: 'Tênis de Mesa', icone: '🏓' }, { id: 10, nome: 'Xadrez', icone: '♟️' },
+            { id: 11, nome: 'Dama', icone: '🏁' }, { id: 12, nome: 'E-Sports', icone: '🎮' }
+        ];
+
+        let setupData = null;
+
+        window.onload = () => {
+            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+            
+            setupData = JSON.parse(localStorage.getItem('arenaSetup'));
+            
+            if (!setupData || !setupData.esportes || setupData.esportes.length === 0) {
+                alert("Nenhuma modalidade foi selecionada. Redirecionando...");
+                window.location.href = '/modalidades.html';
+                return;
+            }
+
+            if (setupData.genero === 'feminino') document.body.classList.add('theme-fem');
+            if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
+
+            renderizarFormularios();
+        };
+
+        function renderizarFormularios() {
+            const container = document.getElementById('torneios-container');
+            container.innerHTML = '';
+
+            setupData.esportes.forEach(esp => {
+                let mod = modalidadeDefs.find(m => m.id === esp.id);
+                if (!mod) return;
+
+                let formatoAtual = esp.formato || 'eliminatoria';
+                let qtdAtual = esp.qtdTimes || 8;
+
+                container.innerHTML += `
+                    <div class="torneio-card" id="card-${mod.id}">
+                        <div class="torneio-header">
+                            <div style="font-size: 2.5rem;">${mod.icone}</div>
+                            <h3 style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase;">${mod.nome}</h3>
+                        </div>
+                        
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Formato de Disputa</label>
+                                <select id="formato-${mod.id}">
+                                    <option value="eliminatoria" ${formatoAtual === 'eliminatoria' ? 'selected' : ''}>Mata-Mata (Eliminatória Direta)</option>
+                                    <option value="grupos" ${formatoAtual === 'grupos' ? 'selected' : ''}>Fase de Grupos + Finais</option>
+                                    <option value="pontos_corridos" ${formatoAtual === 'pontos_corridos' ? 'selected' : ''}>Liga (Pontos Corridos)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Quantidade de Equipes (Estimativa)</label>
+                                <input type="number" id="qtd-${mod.id}" value="${qtdAtual}" min="2" max="32">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="ida-${mod.id}" ${esp.idaEVolta ? 'checked' : ''} style="width: auto;">
+                            <label for="ida-${mod.id}" style="margin: 0; cursor: pointer;">Partidas de Ida e Volta?</label>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+		async function salvarConfiguracoes() {
+		            // 🛡️ CORREÇÃO BUG 1 (Segurança Extra): Só lê o formato se o elemento HTML realmente existir
+		            setupData.esportes.forEach(esp => {
+		                let selectFormato = document.getElementById(`formato-${esp.id}`);
+		                if (selectFormato) {
+		                    esp.formato = selectFormato.value;
+		                    esp.qtdTimes = parseInt(document.getElementById(`qtd-${esp.id}`).value);
+		                    esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
+		                    esp.configurado = true;
+		                }
+		            });
+		            
+		            // Remove lixos de memória e avança
+		            setupData.esportes = setupData.esportes.filter(esp => esp.configurado);
+		            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+
+		            try {
+		                const token = localStorage.getItem('interclassToken');
+		                const response = await fetch('/api/torneios/setup', {
+		                    method: 'POST',
+		                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+		                    body: JSON.stringify(setupData)
+		                });
+
+		                if (response.ok) window.location.href = '/calendario.html';
+		                else if (response.status === 403) { alert("🚨 Sessão expirada."); window.location.href = '/login.html'; }
+		                else { console.warn("Modo offline."); window.location.href = '/calendario.html'; }
+		            } catch (error) { window.location.href = '/calendario.html'; }
+		        }
+    </script>
+</body>
+</html>

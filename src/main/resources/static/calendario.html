@@ -173,7 +173,7 @@
 
                 <div style="text-align: center; margin-top: 2rem;">
                     <button class="btn-acao" style="width: 100%; font-size: 1.2rem; padding: 1.2rem;" onclick="processarAlgoritmo()">✨ Gerar Calendário Inteligente</button>
-                    <button class="btn-secundario" style="margin-top: 15px; padding: 10px 20px; border-radius: 20px; border:none; cursor:pointer;" onclick="window.location.href='/setup/torneios.html'">🡨 Voltar e Alterar Torneios</button>
+                    <button class="btn-secundario" style="margin-top: 15px; padding: 10px 20px; border-radius: 20px; border:none; cursor:pointer;" onclick="window.location.href='/torneios.html'">🡨 Voltar e Alterar Torneios</button>
                 </div>
             </div>
 
@@ -242,6 +242,19 @@
     <div id="footbar-placeholder"></div>
 
     <script>
+        // ========================================================
+        // 🛡️ ESCUDO DE SEGURANÇA FRONTEND - HIGHTECH
+        // Módulo de Prevenção contra XSS (Cross-Site Scripting)
+        // ========================================================
+        const HighTechSecurity = {
+            sanitizar: function(textoCru) {
+                if (!textoCru) return '';
+                const texto = String(textoCru);
+                const mapa = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', "/": '&#x2F;', "`": '&#x60;', "=": '&#x3D;' };
+                return texto.replace(/[&<>"'/`=]/ig, (match) => (mapa[match]));
+            }
+        };
+
         const modalidadeDefs = [
             { id: 1, nome: 'Futsal', icone: '⚽' }, { id: 2, nome: 'Vôlei', icone: '🏐' },
             { id: 3, nome: 'Basquete', icone: '🏀' }, { id: 4, nome: 'Handebol', icone: '🤾' },
@@ -269,7 +282,12 @@
             if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
 
             try {
-                const response = await fetch('/api/alunos');
+                // 🛡️ API Autenticada: Buscar alunos com JWT
+                const token = localStorage.getItem('interclassToken');
+                const response = await fetch('/api/alunos', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
                 if(response.ok) {
                     listaAlunosGlobais = await response.json();
                 }
@@ -349,210 +367,220 @@
             }, 1500);
         }
 
-        function gerarEstruturaDeDados(strInicio, strFim) {
-            diasGeradosGlobais = [];
-            jogosGeradosGlobais = [];
+		function gerarEstruturaDeDados(strInicio, strFim) {
+		            diasGeradosGlobais = [];
+		            jogosGeradosGlobais = [];
 
-            const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
-            const simultaneo = document.getElementById('check-simultaneo').checked;
-            
-            let horaInicialBase = document.getElementById('hora-inicio').value || "08:00";
-            let horaFinalBase = document.getElementById('hora-fim').value || "12:00";
-            
-            let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
-            let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
-            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
+		            const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
+		            const simultaneo = document.getElementById('check-simultaneo').checked;
+		            
+		            let horaInicialBase = document.getElementById('hora-inicio').value || "08:00";
+		            let horaFinalBase = document.getElementById('hora-fim').value || "12:00";
+		            let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
+		            let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
+		            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
 
-            let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
-            if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
+		            let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
+		            if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
 
-            const botoesDias = document.querySelectorAll('.dia-btn.selected');
-            let diasPermitidos = Array.from(botoesDias).map(btn => parseInt(btn.getAttribute('data-dia')));
-            if(diasPermitidos.length === 0) diasPermitidos = [1,2,3,4,5]; 
+		            const botoesDias = document.querySelectorAll('.dia-btn.selected');
+		            let diasPermitidos = Array.from(botoesDias).map(btn => parseInt(btn.getAttribute('data-dia')));
+		            if(diasPermitidos.length === 0) diasPermitidos = [1,2,3,4,5]; 
 
-            let dataAtual = new Date(strInicio + "T12:00:00");
-            let dataFim = new Date(strFim + "T12:00:00");
-            const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
+		            let dataAtual = new Date(strInicio + "T12:00:00");
+		            let dataFim = new Date(strFim + "T12:00:00");
+		            const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
 
-            while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
-                if(diasPermitidos.includes(dataAtual.getDay())) {
-                    diasGeradosGlobais.push({
-                        idStr: dataAtual.toISOString().split('T')[0],
-                        titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
-                        partidasPendentes: []
-                    });
-                }
-                dataAtual.setDate(dataAtual.getDate() + 1);
-            }
+		            while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
+		                if(diasPermitidos.includes(dataAtual.getDay())) {
+		                    diasGeradosGlobais.push({
+		                        idStr: dataAtual.toISOString().split('T')[0],
+		                        titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
+		                        partidasPendentes: []
+		                    });
+		                }
+		                dataAtual.setDate(dataAtual.getDate() + 1);
+		            }
 
-            if(diasGeradosGlobais.length === 0) {
-                alert("Nenhum dia de competição bate com o período e os dias da semana selecionados.");
-                refazerCalendario(); return;
-            }
+		            if(diasGeradosGlobais.length === 0) {
+		                alert("Nenhum dia de competição bate com o período selecionado.");
+		                refazerCalendario(); return;
+		            }
 
-            let totalDiasGerados = diasGeradosGlobais.length;
+		            let totalDiasGerados = diasGeradosGlobais.length;
 
-            setupData.esportes.forEach(esp => {
-                let def = modalidadeDefs.find(m => m.id === esp.id);
-                if(!def) return;
-                
-                let nTimes = esp.qtdTimes || 4;
-                let multIdaVolta = esp.idaEVolta ? 2 : 1;
-                let formato = esp.formato || 'eliminatoria';
-                let jogosDesteEsporte = [];
-                
-                let inscritos = listaAlunosGlobais.filter(a => a.esporte === esp.nome && a.genero === setupData.genero);
-                inscritos = embaralharAlunos(inscritos);
+		            setupData.esportes.forEach(esp => {
+		                let def = modalidadeDefs.find(m => m.id === esp.id);
+		                if(!def) return;
+		                
+		                let nTimes = esp.qtdTimes || 4;
+		                let multIdaVolta = esp.idaEVolta ? 2 : 1;
+		                let formato = esp.formato || 'eliminatoria';
+		                let jogosDesteEsporte = [];
+		                
+		                // 🛡️ CORREÇÃO BUG 2: Usa o "def.nome" que sempre existe, em vez de "esp.nome"
+		                let inscritos = listaAlunosGlobais.filter(a => a.esporte === def.nome && a.genero === setupData.genero);
+		                inscritos = embaralharAlunos(inscritos);
 
-                if(inscritos.length > 0) { nTimes = inscritos.length; }
+		                if(inscritos.length > 0) { 
+		                    nTimes = inscritos.length; 
+		                } else {
+		                    // 🛡️ CORREÇÃO BUG 2: Cria equipas falsas para a IA não tentar dividir zero e entrar em Loop!
+		                    for(let i=1; i<=nTimes; i++) {
+		                        inscritos.push({ nome: `Equipe ${i}`, turma: `A Definir` });
+		                    }
+		                }
 
-                if (nTimes === 2) {
-                    let p1 = inscritos[0]; let p2 = inscritos[1];
-                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
-                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
-                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+		                if (nTimes === 2) {
+		                    let p1 = inscritos[0]; let p2 = inscritos[1];
+		                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
+		                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
+		                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
 
-                    if (multIdaVolta === 1) {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                    } else {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
-                    }
-                } 
-                else if (nTimes === 3) {
-                    let p1 = inscritos[0]; let p2 = inscritos[1]; let p3 = inscritos[2];
-                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
-                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
-                    let n3 = p3 ? `${p3.turma} (${p3.nome.split(' ')[0]})` : "Equipe 3";
-                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
+		                    if (multIdaVolta === 1) {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                    } else {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
+		                    }
+		                } 
+		                else if (nTimes === 3) {
+		                    let p1 = inscritos[0]; let p2 = inscritos[1]; let p3 = inscritos[2];
+		                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
+		                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
+		                    let n3 = p3 ? `${p3.turma} (${p3.nome.split(' ')[0]})` : "Equipe 3";
+		                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
 
-                    if (formato === 'eliminatoria') {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
-                    } else {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
-                    }
-                }
-                else {
-                    // AQUI INSERIMOS OS IDs PARA O MATA-MATA MAIOR!
-                    let paresSorteados = [];
-                    for(let i=0; i < inscritos.length; i+=2) {
-                        let p1 = inscritos[i]; let p2 = inscritos[i+1];
-                        let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "A Definir";
-                        let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "A Definir";
-                        let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
-                        
-                        paresSorteados.push({ tituloStr: `${n1} x ${n2}`, nA: n1, nB: n2, idA: id1, idB: id2 });
-                    }
+		                    if (formato === 'eliminatoria') {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
+		                    } else {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
+		                    }
+		                }
+		                else {
+		                    let paresSorteados = [];
+		                    for(let i=0; i < inscritos.length; i+=2) {
+		                        let p1 = inscritos[i]; let p2 = inscritos[i+1];
+		                        let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "A Definir";
+		                        let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "A Definir";
+		                        let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+		                        
+		                        paresSorteados.push({ tituloStr: `${n1} x ${n2}`, nA: n1, nB: n2, idA: id1, idB: id2 });
+		                    }
 
-                    if (formato === 'eliminatoria') {
-                        let numJogos = (nTimes - 1);
-                        let idFaseAtual = 1;
-                        let filaJogos = [];
+		                    if (formato === 'eliminatoria') {
+		                        let numJogos = (nTimes - 1);
+		                        let idFaseAtual = 1;
+		                        let filaJogos = [];
 
-                        for (let i = 0; i < paresSorteados.length; i++) {
-                            let nomeFase = numJogos === 1 ? "🏆 GRANDE FINAL" :
-                                           (paresSorteados.length === 2 ? "Semifinal" :
-                                           (paresSorteados.length === 4 ? "Quartas de Final" : "Eliminatória"));
+		                        for (let i = 0; i < paresSorteados.length; i++) {
+		                            let nomeFase = numJogos === 1 ? "🏆 GRANDE FINAL" :
+		                                           (paresSorteados.length === 2 ? "Semifinal" :
+		                                           (paresSorteados.length === 4 ? "Quartas de Final" : "Eliminatória"));
 
-                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${paresSorteados[i].tituloStr}`;
-                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: paresSorteados[i].idA, equipeANome: paresSorteados[i].nA, equipeBId: paresSorteados[i].idB, equipeBNome: paresSorteados[i].nB });
-                            idFaseAtual++;
-                        }
+		                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${paresSorteados[i].tituloStr}`;
+		                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: paresSorteados[i].idA, equipeANome: paresSorteados[i].nA, equipeBId: paresSorteados[i].idB, equipeBNome: paresSorteados[i].nB });
+		                            idFaseAtual++;
+		                        }
 
-                        let inicioFaseAnterior = 1;
-                        let fimFaseAnterior = paresSorteados.length;
+		                        let inicioFaseAnterior = 1;
+		                        let fimFaseAnterior = paresSorteados.length;
+		                        let loopSafety = 0; // 🛡️ Trava contra loop infinito absoluto
 
-                        while (fimFaseAnterior < numJogos) {
-                            let qtdJogosNovaFase = (fimFaseAnterior - inicioFaseAnterior + 1) / 2;
-                            let novoInicio = idFaseAtual;
+		                        while (fimFaseAnterior < numJogos && loopSafety < 100) {
+		                            loopSafety++;
+		                            // 🛡️ CORREÇÃO BUG 2: Math.ceil garante que a conta feche em números ímpares!
+		                            let qtdJogosNovaFase = Math.ceil((fimFaseAnterior - inicioFaseAnterior + 1) / 2);
+		                            if (qtdJogosNovaFase <= 0) break; // Parada de segurança
 
-                            for (let i = 0; i < qtdJogosNovaFase; i++) {
-                                let j1 = inicioFaseAnterior + (i * 2);
-                                let j2 = inicioFaseAnterior + (i * 2) + 1;
+		                            let novoInicio = idFaseAtual;
 
-                                let nomeFase = qtdJogosNovaFase === 1 ? "🏆 GRANDE FINAL" :
-                                               (qtdJogosNovaFase === 2 ? "Semifinal" :
-                                               (qtdJogosNovaFase === 4 ? "Quartas de Final" : "Eliminatória"));
-                                
-                                let nomeA = `Vencedor do Jogo ${j1}`;
-                                let nomeB = `Vencedor do Jogo ${j2}`;
-                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${nomeA} x ${nomeB}`;
-                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: null, equipeANome: nomeA, equipeBId: null, equipeBNome: nomeB });
-                                idFaseAtual++;
-                            }
-                            inicioFaseAnterior = novoInicio;
-                            fimFaseAnterior = idFaseAtual - 1;
-                        }
+		                            for (let i = 0; i < qtdJogosNovaFase; i++) {
+		                                let j1 = inicioFaseAnterior + (i * 2);
+		                                let j2 = inicioFaseAnterior + (i * 2) + 1;
 
-                        filaJogos.forEach(fj => {
-                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
-                        });
-                    } 
-                    else { 
-                        for(let i=1; i<=3; i++) {
-                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase Regular | Sorteio da Tabela ${i}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
-                        }
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | 1º Colocado x 4º Colocado`, equipeAId: null, equipeANome: "1º Colocado", equipeBId: null, equipeBNome: "4º Colocado" });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 2) | 2º Colocado x 3º Colocado`, equipeAId: null, equipeANome: "2º Colocado", equipeBId: null, equipeBNome: "3º Colocado" });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
-                    }
-                }
+		                                let nomeFase = qtdJogosNovaFase === 1 ? "🏆 GRANDE FINAL" :
+		                                               (qtdJogosNovaFase === 2 ? "Semifinal" :
+		                                               (qtdJogosNovaFase === 4 ? "Quartas de Final" : "Eliminatória"));
+		                                
+		                                let nomeA = `Vencedor do Jogo ${j1}`;
+		                                let nomeB = `Vencedor do Jogo ${j2}`;
+		                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${nomeA} x ${nomeB}`;
+		                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: null, equipeANome: nomeA, equipeBId: null, equipeBNome: nomeB });
+		                                idFaseAtual++;
+		                            }
+		                            inicioFaseAnterior = novoInicio;
+		                            fimFaseAnterior = idFaseAtual - 1;
+		                        }
 
-                let indexJogo = 0;
-                for(let d = 0; d < totalDiasGerados; d++) {
-                    let diasSobrando = totalDiasGerados - d;
-                    let jogosSobrando = jogosDesteEsporte.length - indexJogo;
-                    
-                    if (jogosSobrando === 0) break;
-                    if (jogosSobrando < diasSobrando) continue;
-                    
-                    let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
-                    for(let k = 0; k < qtdParaEsteDia; k++) {
-                        diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
-                        indexJogo++;
-                    }
-                }
-            });
+		                        filaJogos.forEach(fj => {
+		                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
+		                        });
+		                    } 
+		                    else { 
+		                        for(let i=1; i<=3; i++) {
+		                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase Regular | Sorteio da Tabela ${i}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
+		                        }
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | 1º Colocado x 4º Colocado`, equipeAId: null, equipeANome: "1º Colocado", equipeBId: null, equipeBNome: "4º Colocado" });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 2) | 2º Colocado x 3º Colocado`, equipeAId: null, equipeANome: "2º Colocado", equipeBId: null, equipeBNome: "3º Colocado" });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
+		                    }
+		                }
 
-            let idJogoGlobal = 1;
-            for(let d = 0; d < diasGeradosGlobais.length; d++) {
-                let dia = diasGeradosGlobais[d];
-                let trackersDeQuadra = {};
-                quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
-                let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
-                let jogosAlocadosNesteDia = 0;
+		                let indexJogo = 0;
+		                for(let d = 0; d < totalDiasGerados; d++) {
+		                    let diasSobrando = totalDiasGerados - d;
+		                    let jogosSobrando = jogosDesteEsporte.length - indexJogo;
+		                    
+		                    if (jogosSobrando === 0) break;
+		                    if (jogosSobrando < diasSobrando) continue;
+		                    
+		                    let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
+		                    for(let k = 0; k < qtdParaEsteDia; k++) {
+		                        diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
+		                        indexJogo++;
+		                    }
+		                }
+		            });
 
-                for (let i = 0; i < dia.partidasPendentes.length; i++) {
-                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
-                    let partida = dia.partidasPendentes[i];
-                    let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
-                    
-                    if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
-                        if (simultaneo) {
-                            let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
-                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
-                        } else { continue; }
-                    }
+		            let idJogoGlobal = 1;
+		            for(let d = 0; d < diasGeradosGlobais.length; d++) {
+		                let dia = diasGeradosGlobais[d];
+		                let trackersDeQuadra = {};
+		                quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
+		                let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
+		                let jogosAlocadosNesteDia = 0;
 
-                    let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
-                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
-                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
+		                for (let i = 0; i < dia.partidasPendentes.length; i++) {
+		                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
+		                    let partida = dia.partidasPendentes[i];
+		                    let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
+		                    
+		                    if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
+		                        if (simultaneo) {
+		                            let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
+		                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
+		                        } else { continue; }
+		                    }
 
-                    // GRAVA OS IDS NA MEMÓRIA DE EXPORTAÇÃO!
-                    jogosGeradosGlobais.push({
-                        id: idJogoGlobal++, diaId: dia.idStr, hora: horaDoJogo, esporte: partida.espObj.nome,
-                        icone: partida.espObj.icone, titulo: partida.titulo, quadra: quadraAlvo,
-                        equipeAId: partida.equipeAId, equipeANome: partida.equipeANome, 
-                        equipeBId: partida.equipeBId, equipeBNome: partida.equipeBNome
-                    });
-                    jogosAlocadosNesteDia++;
-                }
-            }
-        }
+		                    let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
+		                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
+		                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
+
+		                    jogosGeradosGlobais.push({
+		                        id: idJogoGlobal++, diaId: dia.idStr, hora: horaDoJogo, esporte: partida.espObj.nome,
+		                        icone: partida.espObj.icone, titulo: partida.titulo, quadra: quadraAlvo,
+		                        equipeAId: partida.equipeAId, equipeANome: partida.equipeANome, 
+		                        equipeBId: partida.equipeBId, equipeBNome: partida.equipeBNome
+		                    });
+		                    jogosAlocadosNesteDia++;
+		                }
+		            }
+		        }
 
         function renderizarVisualizacoes() {
             renderizarAbaGeral();
@@ -572,15 +600,15 @@
                     let corTexto = jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-${jogo.id}">
-                            <div class="jogo-hora">${jogo.hora}</div>
-                            <div class="jogo-desc"><b>${jogo.icone} ${jogo.esporte}</b> <span style="color:${corTexto};">- ${jogo.titulo}</span> <span class="jogo-quadra">| 📍 ${jogo.quadra}</span></div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora)}</div>
+                            <div class="jogo-desc"><b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo)}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
                 });
                 container.innerHTML += `
                     <div class="dia-card">
-                        <div class="dia-header"><h5>${dia.titulo}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
+                        <div class="dia-header"><h5>${HighTechSecurity.sanitizar(dia.titulo)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
                         ${jogosHtml}
                     </div>
                 `;
@@ -608,8 +636,8 @@
 
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-esp-${jogo.id}">
-                            <div class="jogo-hora">${dataCurta}<br><span style="color:var(--theme-primary);">${jogo.hora}</span></div>
-                            <div class="jogo-desc"><b>${jogo.titulo}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${jogo.quadra}</span></div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora)}</span></div>
+                            <div class="jogo-desc"><b>${HighTechSecurity.sanitizar(jogo.titulo)}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
@@ -617,7 +645,7 @@
                 let iconeEsp = jogosDoEsporte[0].icone;
                 container.innerHTML += `
                     <div class="dia-card">
-                        <div class="dia-header"><h5>${iconeEsp} ${nomeEsp}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoEsporte.length} Partidas</span></div>
+                        <div class="dia-header"><h5>${HighTechSecurity.sanitizar(iconeEsp)} ${HighTechSecurity.sanitizar(nomeEsp)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoEsporte.length} Partidas</span></div>
                         ${jogosHtml}
                     </div>
                 `;
@@ -629,14 +657,14 @@
             if(!jogo) return;
 
             document.getElementById('edit-jogo-id').value = jogo.id;
-            document.getElementById('edit-jogo-nome').innerHTML = `${jogo.icone} ${jogo.esporte} - ${jogo.titulo}`;
+            document.getElementById('edit-jogo-nome').innerHTML = `${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)} - ${HighTechSecurity.sanitizar(jogo.titulo)}`;
             document.getElementById('edit-hora').value = jogo.hora;
 
             const selectDia = document.getElementById('edit-dia');
             selectDia.innerHTML = '';
             diasGeradosGlobais.forEach(d => {
                 let isSelected = (d.idStr === jogo.diaId) ? "selected" : "";
-                selectDia.innerHTML += `<option value="${d.idStr}" ${isSelected}>${d.titulo}</option>`;
+                selectDia.innerHTML += `<option value="${d.idStr}" ${isSelected}>${HighTechSecurity.sanitizar(d.titulo)}</option>`;
             });
 
             const selectQuadras = document.getElementById('edit-quadra');
@@ -644,7 +672,7 @@
             const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
             quadrasArray.forEach(q => {
                 let isSelected = (q === jogo.quadra) ? "selected" : "";
-                selectQuadras.innerHTML += `<option value="${q}" ${isSelected}>${q}</option>`;
+                selectQuadras.innerHTML += `<option value="${HighTechSecurity.sanitizar(q)}" ${isSelected}>${HighTechSecurity.sanitizar(q)}</option>`;
             });
 
             document.getElementById('modal-edicao').style.display = 'flex';
@@ -683,12 +711,19 @@
             document.getElementById('calendario-result').style.display = 'none';
 
             try {
-                const resCalendario = await fetch('http://localhost:8015/api/jogos/calendario', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(calendarioSaveDTO)
+                // 🛡️ API Autenticada: Salvar Calendário com JWT e rota relativa
+                const token = localStorage.getItem('interclassToken');
+                const resCalendario = await fetch('/api/jogos/calendario', {
+                    method: 'POST', 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }, 
+                    body: JSON.stringify(calendarioSaveDTO)
                 });
 
                 if (!resCalendario.ok) {
-                    throw new Error("O Servidor Java recusou os dados.");
+                    throw new Error("O Servidor Java recusou os dados. Verifique a autenticação.");
                 }
 
                 localStorage.removeItem('arenaSetup');
@@ -701,7 +736,7 @@
                 console.error("ERRO:", error);
                 document.getElementById('ai-loading').style.display = 'none';
                 document.getElementById('calendario-result').style.display = 'block';
-                alert("🚨 Falha ao salvar. Verifique o console do STS.");
+                alert("🚨 Falha ao salvar. Sua sessão pode ter expirado. Faça o login novamente.");
             }
         }
     </script>

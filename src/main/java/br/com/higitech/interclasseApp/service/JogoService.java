@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,7 @@ import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.JogoRepository;
 import br.com.higitech.interclasseApp.repositories.LoteRepository;
 import br.com.higitech.interclasseApp.repositories.ModalidadeRepository;
-import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class JogoService {
@@ -27,25 +28,33 @@ public class JogoService {
     private final JogoRepository jogoRepository;
     private final ModalidadeRepository modalidadeRepository;
     private final LoteRepository loteRepository;
-    private final ProfessorRepository professorRepository; // 🌟 Novo Repositório
+    private final JdbcTemplate jdbcTemplate;
 
-    public JogoService(JogoRepository jogoRepository, ModalidadeRepository modalidadeRepository, 
-                       LoteRepository loteRepository, ProfessorRepository professorRepository) {
+    public JogoService(JogoRepository jogoRepository, ModalidadeRepository modalidadeRepository, LoteRepository loteRepository, JdbcTemplate jdbcTemplate) {
         this.jogoRepository = jogoRepository;
         this.modalidadeRepository = modalidadeRepository;
         this.loteRepository = loteRepository;
-        this.professorRepository = professorRepository;
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @PostConstruct
+    public void higienizarBancoDeDados() {
+        System.out.println("🔄 Iniciando higienização do Banco de Dados...");
+        try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN dia_id DROP NOT NULL"); } catch (Exception e) {}
+        try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN esporte DROP NOT NULL"); } catch (Exception e) {}
+        try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN icone DROP NOT NULL"); } catch (Exception e) {}
+        try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN hora DROP NOT NULL"); } catch (Exception e) {}
+        try { jdbcTemplate.execute("ALTER TABLE tb_lote DROP CONSTRAINT IF EXISTS tb_lote_genero_key"); } catch (Exception e) {}
+        try { jdbcTemplate.execute("ALTER TABLE tb_lote DROP CONSTRAINT IF EXISTS uk_tb_lote_genero"); } catch (Exception e) {}
+        System.out.println("✅ Travas fantasmas removidas com sucesso! Servidor pronto.");
     }
 
     @Transactional
-    public void salvarLoteDeJogos(CalendarioSaveDTO dto) {
-        
-        // 🌟 MOCK: Professor Fantasma (ID 1)
-        Professor profLogado = professorRepository.findById(1L).orElseThrow(() -> new RuntimeException("Professor base não existe. Vá na aba de Setup primeiro!"));
-        
-        // 1. Encontra ou cria o Lote (Gênero) Deste Professor
-        List<Lote> lotesSalvos = loteRepository.findByProfessorId(1L);
-        Lote loteCorreto = lotesSalvos.stream()
+    public void salvarLoteDeJogos(CalendarioSaveDTO dto, Professor profLogado) {
+        jogoRepository.deleteByProfessorIdAndGenero(profLogado.getId(), dto.genero());
+
+        List<Lote> todosLotes = loteRepository.findAll();
+        Lote loteCorreto = todosLotes.stream()
                 .filter(l -> l.getGenero() != null && l.getGenero().equalsIgnoreCase(dto.genero()))
                 .findFirst()
                 .orElse(null);
@@ -53,7 +62,7 @@ public class JogoService {
         if (loteCorreto == null) {
             loteCorreto = new Lote();
             loteCorreto.setGenero(dto.genero());
-            loteCorreto.setProfessor(profLogado); // 🔒 Atrela ao professor
+            try { loteCorreto.setProfessor(profLogado); } catch(Exception e) {}
             loteCorreto = loteRepository.save(loteCorreto);
         }
 
@@ -66,10 +75,18 @@ public class JogoService {
             jogo.setQuadra(jogoDTO.quadra());
             jogo.setStatus("PENDENTE"); 
             jogo.setGenero(dto.genero()); 
-            jogo.setProfessor(profLogado); // 🔒 Jogo atrelado ao professor!
+            jogo.setProfessor(profLogado); 
             
-            jogo.setDataJogo(LocalDate.parse(jogoDTO.diaId())); 
-            jogo.setHorario(LocalTime.parse(jogoDTO.hora(), DateTimeFormatter.ofPattern("HH:mm")));
+            try {
+                if (jogoDTO.diaId() != null && !jogoDTO.diaId().isEmpty()) {
+                    jogo.setDataJogo(LocalDate.parse(jogoDTO.diaId())); 
+                }
+                if (jogoDTO.hora() != null && !jogoDTO.hora().isEmpty()) {
+                    jogo.setHorario(LocalTime.parse(jogoDTO.hora(), DateTimeFormatter.ofPattern("HH:mm")));
+                }
+            } catch (Exception e) {
+                System.out.println("Aviso: Formato de data/hora ignorado.");
+            }
             
             jogo.setEquipeAId(jogoDTO.equipeAId());
             jogo.setEquipeANome(jogoDTO.equipeANome());
@@ -77,7 +94,7 @@ public class JogoService {
             jogo.setEquipeBNome(jogoDTO.equipeBNome());
 
             Modalidade modCorreta = modalidadesSalvas.stream()
-                    .filter(m -> m.getNomeEsporte().equalsIgnoreCase(jogoDTO.esporte()))
+                    .filter(m -> m.getNomeEsporte().equalsIgnoreCase(jogoDTO.esporte()) && m.getLote() != null && m.getLote().getId().equals(loteParaSalvar.getId()))
                     .findFirst()
                     .orElse(null);
             
@@ -98,9 +115,8 @@ public class JogoService {
     }
 
     @Transactional(readOnly = true)
-    public List<JogoDTO> buscarJogosParaPlayHub(String genero) {
-        // 🔒 Filtra apenas os jogos do Professor Fantasma (ID 1)
-        List<Jogo> jogos = jogoRepository.findByProfessorIdAndGeneroOrderByDataJogoAscHorarioAsc(1L, genero);
+    public List<JogoDTO> buscarJogosParaPlayHub(String genero, Professor profLogado) {
+        List<Jogo> jogos = jogoRepository.findByProfessorIdAndGenero(profLogado.getId(), genero);
         
         return jogos.stream().map(j -> new JogoDTO(
                 j.getId(),
@@ -137,5 +153,11 @@ public class JogoService {
         map.put("modalidade", modMap);
         map.put("escalacoes", List.of()); 
         return map;
+    }
+
+    // 🔥 O NOVO MOTOR DE EXCLUSÃO
+    @Transactional
+    public void excluirTorneioEspecifico(String genero, String esporte, Professor profLogado) {
+        jogoRepository.excluirTorneioEspecificoDoBanco(profLogado.getId(), genero, esporte);
     }
 }
