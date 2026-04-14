@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Configuração de Torneios - InterclassApp</title>
+	<link rel="manifest" href="/manifest.json">
+	<meta name="theme-color" content="#05050f">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
+	
     <style>
         :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
         body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
@@ -62,7 +68,7 @@
             <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Defina as regras e a quantidade de equipes para cada modalidade que você ativou.</p>
 
             <div id="torneios-container">
-                <p style="text-align: center; color: var(--theme-primary);">⏳ Carregando modalidades escolhidas...</p>
+                <p style="text-align: center; color: var(--theme-primary);">⏳ Carregando modalidades e sincronizando alunos inscritos...</p>
             </div>
 
             <div style="display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
@@ -85,8 +91,9 @@
         ];
 
         let setupData = null;
+        let listaAlunosGlobais = [];
 
-        window.onload = () => {
+        window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
@@ -101,6 +108,17 @@
             if (setupData.genero === 'feminino') document.body.classList.add('theme-fem');
             if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
 
+            // 🔥 BUSCA OS ALUNOS PARA PREENCHER A QUANTIDADE EXATA AUTOMATICAMENTE 🔥
+            try {
+                const token = localStorage.getItem('interclassToken');
+                const response = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (response.ok) {
+                    listaAlunosGlobais = await response.json();
+                }
+            } catch (e) {
+                console.warn("Offline: Não foi possível buscar alunos para contagem automática.");
+            }
+
             renderizarFormularios();
         };
 
@@ -112,14 +130,29 @@
                 let mod = modalidadeDefs.find(m => m.id === esp.id);
                 if (!mod) return;
 
+                // 1. Filtra para saber exatamente quantos alunos estão matriculados nesta modalidade/gênero
+                let alunosInscritos = listaAlunosGlobais.filter(a => a.esporte === mod.nome && a.genero === setupData.genero).length;
+                
+                // 2. Define a quantidade padrão com prioridade para a vida real:
+                // Se o professor já digitou algo antes (esp.qtdTimes), mantém.
+                // Se não, ele tenta usar o total de inscritos. Se não houver inscritos, assume 8 por defeito.
                 let formatoAtual = esp.formato || 'eliminatoria';
-                let qtdAtual = esp.qtdTimes || 8;
+                let qtdAtual = esp.qtdTimes || (alunosInscritos > 0 ? alunosInscritos : 8);
+                if (qtdAtual < 2) qtdAtual = 2; // Previne tentar gerar torneio de 1 equipa
+
+                // 3. Adiciona um aviso visual discreto para o professor saber porque aquele número está lá
+                let avisoInscritosHtml = alunosInscritos > 0 
+                    ? `<span style="color:#00ff00; font-size: 0.8rem; margin-left: 10px;">(📌 ${alunosInscritos} inscrições detectadas)</span>` 
+                    : ``;
 
                 container.innerHTML += `
                     <div class="torneio-card" id="card-${mod.id}">
                         <div class="torneio-header">
                             <div style="font-size: 2.5rem;">${mod.icone}</div>
-                            <h3 style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase;">${mod.nome}</h3>
+                            <div>
+                                <h3 style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 5px;">${mod.nome}</h3>
+                                <span style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Categoria: ${setupData.genero.toUpperCase()}</span>
+                            </div>
                         </div>
                         
                         <div class="grid-2">
@@ -133,8 +166,8 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>Quantidade de Equipes (Estimativa)</label>
-                                <input type="number" id="qtd-${mod.id}" value="${qtdAtual}" min="2" max="32">
+                                <label>Quantidade de Equipes / Atletas ${avisoInscritosHtml}</label>
+                                <input type="number" id="qtd-${mod.id}" value="${qtdAtual}" min="2" max="100">
                             </div>
                         </div>
                         
@@ -147,35 +180,34 @@
             });
         }
 
-		async function salvarConfiguracoes() {
-		            // 🛡️ CORREÇÃO BUG 1 (Segurança Extra): Só lê o formato se o elemento HTML realmente existir
-		            setupData.esportes.forEach(esp => {
-		                let selectFormato = document.getElementById(`formato-${esp.id}`);
-		                if (selectFormato) {
-		                    esp.formato = selectFormato.value;
-		                    esp.qtdTimes = parseInt(document.getElementById(`qtd-${esp.id}`).value);
-		                    esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
-		                    esp.configurado = true;
-		                }
-		            });
-		            
-		            // Remove lixos de memória e avança
-		            setupData.esportes = setupData.esportes.filter(esp => esp.configurado);
-		            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+        async function salvarConfiguracoes() {
+            setupData.esportes.forEach(esp => {
+                let selectFormato = document.getElementById(`formato-${esp.id}`);
+                if (selectFormato) {
+                    esp.formato = selectFormato.value;
+                    esp.qtdTimes = parseInt(document.getElementById(`qtd-${esp.id}`).value);
+                    esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
+                    esp.configurado = true;
+                }
+            });
+            
+            // Remove lixos de memória e avança
+            setupData.esportes = setupData.esportes.filter(esp => esp.configurado);
+            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
 
-		            try {
-		                const token = localStorage.getItem('interclassToken');
-		                const response = await fetch('/api/torneios/setup', {
-		                    method: 'POST',
-		                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-		                    body: JSON.stringify(setupData)
-		                });
+            try {
+                const token = localStorage.getItem('interclassToken');
+                const response = await fetch('/api/torneios/setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(setupData)
+                });
 
-		                if (response.ok) window.location.href = '/calendario.html';
-		                else if (response.status === 403) { alert("🚨 Sessão expirada."); window.location.href = '/login.html'; }
-		                else { console.warn("Modo offline."); window.location.href = '/calendario.html'; }
-		            } catch (error) { window.location.href = '/calendario.html'; }
-		        }
+                if (response.ok) window.location.href = '/calendario.html';
+                else if (response.status === 403) { alert("🚨 Sessão expirada."); window.location.href = '/login.html'; }
+                else { console.warn("Modo offline."); window.location.href = '/calendario.html'; }
+            } catch (error) { window.location.href = '/calendario.html'; }
+        }
     </script>
 </body>
 </html>
