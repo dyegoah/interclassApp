@@ -19,7 +19,6 @@ public class Modalidade {
     private String nomeEsporte;
     private String icone;
 
-    // A MÁGICA DA CORRENTE: Liga a Modalidade ao Lote
     @ManyToOne
     @JoinColumn(name = "lote_id")
     private Lote lote;

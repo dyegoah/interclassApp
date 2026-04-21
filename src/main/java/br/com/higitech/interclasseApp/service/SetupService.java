@@ -24,7 +24,7 @@ public class SetupService {
     private final LoteRepository loteRepository;
     private final ModalidadeRepository modalidadeRepository;
     private final ClassificacaoRepository classificacaoRepository;
-    private final ProfessorRepository professorRepository; // 🌟 Novo Repositório
+    private final ProfessorRepository professorRepository;
 
     public SetupService(TorneioRepository torneioRepository, LoteRepository loteRepository, 
                         ModalidadeRepository modalidadeRepository, ClassificacaoRepository classificacaoRepository,
@@ -37,7 +37,6 @@ public class SetupService {
     }
 
     public void processarLote(LoteSetupDTO dto) {
-        // 🌟 MOCK: Cria ou resgata o Professor Fantasma (ID 1)
         Professor profLogado = professorRepository.findById(1L).orElseGet(() -> {
             Professor p = new Professor();
             p.setNome("Admin Sistema");
@@ -47,28 +46,25 @@ public class SetupService {
             return professorRepository.save(p);
         });
 
+        // Pega o primeiro torneio disponível ou cria um básico seguro para o BD
         Torneio torneioAtivo = torneioRepository.findAll().stream()
-                .filter(Torneio::getAtivo).findFirst()
+                .findFirst() 
                 .orElseGet(() -> {
                     Torneio t = new Torneio();
-                    t.setNome("Interclasses Oficial");
-                    t.setAno(2026);
-                    t.setAtivo(true);
+                    t.setTitulo("Interclasses Oficial");
+                    t.setStatus("ATIVO");
                     return torneioRepository.save(t);
                 });
 
         Lote lote = new Lote();
         lote.setGenero(dto.genero());
         lote.setTorneio(torneioAtivo);
-        lote.setProfessor(profLogado); // 🔒 Atrelando o lote ao Professor
+        lote.setProfessor(profLogado);
         lote = loteRepository.save(lote);
 
         for (EsporteSetupDTO esporteDto : dto.esportes()) {
             Modalidade modalidade = new Modalidade();
             modalidade.setNomeEsporte(obterNomeEsporte(esporteDto.id()));
-            modalidade.setFormato(esporteDto.formato());
-            modalidade.setQtdTimes(esporteDto.qtdTimes());
-            modalidade.setIdaEVolta(esporteDto.idaEVolta());
             modalidade.setLote(lote);
             
             Modalidade modalidadeSalva = modalidadeRepository.save(modalidade);

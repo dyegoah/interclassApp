@@ -1,10 +1,17 @@
 package br.com.higitech.interclasseApp.dto;
 
-import java.time.LocalDate;
+public class TorneioDTO {
+    
+    private String titulo;
 
-public record TorneioDTO(
-    String nome,
-    Integer ano,
-    LocalDate dataInicio,
-    LocalDate dataFim
-) {}
+    // ==========================
+    // GETTERS E SETTERS
+    // ==========================
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+}

@@ -22,6 +22,10 @@ public class Lote {
     @ManyToOne
     @JoinColumn(name = "professor_id")
     private Professor professor;
+    
+    @ManyToOne
+    @JoinColumn(name = "torneio_id")
+    private Torneio torneio;
 
     // ==========================
     // GETTERS E SETTERS
@@ -34,4 +38,13 @@ public class Lote {
 
     public Professor getProfessor() { return professor; }
     public void setProfessor(Professor professor) { this.professor = professor; }
+    
+    public Torneio getTorneio() {
+        return torneio;
+    }
+
+    public void setTorneio(Torneio torneio) {
+        this.torneio = torneio;
+    }
+    
 }
