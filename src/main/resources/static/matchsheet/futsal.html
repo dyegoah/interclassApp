@@ -160,20 +160,39 @@
         
         let jogadorAcao = null; let timeAcao = null;
         let cronoInt = null; let secs = 0; let rodando = false; let periodo = "1º Tempo";
-        let periodoIndex = 1; // Suporte à API
+        let periodoIndex = 1;
 
-        window.onload = () => {
+        window.onload = async () => {
             const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
             if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
-            
-            if(!matchAtiva) { alert("Jogo não encontrado."); window.location.href = '/tabelas.html'; return; }
+
+            const token = localStorage.getItem('interclassToken');
+
+            // 🔥 Tenta buscar o jogo na API se não achar no LocalStorage
+            if (!matchAtiva) {
+                try {
+                    let res = await fetch(`/api/jogos/lote/${lote}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (res.ok) {
+                        let jogosLote = await res.json();
+                        matchAtiva = jogosLote.find(j => j.id === idJogo);
+                    }
+                } catch(e) { console.warn("Súmula em Modo Offline."); }
+            }
+
+            // 🔥 Mock "Anti-Crash": Se nem a API nem o LocalStorage tiverem o jogo, cria um visual vazio para não quebrar a tela
+            if(!matchAtiva) {
+                matchAtiva = { id: idJogo, esporte: 'Futsal', titulo: 'Partida', quadra: 'Quadra', icone: '⚽' };
+            }
 
             document.getElementById('match-info').innerHTML = `${matchAtiva.icone} <b>${matchAtiva.esporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
 
             if(isReadOnly) {
                 let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                let rel = relatorios[idJogo];
-                placar = rel.placar; faltas = rel.faltas; escalacao = rel.escalacao; timeline = rel.timeline;
+                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, faltas:{A:0,B:0}, escalacao:{A:[],B:[]}, timeline:[] }; // Escudo Anti-Crash
+                placar = rel.placar || {A:0,B:0};
+                faltas = rel.faltas || {A:0,B:0};
+                escalacao = rel.escalacao || {A:[],B:[]};
+                timeline = rel.timeline || [];
                 
                 document.getElementById('crono-area').style.display = 'none';
                 document.getElementById('btn-finalizar').style.display = 'none';
@@ -288,7 +307,12 @@
         async function finalizarFutsal() {
             if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
                 
+                const token = localStorage.getItem('interclassToken');
+
                 const sumulaFinalizadaDTO = { 
+                    status: 'FINALIZADO',
+                    placarA: placar.A,
+                    placarB: placar.B,
                     placar: placar, 
                     periodoIndex: periodoIndex, 
                     escalacao: escalacao, 
@@ -296,24 +320,38 @@
                 };
 
                 try {
-                    const response = await fetch(`http://localhost:8080/api/sumulas/${idJogo}/finalizar`, {
+                    // 🔥 Passo 1: Força o envio direto para a tabela Jogos (Resolve o bug do placar vazio)
+                    await fetch(`/api/jogos/${idJogo}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        body: JSON.stringify({ status: 'FINALIZADO', placarA: placar.A, placarB: placar.B })
+                    }).catch(e => console.warn("Fallback PUT Jogos ignorado:", e));
+
+                    // 🔥 Passo 2: Rota Dinâmica (remove o localhost hardcoded) e envia a súmula
+                    const response = await fetch(`/api/sumulas/${idJogo}/finalizar`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
                         body: JSON.stringify(sumulaFinalizadaDTO)
                     });
 
+                    // 🔥 Passo 3: Sincroniza o LocalStorage perfeitamente para exibir instantaneamente
+                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                    rels[idJogo] = { placar: placar, faltas: faltas, escalacao: escalacao, timeline: timeline, periodoIndex: periodoIndex };
+                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+
                     if (response.ok) {
                         alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
-                        
-                        // Atualiza o local storage para a tela PlayHub funcionar enquanto não consome a API de listar jogos
-                        let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                        rels[idJogo] = { placar: placar, faltas: faltas, escalacao: escalacao, timeline: timeline, periodoIndex: periodoIndex };
-                        localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
-                        
                         window.location.href = '/tabelas.html';
                     } else {
                         const erroMsg = await response.text();
                         alert(`⚠️ Erro ao salvar na base de dados: ${erroMsg}`);
+                        window.location.href = '/tabelas.html';
                     }
                 } catch (error) {
                     console.error("Erro de conexão com a API:", error);

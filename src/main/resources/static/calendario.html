@@ -73,9 +73,31 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
         .modal-box { background: rgba(10,10,20,0.95); border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
 
-        .tabs-container { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; gap: 5px; }
-        .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; }
+        .tabs-container { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; gap: 5px; overflow-x: auto; }
+        .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; white-space: nowrap; }
         .tab-btn.active { background: rgba(0, 242, 254, 0.1); color: var(--theme-primary); border-color: rgba(0, 242, 254, 0.3); border-bottom: 2px solid var(--theme-primary); text-shadow: 0 0 5px var(--theme-glow); }
+
+        /* 🔥 CSS DA VISÃO MINI-BRACKET SIMBÓLICO 🔥 */
+        .mini-bracket-wrapper { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 15px 5px; overflow-x: auto; background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%); border-radius: 12px;}
+        .mini-col { display: flex; flex-direction: column; justify-content: space-around; gap: 15px; position: relative; }
+        .mini-match { background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; width: 120px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .mini-match-header { background: rgba(255,255,255,0.08); font-size: 0.65rem; text-align: center; padding: 4px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .mini-team { padding: 6px 8px; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; color: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-team:first-of-type { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mini-match.final { border-color: #ffd700; transform: scale(1.1); box-shadow: 0 0 15px rgba(255,215,0,0.25); margin: 0 10px;}
+        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.15); color: #ffd700; font-weight: bold;}
+        .mini-connector-left::after { content: ''; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.2); z-index: 1; }
+        .mini-connector-right::before { content: ''; position: absolute; left: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.2); z-index: 1; }
+
+        .mini-group-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; padding: 10px; }
+        .mini-group-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; width: 180px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .mini-group-header { padding: 8px; font-family: 'Orbitron'; font-size: 0.85rem; color: #fff; font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1);}
+        .mini-group-row { display: flex; align-items: center; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'Segoe UI'; font-size: 0.8rem; color: #fff; }
+        .mini-group-row:last-child { border-bottom: none; }
+        .mini-group-pos { width: 25px; font-weight: bold; color: rgba(255,255,255,0.5); font-family: 'Orbitron'; }
+        .mini-group-team { flex-grow: 1; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-group-row.qualified { background: rgba(0,255,0,0.05); border-left: 3px solid #00ff00; }
+        .mini-group-row.qualified .mini-group-pos { color: #00ff00; }
 
         #tabela-impressao { display: none; }
         
@@ -114,12 +136,21 @@
         <div class="glass" style="padding: 2rem; border-radius: 15px; border-top: 4px solid var(--theme-primary);">
             
             <div id="calendario-config">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                     <div>
                         <h2 class="section-title" style="margin: 0; font-size: 1.5rem;">🧠 Inteligência de Agendamento</h2>
-                        <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); margin-top: 5px;">O sistema garantirá que as grandes finais de todas as modalidades aconteçam na data final que você estipular.</p>
+                        <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); margin-top: 5px;">O sistema garantirá que as grandes finais aconteçam na data final estipulada.</p>
                     </div>
                     <span style="font-size: 3rem;">🗓️</span>
+                </div>
+
+                <div id="aviso-existentes" style="display: none; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--theme-primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);">
+                    <strong style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.1rem;">📌 Lote em Andamento!</strong>
+                    <p style="font-family: 'Segoe UI'; font-size: 0.95rem; margin-top: 5px; color: rgba(255,255,255,0.9); line-height: 1.5;">
+                        Atenção! Já existem torneios gravados no banco de dados para a categoria <b id="txt-genero-existentes" style="text-transform: uppercase;"></b> 
+                        (<span id="txt-esportes-existentes" style="color: #00ff00; font-weight: bold;"></span>). <br>
+                        Fique tranquilo: Os esportes que está a configurar agora <b>serão adicionados ao calendário</b> e a IA irá encaixá-los automaticamente para <b>não chocar com os horários</b> dos torneios antigos!
+                    </p>
                 </div>
 
                 <div class="config-section">
@@ -186,7 +217,7 @@
             <div id="ai-loading" class="ai-loading">
                 <div class="spinner"></div>
                 <h3 style="color: var(--theme-primary);">A Inteligência está cruzando as datas...</h3>
-                <p style="font-family: 'Segoe UI'; opacity: 0.7;">Encaixando os jogos e garantindo a Grande Final no último dia.</p>
+                <p style="font-family: 'Segoe UI'; opacity: 0.7;">Analisando jogos antigos e encaixando os novos sem conflito.</p>
             </div>
 
             <div id="calendario-result" class="calendario-result">
@@ -201,15 +232,17 @@
                     </div>
                 </div>
                 
-                <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">Use o botão <b>Editar</b> para mover livremente qualquer partida para outro dia, horário ou quadra.</p>
+                <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">A Inteligência Artificial alocou os jogos perfeitamente. Use o botão <b>Editar</b> para mover livremente qualquer partida se necessário.</p>
 
                 <div class="tabs-container">
                     <button class="tab-btn active" id="tab-geral" onclick="mudarAba('geral')">📅 Visão Geral (Por Dia)</button>
                     <button class="tab-btn" id="tab-esporte" onclick="mudarAba('esporte')">🏅 Visão Por Modalidade</button>
+                    <button class="tab-btn" id="tab-tabela" onclick="mudarAba('tabela')">🏆 Visão da Tabela (TV)</button>
                 </div>
                 
                 <div id="calendario-dias-container"></div>
                 <div id="calendario-esportes-container" style="display: none;"></div>
+                <div id="calendario-tabela-container" style="display: none;"></div>
 
                 <div style="display: flex; justify-content: space-between; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;" class="impressao-botoes">
                     <button class="btn-acao btn-secundario" onclick="refazerCalendario()">🡨 Refazer Parâmetros</button>
@@ -248,10 +281,6 @@
     <div id="footbar-placeholder"></div>
 
     <script>
-        // ========================================================
-        // 🛡️ ESCUDO DE SEGURANÇA FRONTEND - HIGHTECH
-        // Módulo de Prevenção contra XSS (Cross-Site Scripting)
-        // ========================================================
         const HighTechSecurity = {
             sanitizar: function(textoCru) {
                 if (!textoCru) return '';
@@ -270,10 +299,20 @@
             { id: 11, nome: 'Dama', icone: '🏁' }, { id: 12, nome: 'E-Sports', icone: '🎮' }
         ];
 
+        const esportesIndividuais = ['Natação', 'Atletismo', 'Tênis de Mesa', 'Xadrez', 'Dama', 'E-Sports'];
+        
+        const minJogadoresPorEsporte = {
+            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2
+        };
+
+        const turmasPlaceholder = ["1º A", "1º B", "2º A", "2º B", "3º A", "3º B", "8º A", "8º B", "9º A", "9º B"];
+
         let setupData = null;
         let diasGeradosGlobais = []; 
         let jogosGeradosGlobais = []; 
         let listaAlunosGlobais = [];
+        
+        let jogosExistentesGlobais = [];
 
         window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
@@ -281,23 +320,32 @@
             
             setupData = JSON.parse(localStorage.getItem('arenaSetup'));
             if (!setupData || !setupData.esportes) {
-                setupData = { genero: 'masculino', esportes: [{id: 10, formato: 'eliminatoria', qtdTimes: 2, idaEVolta: false}] };
+                setupData = { genero: 'masculino', esportes: [{id: 1, formato: 'eliminatoria', qtdTimes: 4, idaEVolta: false}] };
             }
 
             if (setupData.genero === 'feminino') document.body.classList.add('theme-fem');
             if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
 
             try {
-                // 🛡️ API Autenticada: Buscar alunos com JWT
                 const token = localStorage.getItem('interclassToken');
-                const response = await fetch('/api/alunos', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
                 
-                if(response.ok) {
-                    listaAlunosGlobais = await response.json();
+                const resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+                if(resAlunos.ok) { listaAlunosGlobais = await resAlunos.json(); }
+                
+                const resExistentes = await fetch(`/api/jogos/lote/${setupData.genero}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(resExistentes.ok) {
+                    let jgs = await resExistentes.json();
+                    if(Array.isArray(jgs) && jgs.length > 0) {
+                        jogosExistentesGlobais = jgs;
+                        let esportesExistentes = [...new Set(jgs.map(j => j.esporte))].join(', ');
+                        
+                        document.getElementById('aviso-existentes').style.display = 'block';
+                        document.getElementById('txt-genero-existentes').innerText = setupData.genero;
+                        document.getElementById('txt-esportes-existentes').innerText = esportesExistentes;
+                    }
                 }
-            } catch (e) { console.warn("Modo offline ativo."); }
+
+            } catch (e) { console.warn("Modo offline ou erro ao buscar dados."); }
 
             let hoje = new Date();
             let semanaQueVem = new Date();
@@ -310,15 +358,20 @@
         function mudarAba(aba) {
             document.getElementById('tab-geral').classList.remove('active');
             document.getElementById('tab-esporte').classList.remove('active');
+            document.getElementById('tab-tabela').classList.remove('active');
             document.getElementById('calendario-dias-container').style.display = 'none';
             document.getElementById('calendario-esportes-container').style.display = 'none';
+            document.getElementById('calendario-tabela-container').style.display = 'none';
 
             if(aba === 'geral') {
                 document.getElementById('tab-geral').classList.add('active');
                 document.getElementById('calendario-dias-container').style.display = 'block';
-            } else {
+            } else if (aba === 'esporte') {
                 document.getElementById('tab-esporte').classList.add('active');
                 document.getElementById('calendario-esportes-container').style.display = 'block';
+            } else {
+                document.getElementById('tab-tabela').classList.add('active');
+                document.getElementById('calendario-tabela-container').style.display = 'block';
             }
         }
 
@@ -362,6 +415,42 @@
                 alert("Período de datas inválido."); return;
             }
 
+            // 🔥 TRAVA INTELIGENTE ANTES DE PROCESSAR (VALIDAÇÃO DE GRUPOS) 🔥
+            let erroGrupos = false;
+            let msgErro = "";
+
+            setupData.esportes.forEach(esp => {
+                let def = modalidadeDefs.find(m => m.id === esp.id);
+                if(!def) return;
+                
+                let isIndividual = esportesIndividuais.includes(def.nome);
+                let tipoDisputa = esp.tipoDisputa || 'coletiva';
+                let inscritosRaw = listaAlunosGlobais.filter(a => a.esporte === def.nome && a.genero === setupData.genero);
+                
+                let nTimes = esp.qtdTimes || 4;
+
+                if (tipoDisputa === 'coletiva' || !isIndividual) {
+                    let minReq = isIndividual ? 2 : (minJogadoresPorEsporte[def.nome] || 5);
+                    let contagemPorTurma = {};
+                    inscritosRaw.forEach(a => { contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; });
+                    let turmasValidas = Object.keys(contagemPorTurma).filter(t => contagemPorTurma[t] >= minReq);
+                    if (inscritosRaw.length > 0) nTimes = turmasValidas.length;
+                } else {
+                    if (inscritosRaw.length > 0) nTimes = inscritosRaw.length;
+                }
+
+                // A trava de Fase de Grupos
+                if (esp.formato === 'grupos' && nTimes < 4) {
+                    erroGrupos = true;
+                    msgErro += `- ${def.icone} ${def.nome}: Formato "Fase de Grupos" exige mínimo de 4 equipes inscritas. O sistema detetou apenas ${nTimes} válidas.\n`;
+                }
+            });
+
+            if (erroGrupos) {
+                alert("🚨 TRAVA DE SEGURANÇA:\n\n" + msgErro + "\nVolte à tela anterior (Passo 3) e altere o formato para 'Mata-Mata' ou 'Pontos Corridos', ou adicione mais inscrições para fechar os Grupos.");
+                return;
+            }
+
             document.getElementById('calendario-config').style.display = 'none';
             document.getElementById('ai-loading').style.display = 'block';
 
@@ -374,247 +463,317 @@
         }
 
 		function gerarEstruturaDeDados(strInicio, strFim) {
-		            diasGeradosGlobais = [];
-		            jogosGeradosGlobais = [];
+            diasGeradosGlobais = [];
+            jogosGeradosGlobais = [];
 
-		            const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
-		            const simultaneo = document.getElementById('check-simultaneo').checked;
-		            
-		            let horaInicialBase = document.getElementById('hora-inicio').value || "08:00";
-		            let horaFinalBase = document.getElementById('hora-fim').value || "12:00";
-		            let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
-		            let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
-		            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
+            const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
+            const simultaneo = document.getElementById('check-simultaneo').checked;
+            
+            let horaInicialBase = document.getElementById('hora-inicio').value || "08:00";
+            let horaFinalBase = document.getElementById('hora-fim').value || "12:00";
+            let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
+            let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
+            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
 
-		            let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
-		            if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
+            let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
+            if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
 
-		            const botoesDias = document.querySelectorAll('.dia-btn.selected');
-		            let diasPermitidos = Array.from(botoesDias).map(btn => parseInt(btn.getAttribute('data-dia')));
-		            if(diasPermitidos.length === 0) diasPermitidos = [1,2,3,4,5]; 
+            const botoesDias = document.querySelectorAll('.dia-btn.selected');
+            let diasPermitidos = Array.from(botoesDias).map(btn => parseInt(btn.getAttribute('data-dia')));
+            if(diasPermitidos.length === 0) diasPermitidos = [1,2,3,4,5]; 
 
-		            let dataAtual = new Date(strInicio + "T12:00:00");
-		            let dataFim = new Date(strFim + "T12:00:00");
-		            const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
+            let dataAtual = new Date(strInicio + "T12:00:00");
+            let dataFim = new Date(strFim + "T12:00:00");
+            const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
 
-		            while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
-		                if(diasPermitidos.includes(dataAtual.getDay())) {
-		                    diasGeradosGlobais.push({
-		                        idStr: dataAtual.toISOString().split('T')[0],
-		                        titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
-		                        partidasPendentes: []
-		                    });
-		                }
-		                dataAtual.setDate(dataAtual.getDate() + 1);
-		            }
+            while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
+                if(diasPermitidos.includes(dataAtual.getDay())) {
+                    diasGeradosGlobais.push({
+                        idStr: dataAtual.toISOString().split('T')[0],
+                        titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
+                        partidasPendentes: []
+                    });
+                }
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
 
-		            if(diasGeradosGlobais.length === 0) {
-		                alert("Nenhum dia de competição bate com o período selecionado.");
-		                refazerCalendario(); return;
-		            }
+            if(diasGeradosGlobais.length === 0) {
+                alert("Nenhum dia de competição bate com o período selecionado.");
+                refazerCalendario(); return;
+            }
 
-		            let totalDiasGerados = diasGeradosGlobais.length;
+            let totalDiasGerados = diasGeradosGlobais.length;
 
-		            setupData.esportes.forEach(esp => {
-		                let def = modalidadeDefs.find(m => m.id === esp.id);
-		                if(!def) return;
-		                
-		                let nTimes = esp.qtdTimes || 4;
-		                let multIdaVolta = esp.idaEVolta ? 2 : 1;
-		                let formato = esp.formato || 'eliminatoria';
-		                let jogosDesteEsporte = [];
-		                
-		                // 🛡️ CORREÇÃO BUG 2: Usa o "def.nome" que sempre existe, em vez de "esp.nome"
-		                let inscritos = listaAlunosGlobais.filter(a => a.esporte === def.nome && a.genero === setupData.genero);
-		                inscritos = embaralharAlunos(inscritos);
+            setupData.esportes.forEach(esp => {
+                let def = modalidadeDefs.find(m => m.id === esp.id);
+                if(!def) return;
+                
+                let isIndividual = esportesIndividuais.includes(def.nome);
+                let tipoDisputa = esp.tipoDisputa || 'coletiva';
+                
+                let nTimes = esp.qtdTimes || 4;
+                let multIdaVolta = esp.idaEVolta ? 2 : 1;
+                let formato = esp.formato || 'eliminatoria';
+                let jogosDesteEsporte = [];
+                
+                let inscritosRaw = listaAlunosGlobais.filter(a => a.esporte === def.nome && a.genero === setupData.genero);
+                let participantes = [];
 
-		                if(inscritos.length > 0) { 
-		                    nTimes = inscritos.length; 
-		                } else {
-		                    // 🛡️ CORREÇÃO BUG 2: Cria equipas falsas para a IA não tentar dividir zero e entrar em Loop!
-		                    for(let i=1; i<=nTimes; i++) {
-		                        inscritos.push({ nome: `Equipe ${i}`, turma: `A Definir` });
-		                    }
-		                }
+                if (tipoDisputa === 'coletiva' || !isIndividual) {
+                    let minReq = isIndividual ? 2 : (minJogadoresPorEsporte[def.nome] || 5);
+                    let contagemPorTurma = {};
+                    inscritosRaw.forEach(a => { contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; });
+                    
+                    let turmasValidas = Object.keys(contagemPorTurma).filter(t => contagemPorTurma[t] >= minReq);
+                    participantes = turmasValidas.map(t => ({ nomeVisivel: t, id: null }));
+                } else {
+                    participantes = inscritosRaw.map(a => ({
+                        nomeVisivel: `${a.nome.split(' ')[0]} (${a.turma})`,
+                        id: a.id
+                    }));
+                }
 
-		                if (nTimes === 2) {
-		                    let p1 = inscritos[0]; let p2 = inscritos[1];
-		                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
-		                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
-		                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+                participantes = embaralharAlunos(participantes);
 
-		                    if (multIdaVolta === 1) {
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-		                    } else {
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
-		                    }
-		                } 
-		                else if (nTimes === 3) {
-		                    let p1 = inscritos[0]; let p2 = inscritos[1]; let p3 = inscritos[2];
-		                    let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "Equipe 1";
-		                    let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "Equipe 2";
-		                    let n3 = p3 ? `${p3.turma} (${p3.nome.split(' ')[0]})` : "Equipe 3";
-		                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
+                if(participantes.length > 0) {
+                    nTimes = participantes.length;
+                } else {
+                    for(let i=0; i < nTimes; i++) {
+                        let nomeTurma = turmasPlaceholder[i % turmasPlaceholder.length];
+                        if (i >= turmasPlaceholder.length) nomeTurma += ` (T${i+1})`; 
+                        let nomeFinal = (tipoDisputa === 'coletiva') ? nomeTurma : `Atleta ${i+1} (${nomeTurma})`;
+                        participantes.push({ nomeVisivel: nomeFinal, id: null });
+                    }
+                }
+                
+                let suffix = (isIndividual && tipoDisputa === 'coletiva') ? " (Série de Partidas)" : "";
 
-		                    if (formato === 'eliminatoria') {
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
-		                    } else {
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
-		                    }
-		                }
-		                else {
-		                    let paresSorteados = [];
-		                    for(let i=0; i < inscritos.length; i+=2) {
-		                        let p1 = inscritos[i]; let p2 = inscritos[i+1];
-		                        let n1 = p1 ? `${p1.turma} (${p1.nome.split(' ')[0]})` : "A Definir";
-		                        let n2 = p2 ? `${p2.turma} (${p2.nome.split(' ')[0]})` : "A Definir";
-		                        let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
-		                        
-		                        paresSorteados.push({ tituloStr: `${n1} x ${n2}`, nA: n1, nB: n2, idA: id1, idB: id2 });
-		                    }
+                if (nTimes === 2) {
+                    let p1 = participantes[0]; let p2 = participantes[1];
+                    let n1 = p1 ? p1.nomeVisivel : "Equipe 1";
+                    let n2 = p2 ? p2.nomeVisivel : "Equipe 2";
+                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
 
-		                    if (formato === 'eliminatoria') {
-		                        let numJogos = (nTimes - 1);
-		                        let idFaseAtual = 1;
-		                        let filaJogos = [];
+                    if (multIdaVolta === 1) {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                    } else {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}${suffix}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
+                    }
+                } 
+                else if (nTimes === 3) {
+                    let p1 = participantes[0]; let p2 = participantes[1]; let p3 = participantes[2];
+                    let n1 = p1 ? p1.nomeVisivel : "Equipe 1";
+                    let n2 = p2 ? p2.nomeVisivel : "Equipe 2";
+                    let n3 = p3 ? p3.nomeVisivel : "Equipe 3";
+                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
 
-		                        for (let i = 0; i < paresSorteados.length; i++) {
-		                            let nomeFase = numJogos === 1 ? "🏆 GRANDE FINAL" :
-		                                           (paresSorteados.length === 2 ? "Semifinal" :
-		                                           (paresSorteados.length === 4 ? "Quartas de Final" : "Eliminatória"));
+                    if (formato === 'eliminatoria') {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 1 (Jogo 1) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1${suffix}`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
+                    } else {
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}${suffix}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado${suffix}`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
+                    }
+                }
+                else {
+                    let paresSorteados = [];
+                    for(let i=0; i < participantes.length; i+=2) {
+                        let p1 = participantes[i]; let p2 = participantes[i+1];
+                        let n1 = p1 ? p1.nomeVisivel : "A Definir";
+                        let n2 = p2 ? p2.nomeVisivel : "A Definir";
+                        let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+                        
+                        paresSorteados.push({ tituloStr: `${n1} x ${n2}${suffix}`, nA: n1, nB: n2, idA: id1, idB: id2 });
+                    }
 
-		                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${paresSorteados[i].tituloStr}`;
-		                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: paresSorteados[i].idA, equipeANome: paresSorteados[i].nA, equipeBId: paresSorteados[i].idB, equipeBNome: paresSorteados[i].nB });
-		                            idFaseAtual++;
-		                        }
+                    if (formato === 'eliminatoria') {
+                        let numJogos = (nTimes - 1);
+                        let idFaseAtual = 1;
+                        let filaJogos = [];
 
-		                        let inicioFaseAnterior = 1;
-		                        let fimFaseAnterior = paresSorteados.length;
-		                        let loopSafety = 0; // 🛡️ Trava contra loop infinito absoluto
+                        for (let i = 0; i < paresSorteados.length; i++) {
+                            let nomeFase = numJogos === 1 ? "🏆 GRANDE FINAL" :
+                                           (paresSorteados.length === 2 ? "SEMIFINAL " + (i+1) :
+                                           (paresSorteados.length === 4 ? "Quartas de Final" : "Eliminatória"));
 
-		                        while (fimFaseAnterior < numJogos && loopSafety < 100) {
-		                            loopSafety++;
-		                            // 🛡️ CORREÇÃO BUG 2: Math.ceil garante que a conta feche em números ímpares!
-		                            let qtdJogosNovaFase = Math.ceil((fimFaseAnterior - inicioFaseAnterior + 1) / 2);
-		                            if (qtdJogosNovaFase <= 0) break; // Parada de segurança
+                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${paresSorteados[i].tituloStr}`;
+                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: paresSorteados[i].idA, equipeANome: paresSorteados[i].nA, equipeBId: paresSorteados[i].idB, equipeBNome: paresSorteados[i].nB });
+                            idFaseAtual++;
+                        }
 
-		                            let novoInicio = idFaseAtual;
+                        let inicioFaseAnterior = 1;
+                        let fimFaseAnterior = paresSorteados.length;
+                        let loopSafety = 0; 
 
-		                            for (let i = 0; i < qtdJogosNovaFase; i++) {
-		                                let j1 = inicioFaseAnterior + (i * 2);
-		                                let j2 = inicioFaseAnterior + (i * 2) + 1;
+                        while (fimFaseAnterior < numJogos && loopSafety < 100) {
+                            loopSafety++;
+                            let qtdJogosNovaFase = Math.ceil((fimFaseAnterior - inicioFaseAnterior + 1) / 2);
+                            if (qtdJogosNovaFase <= 0) break; 
 
-		                                let nomeFase = qtdJogosNovaFase === 1 ? "🏆 GRANDE FINAL" :
-		                                               (qtdJogosNovaFase === 2 ? "Semifinal" :
-		                                               (qtdJogosNovaFase === 4 ? "Quartas de Final" : "Eliminatória"));
-		                                
-		                                let nomeA = `Vencedor do Jogo ${j1}`;
-		                                let nomeB = `Vencedor do Jogo ${j2}`;
-		                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${nomeA} x ${nomeB}`;
-		                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: null, equipeANome: nomeA, equipeBId: null, equipeBNome: nomeB });
-		                                idFaseAtual++;
-		                            }
-		                            inicioFaseAnterior = novoInicio;
-		                            fimFaseAnterior = idFaseAtual - 1;
-		                        }
+                            let novoInicio = idFaseAtual;
 
-		                        filaJogos.forEach(fj => {
-		                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
-		                        });
-		                    } 
-		                    else { 
-		                        for(let i=1; i<=3; i++) {
-		                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase Regular | Sorteio da Tabela ${i}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
-		                        }
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 1) | 1º Colocado x 4º Colocado`, equipeAId: null, equipeANome: "1º Colocado", equipeBId: null, equipeBNome: "4º Colocado" });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `Semifinal (Jogo 2) | 2º Colocado x 3º Colocado`, equipeAId: null, equipeANome: "2º Colocado", equipeBId: null, equipeBNome: "3º Colocado" });
-		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
-		                    }
-		                }
+                            for (let i = 0; i < qtdJogosNovaFase; i++) {
+                                let j1 = inicioFaseAnterior + (i * 2);
+                                let j2 = inicioFaseAnterior + (i * 2) + 1;
 
-		                let indexJogo = 0;
-		                for(let d = 0; d < totalDiasGerados; d++) {
-		                    let diasSobrando = totalDiasGerados - d;
-		                    let jogosSobrando = jogosDesteEsporte.length - indexJogo;
-		                    
-		                    if (jogosSobrando === 0) break;
-		                    if (jogosSobrando < diasSobrando) continue;
-		                    
-		                    let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
-		                    for(let k = 0; k < qtdParaEsteDia; k++) {
-		                        diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
-		                        indexJogo++;
-		                    }
-		                }
-		            });
+                                let nomeFase = qtdJogosNovaFase === 1 ? "🏆 GRANDE FINAL" :
+                                               (qtdJogosNovaFase === 2 ? "SEMIFINAL " + (i+1) :
+                                               (qtdJogosNovaFase === 4 ? "Quartas de Final" : "Eliminatória"));
+                                
+                                let nomeA = `Vencedor do Jogo ${j1}`;
+                                let nomeB = `Vencedor do Jogo ${j2}`;
+                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${nomeA} x ${nomeB}${suffix}`;
+                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: null, equipeANome: nomeA, equipeBId: null, equipeBNome: nomeB });
+                                idFaseAtual++;
+                            }
+                            inicioFaseAnterior = novoInicio;
+                            fimFaseAnterior = idFaseAtual - 1;
+                        }
 
-		            let idJogoGlobal = 1;
-		            for(let d = 0; d < diasGeradosGlobais.length; d++) {
-		                let dia = diasGeradosGlobais[d];
-		                let trackersDeQuadra = {};
-		                quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
-		                let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
-		                let jogosAlocadosNesteDia = 0;
+                        filaJogos.forEach(fj => {
+                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
+                        });
+                    } 
+                    else { 
+                        for(let i=1; i<=3; i++) {
+                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase de Grupos | Sorteio da Tabela ${i}${suffix}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
+                        }
+                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 1 (Jogo 1) | 1º Grupo A x 2º Grupo B${suffix}`, equipeAId: null, equipeANome: "1º Grupo A", equipeBId: null, equipeBNome: "2º Grupo B" });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 2 (Jogo 2) | 1º Grupo B x 2º Grupo A${suffix}`, equipeAId: null, equipeANome: "1º Grupo B", equipeBId: null, equipeBNome: "2º Grupo A" });
+                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2${suffix}`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
+                    }
+                }
 
-		                for (let i = 0; i < dia.partidasPendentes.length; i++) {
-		                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
-		                    let partida = dia.partidasPendentes[i];
-		                    let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
-		                    
-		                    if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
-		                        if (simultaneo) {
-		                            let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
-		                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
-		                        } else { continue; }
-		                    }
+                let indexJogo = 0;
+                for(let d = 0; d < totalDiasGerados; d++) {
+                    let diasSobrando = totalDiasGerados - d;
+                    let jogosSobrando = jogosDesteEsporte.length - indexJogo;
+                    
+                    if (jogosSobrando === 0) break;
+                    if (jogosSobrando < diasSobrando) continue;
+                    
+                    let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
+                    for(let k = 0; k < qtdParaEsteDia; k++) {
+                        diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
+                        indexJogo++;
+                    }
+                }
+            });
 
-		                    let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
-		                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
-		                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
+            let idJogoGlobal = jogosExistentesGlobais.length > 0 ? Math.max(...jogosExistentesGlobais.map(j => j.id || 0)) + 1 : 1;
+            
+            for(let d = 0; d < diasGeradosGlobais.length; d++) {
+                let dia = diasGeradosGlobais[d];
+                let trackersDeQuadra = {};
+                quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
 
-		                    jogosGeradosGlobais.push({
-		                        id: idJogoGlobal++, diaId: dia.idStr, hora: horaDoJogo, esporte: partida.espObj.nome,
-		                        icone: partida.espObj.icone, titulo: partida.titulo, quadra: quadraAlvo,
-		                        equipeAId: partida.equipeAId, equipeANome: partida.equipeANome, 
-		                        equipeBId: partida.equipeBId, equipeBNome: partida.equipeBNome
-		                    });
-		                    jogosAlocadosNesteDia++;
-		                }
-		            }
-		        }
+                let jogosDoMesmoDia = jogosExistentesGlobais.filter(j => (j.diaId || j.dataJogo) === dia.idStr);
+                jogosDoMesmoDia.forEach(jAntigo => {
+                    if (jAntigo.hora) {
+                        let h = parseInt(jAntigo.hora.split(':')[0]);
+                        let m = parseInt(jAntigo.hora.split(':')[1]);
+                        let minsFim = h * 60 + m + tempoPorJogo;
+                        
+                        if (simultaneo) {
+                            let q = jAntigo.quadra || quadrasArray[0];
+                            if (trackersDeQuadra[q] < minsFim) trackersDeQuadra[q] = minsFim;
+                        } else {
+                            quadrasArray.forEach(q => { if (trackersDeQuadra[q] < minsFim) trackersDeQuadra[q] = minsFim; });
+                        }
+                    }
+                });
+
+                let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
+                let jogosAlocadosNesteDia = 0;
+
+                for (let i = 0; i < dia.partidasPendentes.length; i++) {
+                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
+                    let partida = dia.partidasPendentes[i];
+                    let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
+                    
+                    if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
+                        if (simultaneo) {
+                            let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
+                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
+                        } else { continue; }
+                    }
+
+                    let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
+                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
+                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
+
+                    let isIndividual = esportesIndividuais.includes(partida.espObj.nome);
+                    let espSetup = setupData.esportes.find(e => e.id === partida.espObj.id);
+                    let tipoDisputa = espSetup ? (espSetup.tipoDisputa || 'coletiva') : 'coletiva';
+
+                    jogosGeradosGlobais.push({
+                        id: idJogoGlobal++, diaId: dia.idStr, hora: horaDoJogo, esporte: partida.espObj.nome,
+                        icone: partida.espObj.icone, titulo: partida.titulo, quadra: quadraAlvo,
+                        equipeAId: partida.equipeAId, equipeANome: partida.equipeANome, 
+                        equipeBId: partida.equipeBId, equipeBNome: partida.equipeBNome,
+                        isIndividualSport: isIndividual, tipoDisputa: tipoDisputa
+                    });
+                    jogosAlocadosNesteDia++;
+                }
+            }
+        }
 
         function renderizarVisualizacoes() {
             renderizarAbaGeral();
             renderizarAbaPorEsporte();
+            renderizarAbaTabelaTV(); // 🔥 MÁGICA DA TV MINI-BRACKET
         }
 
         function renderizarAbaGeral() {
             const container = document.getElementById('calendario-dias-container');
             container.innerHTML = '';
-            diasGeradosGlobais.forEach(dia => {
-                let jogosDoDia = jogosGeradosGlobais.filter(j => j.diaId === dia.idStr);
+            
+            let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
+            let mapaDias = {};
+            
+            todosOsJogosParaRender.forEach(j => {
+                let dId = j.diaId || j.dataJogo;
+                if (!mapaDias[dId]) {
+                    let dObj = diasGeradosGlobais.find(d => d.idStr === dId);
+                    mapaDias[dId] = dObj ? dObj.titulo : dId;
+                }
+            });
+
+            let diasOrdenados = Object.keys(mapaDias).sort();
+
+            diasOrdenados.forEach(diaId => {
+                let jogosDoDia = todosOsJogosParaRender.filter(j => (j.diaId || j.dataJogo) === diaId);
                 jogosDoDia.sort((a, b) => a.hora.localeCompare(b.hora));
                 if(jogosDoDia.length === 0) return; 
 
                 let jogosHtml = '';
                 jogosDoDia.forEach(jogo => {
+                    let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
+                    let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
+                    
                     let corTexto = jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
+                    
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-${jogo.id}">
                             <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora)}</div>
-                            <div class="jogo-desc"><b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo)}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
+                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo)}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
                 });
+
+                let tituloDia = mapaDias[diaId];
+                if(!tituloDia.includes('-')) {
+                    let partes = tituloDia.split('-');
+                    if(partes.length === 3) tituloDia = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                }
+
                 container.innerHTML += `
                     <div class="dia-card">
-                        <div class="dia-header"><h5>${HighTechSecurity.sanitizar(dia.titulo)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
+                        <div class="dia-header"><h5>${HighTechSecurity.sanitizar(tituloDia)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
                         ${jogosHtml}
                     </div>
                 `;
@@ -624,26 +783,33 @@
         function renderizarAbaPorEsporte() {
             const container = document.getElementById('calendario-esportes-container');
             container.innerHTML = '';
-            let esportesNomes = [...new Set(jogosGeradosGlobais.map(j => j.esporte))];
+            
+            let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
+            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => j.esporte))];
 
             esportesNomes.forEach(nomeEsp => {
-                let jogosDoEsporte = jogosGeradosGlobais.filter(j => j.esporte === nomeEsp);
+                let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
                 jogosDoEsporte.sort((a, b) => {
-                    if (a.diaId === b.diaId) return a.hora.localeCompare(b.hora);
-                    return a.diaId.localeCompare(b.diaId);
+                    let diaA = a.diaId || a.dataJogo; let diaB = b.diaId || b.dataJogo;
+                    if (diaA === diaB) return a.hora.localeCompare(b.hora);
+                    return diaA.localeCompare(diaB);
                 });
                 if(jogosDoEsporte.length === 0) return;
 
                 let jogosHtml = '';
                 jogosDoEsporte.forEach(jogo => {
-                    let dataObj = diasGeradosGlobais.find(d => d.idStr === jogo.diaId);
-                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : "";
+                    let dataObj = diasGeradosGlobais.find(d => d.idStr === (jogo.diaId || jogo.dataJogo));
+                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : (jogo.diaId || jogo.dataJogo).split('-').reverse().slice(0,2).join('/');
+                    
+                    let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
+                    let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
+                    
                     let corTexto = jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
 
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-esp-${jogo.id}">
                             <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora)}</span></div>
-                            <div class="jogo-desc"><b>${HighTechSecurity.sanitizar(jogo.titulo)}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
+                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.titulo)}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
@@ -658,8 +824,162 @@
             });
         }
 
+        // ==========================================
+        // 🔥 RENDERIZAÇÃO: VISÃO DA TABELA (TV) MINI-BRACKET 🔥
+        // ==========================================
+        function renderizarAbaTabelaTV() {
+            const container = document.getElementById('calendario-tabela-container');
+            container.innerHTML = '';
+            
+            let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
+            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => j.esporte))];
+
+            esportesNomes.forEach(nomeEsp => {
+                let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
+                if (jogosDoEsporte.length === 0) return;
+                
+                let iconeEsp = jogosDoEsporte[0].icone;
+                
+                let espSetup = setupData.esportes.find(e => {
+                    let m = modalidadeDefs.find(md => md.id === e.id);
+                    return m && m.nome === nomeEsp;
+                });
+                let formato = espSetup ? espSetup.formato : 'eliminatoria';
+
+                // Extrair as equipes que vão jogar
+                let todasEquipes = new Set();
+                jogosDoEsporte.forEach(j => {
+                    let s1 = j.titulo.split(' | ');
+                    if(s1.length > 1) {
+                        let s2 = s1[1].split(' x ');
+                        let eqA = s2[0] ? s2[0].trim().replace(' (Série de Partidas)', '') : "";
+                        let eqB = s2[1] ? s2[1].trim().replace(' (Série de Partidas)', '') : "";
+                        
+                        if(eqA && !eqA.includes('Vencedor') && !eqA.includes('A Definir') && !eqA.includes('Colocado') && !eqA.includes('Sorteio') && !eqA.includes('Grupo')) todasEquipes.add(eqA);
+                        if(eqB && !eqB.includes('Vencedor') && !eqB.includes('A Definir') && !eqB.includes('Colocado') && !eqB.includes('Sorteio') && !eqB.includes('Grupo')) todasEquipes.add(eqB);
+                    }
+                });
+                let listaEquipes = Array.from(todasEquipes);
+                if(listaEquipes.length === 0) {
+                    for(let i=1; i<= (espSetup ? espSetup.qtdTimes : 4); i++) listaEquipes.push(`Equipe ${i}`);
+                }
+
+                let extrairEqs = (jObj) => {
+                    if(!jObj) return ["A Definir", "A Definir"];
+                    let s1 = jObj.titulo.split(' | ');
+                    if(s1.length < 2) return ["?", "?"];
+                    let s2 = s1[1].split(' x ');
+                    return [
+                        s2[0] ? s2[0].trim().replace(' (Série de Partidas)', '') : "?",
+                        s2[1] ? s2[1].trim().replace(' (Série de Partidas)', '') : "?"
+                    ];
+                };
+
+                let semi1 = jogosDoEsporte.find(j => j.titulo.includes('SEMIFINAL 1'));
+                let semi2 = jogosDoEsporte.find(j => j.titulo.includes('SEMIFINAL 2'));
+                let final = jogosDoEsporte.find(j => j.titulo.includes('GRANDE FINAL'));
+
+                let eqS1 = extrairEqs(semi1);
+                let eqS2 = extrairEqs(semi2);
+                let eqF = extrairEqs(final);
+
+                // HTML do Mini-Bracket Simbólico
+                let bracketHtml = `
+                    <div class="mini-bracket-wrapper">
+                        ${(semi1 || semi2) ? `
+                        <div class="mini-col">
+                            <div class="mini-match mini-connector-left">
+                                <div class="mini-match-header">SEMI 1</div>
+                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS1[0])}">${HighTechSecurity.sanitizar(eqS1[0])}</div>
+                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS1[1])}">${HighTechSecurity.sanitizar(eqS1[1])}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="mini-col" style="align-items:center;">
+                            <div style="font-size: 2rem; filter: drop-shadow(0 0 10px #ffd700); margin-bottom: 5px;">🏆</div>
+                            <div class="mini-match final">
+                                <div class="mini-match-header">FINAL</div>
+                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqF[0])}">${HighTechSecurity.sanitizar(eqF[0])}</div>
+                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqF[1])}">${HighTechSecurity.sanitizar(eqF[1])}</div>
+                            </div>
+                        </div>
+
+                        ${(semi1 || semi2) ? `
+                        <div class="mini-col">
+                            <div class="mini-match mini-connector-right">
+                                <div class="mini-match-header">SEMI 2</div>
+                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS2[0])}">${HighTechSecurity.sanitizar(eqS2[0])}</div>
+                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS2[1])}">${HighTechSecurity.sanitizar(eqS2[1])}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                let htmlTabela = '';
+
+                if (formato === 'pontos_corridos') {
+                    let rows = listaEquipes.map((t, idx) => `
+                        <div class="mini-group-row ${idx === 0 ? 'qualified' : ''}">
+                            <div class="mini-group-pos">${idx+1}</div>
+                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
+                        </div>`).join('');
+                        
+                    htmlTabela = `
+                        <div class="mini-group-grid">
+                            <div class="mini-group-card" style="width: 100%; max-width: 400px; border-top: 3px solid #00ff00;">
+                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(0,255,0,0.15), transparent); color: #00ff00;">LIGA GERAL (PONTOS CORRIDOS)</div>
+                                ${rows}
+                            </div>
+                        </div>
+                    `;
+                } else if (formato === 'grupos') {
+                    let half = Math.ceil(listaEquipes.length / 2);
+                    let grupoA = listaEquipes.slice(0, half).map((t, idx) => `
+                        <div class="mini-group-row ${idx < 2 ? 'qualified' : ''}">
+                            <div class="mini-group-pos">${idx+1}</div>
+                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
+                        </div>`).join('');
+                        
+                    let grupoB = listaEquipes.slice(half).map((t, idx) => `
+                        <div class="mini-group-row ${idx < 2 ? 'qualified' : ''}">
+                            <div class="mini-group-pos">${idx+1}</div>
+                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
+                        </div>`).join('');
+                    
+                    htmlTabela = `
+                        <div class="mini-group-grid">
+                            <div class="mini-group-card" style="border-top: 3px solid var(--theme-primary);">
+                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(0,242,254,0.2), transparent);">GRUPO A</div>
+                                ${grupoA}
+                            </div>
+                            <div class="mini-group-card" style="border-top: 3px solid #ff00de;">
+                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(255,0,222,0.2), transparent);">GRUPO B</div>
+                                ${grupoB}
+                            </div>
+                        </div>
+                        <div style="text-align: center; font-family: 'Orbitron'; color: #ffd700; margin: 15px 0 5px 0; font-size: 0.9rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">↓ FASE FINAL ↓</div>
+                        ${bracketHtml}
+                    `;
+                } else {
+                    htmlTabela = bracketHtml;
+                }
+
+                container.innerHTML += `
+                    <div class="dia-card" style="border-left-color: #ffd700; background: rgba(0,0,0,0.6);">
+                        <div class="dia-header" style="border-bottom-color: rgba(255,215,0,0.3);">
+                            <h5 style="color: #ffd700; font-size: 1.1rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">${iconeEsp} ${nomeEsp}</h5>
+                            <span style="font-family: 'Segoe UI'; font-size: 0.75rem; background: rgba(255,215,0,0.1); padding: 4px 8px; border-radius: 5px; color: #ffd700; text-transform: uppercase; font-weight: bold; border: 1px solid rgba(255,215,0,0.3);">${formato.replace('_', ' ')}</span>
+                        </div>
+                        ${htmlTabela}
+                    </div>
+                `;
+            });
+        }
+
         function abrirModalEdicao(jogoId) {
-            const jogo = jogosGeradosGlobais.find(j => j.id === jogoId);
+            const jogo = jogosGeradosGlobais.find(j => j.id === jogoId) || jogosExistentesGlobais.find(j => j.id === jogoId);
             if(!jogo) return;
 
             document.getElementById('edit-jogo-id').value = jogo.id;
@@ -668,9 +988,17 @@
 
             const selectDia = document.getElementById('edit-dia');
             selectDia.innerHTML = '';
-            diasGeradosGlobais.forEach(d => {
-                let isSelected = (d.idStr === jogo.diaId) ? "selected" : "";
-                selectDia.innerHTML += `<option value="${d.idStr}" ${isSelected}>${HighTechSecurity.sanitizar(d.titulo)}</option>`;
+            
+            let mapaDiasDropdown = {};
+            diasGeradosGlobais.forEach(d => { mapaDiasDropdown[d.idStr] = d.titulo; });
+            jogosExistentesGlobais.forEach(j => {
+                let dId = j.diaId || j.dataJogo;
+                if (dId && !mapaDiasDropdown[dId]) { mapaDiasDropdown[dId] = dId; }
+            });
+
+            Object.keys(mapaDiasDropdown).forEach(dId => {
+                let isSelected = (dId === jogo.diaId || dId === jogo.dataJogo) ? "selected" : "";
+                selectDia.innerHTML += `<option value="${dId}" ${isSelected}>${HighTechSecurity.sanitizar(mapaDiasDropdown[dId])}</option>`;
             });
 
             const selectQuadras = document.getElementById('edit-quadra');
@@ -688,7 +1016,7 @@
 
         function salvarEdicaoJogo() {
             const id = parseInt(document.getElementById('edit-jogo-id').value);
-            const jogo = jogosGeradosGlobais.find(j => j.id === id);
+            let jogo = jogosGeradosGlobais.find(j => j.id === id) || jogosExistentesGlobais.find(j => j.id === id);
             
             if(jogo) {
                 jogo.diaId = document.getElementById('edit-dia').value;
@@ -706,36 +1034,39 @@
         }
 
         async function finalizarSetupInteiro() {
-            if(jogosGeradosGlobais.length === 0) {
-                alert("Você precisa clicar em 'Gerar Calendário Inteligente' antes de salvar!");
-                return;
+            if(jogosGeradosGlobais.length === 0 && jogosExistentesGlobais.length === 0) {
+                alert("Você precisa gerar o calendário antes de salvar!"); return;
             }
 
-            const calendarioSaveDTO = { genero: setupData.genero, dias: diasGeradosGlobais, jogos: jogosGeradosGlobais };
+            let diasFinais = [];
+            let mapaDias = {};
+            diasGeradosGlobais.forEach(d => { mapaDias[d.idStr] = d; });
+            jogosExistentesGlobais.forEach(j => {
+                let dId = j.diaId || j.dataJogo;
+                if (dId && !mapaDias[dId]) { mapaDias[dId] = { idStr: dId, titulo: dId, partidasPendentes: [] }; }
+            });
+            diasFinais = Object.values(mapaDias);
+
+            let todosOsJogosParaSalvar = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
+
+            const calendarioSaveDTO = { genero: setupData.genero, dias: diasFinais, jogos: todosOsJogosParaSalvar };
 
             document.getElementById('ai-loading').style.display = 'block';
             document.getElementById('calendario-result').style.display = 'none';
 
             try {
-                // 🛡️ API Autenticada: Salvar Calendário com JWT e rota relativa
                 const token = localStorage.getItem('interclassToken');
                 const resCalendario = await fetch('/api/jogos/calendario', {
                     method: 'POST', 
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }, 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
                     body: JSON.stringify(calendarioSaveDTO)
                 });
 
-                if (!resCalendario.ok) {
-                    throw new Error("O Servidor Java recusou os dados. Verifique a autenticação.");
-                }
+                if (!resCalendario.ok) throw new Error("O Servidor recusou a fusão.");
 
                 localStorage.removeItem('arenaSetup');
-                localStorage.removeItem('calendariosOficiais'); 
                 
-                alert(`🏆 Tabela oficial do Lote gravada no PostgreSQL com sucesso!`);
+                alert(`🏆 Fusão do Torneio concluída com sucesso! A tabela oficial foi atualizada.`);
                 window.location.href = '/tabelas.html'; 
 
             } catch (error) {

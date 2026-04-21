@@ -38,7 +38,7 @@
         .subtitle { font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); margin-bottom: 1rem; font-size: 0.95rem; }
 
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem; }
-        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); background: #fff; }
+        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); background: #fff; color: #000; }
         .btn-excluir { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; }
         .btn-excluir:hover { background: #ff0055; color: #fff; box-shadow: 0 0 10px rgba(255,0,85,0.5); }
 
@@ -52,32 +52,56 @@
         .tab-btn.active { background: rgba(255, 255, 255, 0.05); color: var(--theme-primary); border-bottom: 3px solid var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); }
         .tab-count { font-size: 0.8em; opacity: 0.7; font-family: 'Segoe UI'; margin-left: 5px; }
 
-        .resumo-esportes { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); align-items: center; }
-        .badge-sport-summary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-family: 'Segoe UI'; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .badge-sport-summary:hover { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.1); color: #fff; box-shadow: 0 0 10px var(--theme-glow); transform: translateY(-2px); }
+        /* 🔥 SESSÃO DE ABAS POR MODALIDADE 🔥 */
+        .resumo-esportes { margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .badge-sport-summary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 25px; font-size: 0.9rem; font-family: 'Segoe UI'; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); }
+        .badge-sport-summary:hover { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .badge-sport-summary.active { border-color: var(--theme-primary); background: rgba(0, 242, 254, 0.1); color: #fff; box-shadow: 0 0 15px var(--theme-glow); }
 
-        /* 🔥 GRID ADAPTADA: 3 Colunas como padrão */
-        .grid-alunos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 2rem;}
+        /* 🔥 SESSÃO VISUAL: GAVETA DE STATUS DAS EQUIPES 🔥 */
+        .sport-details-box { background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid var(--theme-primary); padding: 1.5rem; margin-bottom: 2rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .sub-section-title { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--theme-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 8px var(--theme-glow);}
         
+        .equipes-scroll-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
+        .equipes-scroll-container::-webkit-scrollbar { height: 8px; }
+        .equipes-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+        .equipes-scroll-container::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 4px; }
+
+        .equipe-summary-card { 
+            min-width: 140px; 
+            background: rgba(0,0,0,0.6); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            padding: 15px 10px; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            border-top: 4px solid #555;
+            transition: 0.3s;
+        }
+        .equipe-summary-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.05); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        .eq-turma { font-family: 'Segoe UI'; font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 10px; white-space: nowrap;}
+        .eq-count-badge { font-family: 'Orbitron'; font-weight: bold; font-size: 1.1rem; border: 1px solid; border-radius: 20px; padding: 4px 15px; background: rgba(0,0,0,0.4); display: inline-block; }
+
+        /* GRID INDIVIDUAL DE ALUNOS */
+        .grid-alunos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 2rem;}
         .aluno-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: 0.3s; position: relative;}
         .aluno-card:hover { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.05); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        
         .aluno-foto { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--theme-primary); transition: border-color 0.5s ease;}
         .aluno-info { flex-grow: 1; overflow: hidden; }
         .aluno-nome { font-weight: bold; color: #fff; font-size: 1rem; margin-bottom: 3px; font-family: 'Segoe UI'; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .aluno-detalhes { font-size: 0.8rem; color: rgba(255,255,255,0.6); font-family: 'Segoe UI'; line-height: 1.4; }
         .badge-esporte { background: rgba(255, 255, 255, 0.05); color: var(--theme-primary); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); display: inline-block; margin-top: 5px; }
 
-        /* 🔥 PAGINAÇÃO ESTILOS */
+        /* PAGINAÇÃO ESTILOS */
         .paginacao-container { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; }
         .btn-page { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-weight: bold;}
         .btn-page:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: var(--theme-primary); }
         .btn-page.active { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
         .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* 🔥 RESPONSIVIDADE (TABLET E CELULAR) */
         @media (max-width: 900px) {
-            /* Força o Card a virar uma "Coluninha" para caber 3 em Tablets/Celulares sem esmagar o texto */
             .grid-alunos { grid-template-columns: repeat(3, 1fr); gap: 10px; }
             .aluno-card { flex-direction: column; text-align: center; padding: 12px 10px; }
             .aluno-foto { width: 50px; height: 50px; margin: 0 auto; }
@@ -86,12 +110,11 @@
         }
 
         @media (max-width: 550px) {
-            /* Em celulares muito pequenos, 3 colunas espremem demais o nome. Adaptamos para 2. */
             .grid-alunos { grid-template-columns: repeat(2, 1fr); }
         }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #05050f; border: 1px solid #ff0055; border-radius: 15px; padding: 2rem; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(255,0,85,0.4); }
+        .modal-box { background: #05050f; border: 1px solid #ff0055; border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 0 30px rgba(255,0,85,0.4); }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -131,13 +154,15 @@
                 </button>
             </div>
 
-            <div id="resumo-container" class="resumo-esportes" style="display: none;">
-                </div>
+            <div id="resumo-container" class="resumo-esportes" style="display: none;"></div>
+
+            <div id="sport-details-container" style="display: none;"></div>
 
             <div id="loading-alunos" style="text-align: center; padding: 2rem; color: var(--theme-primary);">
                 ⏳ Conectando ao Banco de Dados Seguro...
             </div>
 
+            <h4 class="sub-section-title" id="titulo-lista-alunos" style="display: none; margin-top: 2rem; border: none; font-family: 'Segoe UI'; font-size: 1rem; color: rgba(255,255,255,0.7);">📋 Lista de Inscrições Individuais</h4>
             <div class="grid-alunos" id="grid-alunos" style="display: none;"></div>
             
             <div id="paginacao-container" class="paginacao-container"></div>
@@ -159,6 +184,22 @@
         </div>
     </div>
 
+    <div id="modal-exclusao-massa" class="modal-overlay">
+        <div class="modal-box" style="border-color: #ff0055;">
+            <h3 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 15px;">🚨 Exclusão em Massa!</h3>
+            <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.8); margin-bottom: 20px;">
+                Tem certeza que deseja excluir <b>TODOS</b> os <span id="qtd-exclusao-massa" style="color:#fff; font-weight:bold; font-size: 1.2rem;"></span> alunos inscritos no <b id="esporte-exclusao-massa" style="color: #fff; font-size: 1.1rem;"></b> (<span id="genero-exclusao-massa" style="text-transform: uppercase;"></span>)?<br><br>Esta ação não pode ser desfeita!
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;" id="botoes-exclusao-massa">
+                <button class="btn-acao" style="background: transparent; border: 1px solid #fff; color: #fff;" onclick="fecharModalMassa()">Cancelar</button>
+                <button class="btn-acao" style="background: #ff0055; color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4);" onclick="executarExclusaoEmMassa()">DELETAR TODOS</button>
+            </div>
+            <div id="loading-exclusao-massa" style="display: none; color: #00f2fe; font-family: 'Orbitron'; font-size: 1.2rem; margin-top: 10px;">
+                ⏳ Limpando banco de dados...
+            </div>
+        </div>
+    </div>
+
     <div id="footbar-placeholder"></div>
 
     <script>
@@ -171,13 +212,20 @@
             { id: 11, nome: 'Dama', icone: '🏁' }, { id: 12, nome: 'E-Sports', icone: '🎮' }
         ];
 
+        const minJogadoresPorEsporte = {
+            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2
+        };
+
         let listaAlunosBase = []; 
         let generoAtual = 'masculino';
-        
-        // 🔥 VARIÁVEIS DA PAGINAÇÃO
         let alunosFiltradosGlobais = [];
         let paginaAtual = 1;
         const itensPorPagina = 9;
+
+        let esporteAbaSelecionada = null;
+
+        // Variáveis de Exclusão em Massa
+        let idsParaExcluirMassa = [];
 
         window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
@@ -226,7 +274,8 @@
 
         function mudarAba(genero) {
             generoAtual = genero;
-            paginaAtual = 1; // Reseta a paginação ao mudar a aba
+            paginaAtual = 1; 
+            esporteAbaSelecionada = null; 
             
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`tab-${genero}`).classList.add('active');
@@ -240,7 +289,7 @@
         }
 
         function realizarBusca() {
-            paginaAtual = 1; // Reseta a paginação ao digitar
+            paginaAtual = 1; 
             aplicarFiltrosEPaginacao();
         }
 
@@ -257,9 +306,9 @@
             }
 
             alunosFiltradosGlobais = filtrados;
-            renderizarResumo(alunosFiltradosGlobais);
             
-            // Tratamento contra "Página fantasma"
+            renderizarPainelEsportes(alunosFiltradosGlobais);
+            
             const totalPaginas = Math.ceil(alunosFiltradosGlobais.length / itensPorPagina);
             if(paginaAtual > totalPaginas && totalPaginas > 0) paginaAtual = totalPaginas;
             if(paginaAtual === 0 && totalPaginas > 0) paginaAtual = 1;
@@ -267,33 +316,171 @@
             renderizarGridPaginado();
         }
 
-        function renderizarResumo(filtrados) {
+        function renderizarPainelEsportes(filtrados) {
             const container = document.getElementById('resumo-container');
-            if (filtrados.length === 0) { container.style.display = 'none'; return; }
-            container.style.display = 'flex';
+            const detailsContainer = document.getElementById('sport-details-container');
+            
+            if (filtrados.length === 0) { 
+                container.style.display = 'none'; 
+                detailsContainer.style.display = 'none';
+                return; 
+            }
+            
+            container.style.display = 'block';
             
             let contagem = {};
             filtrados.forEach(a => {
                 const chave = a.esporte;
-                if(!contagem[chave]) contagem[chave] = { nome: a.esporte, icone: a.iconeEsporte || '🏅', count: 0 };
+                if(!contagem[chave]) contagem[chave] = { nome: a.esporte, icone: a.iconeEsporte || '🏅', count: 0, alunos: [] };
                 contagem[chave].count++;
+                contagem[chave].alunos.push(a);
             });
 
-            let html = `<span style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-right: 10px;">Encontrados por Modalidade:</span>`;
+            if (!esporteAbaSelecionada || !contagem[esporteAbaSelecionada]) {
+                esporteAbaSelecionada = Object.keys(contagem)[0]; 
+            }
+
+            let htmlTabs = `<p style="font-family: 'Segoe UI'; font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-bottom: 15px;">💡 Selecione uma modalidade abaixo para ver as turmas formadas e iniciar a criação do torneio:</p>`;
+            htmlTabs += `<div style="display: flex; flex-wrap: wrap; gap: 10px;">`;
+            
             for (let chave in contagem) {
                 let esporte = contagem[chave];
-                html += `
-                    <div class="badge-sport-summary" onclick="iniciarSetupDoEsporte('${esporte.nome}')" title="Configurar formato para ${esporte.nome}">
-                        ${esporte.icone} ${esporte.nome} <b style="color: #fff;">(${esporte.count})</b>
+                let cssActive = (esporteAbaSelecionada === esporte.nome) ? 'active' : '';
+                
+                htmlTabs += `
+                    <div class="badge-sport-summary ${cssActive}" onclick="clicarAbaEsporte('${esporte.nome}')">
+                        ${esporte.icone} ${esporte.nome} <b style="color: #fff; margin-left: 5px;">(${esporte.count})</b>
                     </div>
                 `;
             }
             
+            htmlTabs += `</div>`;
+            
             const termoBusca = document.getElementById('input-busca') ? document.getElementById('input-busca').value : "";
             if (termoBusca === "") {
-                html += `<button class="btn-acao" style="margin-left: auto; padding: 6px 15px; font-size: 0.75rem;" onclick="iniciarSetupGeral()">⚡ Múltiplos Torneios</button>`;
+                htmlTabs += `<div style="text-align: right; margin-top: 15px;"><button class="btn-acao" onclick="iniciarSetupGeral()" style="box-shadow: 0 0 15px var(--theme-glow);">⚡ Configurar Múltiplos Torneios ➔</button></div>`;
             }
-            container.innerHTML = html;
+            
+            container.innerHTML = htmlTabs;
+
+            if (esporteAbaSelecionada && contagem[esporteAbaSelecionada]) {
+                renderizarGavetaDoEsporte(esporteAbaSelecionada, contagem[esporteAbaSelecionada].alunos);
+            }
+        }
+
+        function clicarAbaEsporte(nomeEsporte) {
+            esporteAbaSelecionada = nomeEsporte;
+            aplicarFiltrosEPaginacao(); 
+        }
+
+        function renderizarGavetaDoEsporte(nomeEsporte, alunosDoEsporte) {
+            const detailsContainer = document.getElementById('sport-details-container');
+            detailsContainer.style.display = 'block';
+
+            let equipes = {};
+            alunosDoEsporte.forEach(a => {
+                let chave = a.turma;
+                if (!equipes[chave]) {
+                    equipes[chave] = { turma: a.turma, count: 0 };
+                }
+                equipes[chave].count++;
+            });
+
+            let arrayEquipes = Object.values(equipes).sort((a, b) => a.turma.localeCompare(b.turma));
+            let minimoExigido = minJogadoresPorEsporte[nomeEsporte] || 2; 
+
+            let htmlEquipes = '';
+            arrayEquipes.forEach(eq => {
+                let corStatus = '#ff0055'; 
+                let borderTopColor = '#ff0055';
+                
+                if (eq.count >= minimoExigido) {
+                    corStatus = '#00ff00'; borderTopColor = '#00ff00';
+                } else if (eq.count >= (minimoExigido / 2)) {
+                    corStatus = '#ffd700'; borderTopColor = '#ffd700';
+                }
+
+                htmlEquipes += `
+                    <div class="equipe-summary-card" style="border-top-color: ${borderTopColor};">
+                        <div class="eq-turma" title="Turma">${eq.turma}</div>
+                        <div class="eq-count-badge" style="color: ${corStatus}; border-color: ${corStatus}; box-shadow: 0 0 10px rgba(${corStatus === '#00ff00' ? '0,255,0' : (corStatus === '#ffd700' ? '255,215,0' : '255,0,85')}, 0.2);">
+                            ${eq.count} <span style="font-size:0.65rem; color:#ccc; font-weight:normal;">/ ${minimoExigido}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            let iconeEsp = modalidadeDefs.find(m => m.nome === nomeEsporte)?.icone || '🏅';
+
+            // 🔥 BOTÃO DE EXCLUSÃO EM MASSA ADICIONADO AQUI 🔥
+            detailsContainer.innerHTML = `
+                <div class="sport-details-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 15px;">
+                        <h4 class="sub-section-title" style="margin: 0; padding: 0; border: none;">${iconeEsp} Status das Turmas (${nomeEsporte})</h4>
+                        
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-excluir" onclick="abrirModalExclusaoMassa('${nomeEsporte}')" style="padding: 10px 15px; border-radius: 30px;">🗑️ Limpar Inscrições</button>
+                            <button class="btn-acao" onclick="iniciarSetupDoEsporte('${nomeEsporte}')" style="box-shadow: 0 0 15px var(--theme-glow);">⚙️ Criar Torneio de ${nomeEsporte} ➔</button>
+                        </div>
+                    </div>
+                    <div class="equipes-scroll-container" style="margin-bottom: 0;">
+                        ${htmlEquipes}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 🔥 FUNÇÕES DE EXCLUSÃO EM MASSA 🔥
+        // ==========================================
+        function abrirModalExclusaoMassa(esporteNome) {
+            let alunosDoEsporte = alunosFiltradosGlobais.filter(a => a.esporte === esporteNome);
+            idsParaExcluirMassa = alunosDoEsporte.map(a => a.id);
+            
+            document.getElementById('esporte-exclusao-massa').textContent = esporteNome;
+            document.getElementById('genero-exclusao-massa').textContent = generoAtual;
+            document.getElementById('qtd-exclusao-massa').textContent = idsParaExcluirMassa.length;
+            
+            document.getElementById('modal-exclusao-massa').style.display = 'flex';
+        }
+
+        function fecharModalMassa() {
+            document.getElementById('modal-exclusao-massa').style.display = 'none';
+            idsParaExcluirMassa = [];
+        }
+
+        async function executarExclusaoEmMassa() {
+            if(idsParaExcluirMassa.length === 0) return;
+
+            document.getElementById('botoes-exclusao-massa').style.display = 'none';
+            document.getElementById('loading-exclusao-massa').style.display = 'block';
+
+            const token = localStorage.getItem('interclassToken');
+            let teveErro = false;
+
+            // Dispara as exclusões de forma segura pelo Frontend (um loop para garantir)
+            for (let id of idsParaExcluirMassa) {
+                try {
+                    const response = await fetch(`/api/alunos/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                    if(response.ok) {
+                        listaAlunosBase = listaAlunosBase.filter(a => a.id !== id);
+                    } else { teveErro = true; }
+                } catch (e) { teveErro = true; }
+            }
+
+            document.getElementById('botoes-exclusao-massa').style.display = 'flex';
+            document.getElementById('loading-exclusao-massa').style.display = 'none';
+
+            fecharModalMassa();
+            
+            if (teveErro) {
+                alert("⚠️ A limpeza terminou, mas alguns alunos podem não ter sido removidos por erro de conexão.");
+            } else {
+                alert("✅ Todos os alunos desta modalidade foram removidos com sucesso!");
+            }
+
+            atualizarContadoresGerais();
+            aplicarFiltrosEPaginacao(); 
         }
 
         function iniciarSetupDoEsporte(nomeEsporte) {
@@ -310,9 +497,9 @@
             window.location.href = '/modalidades.html';
         }
 
-        // 🔥 O MOTOR DE EXIBIÇÃO PAGINADA
         function renderizarGridPaginado() {
             const container = document.getElementById('grid-alunos');
+            const tituloLista = document.getElementById('titulo-lista-alunos');
             container.style.display = 'grid';
             container.innerHTML = '';
 
@@ -320,6 +507,7 @@
             const totalPaginas = Math.ceil(totalItens / itensPorPagina);
 
             if (totalItens === 0) {
+                tituloLista.style.display = 'none';
                 const termoBusca = document.getElementById('input-busca') ? document.getElementById('input-busca').value : "";
                 if (termoBusca !== "") {
                     container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #ff0055; padding: 3rem 0; font-weight: bold;">Nenhum atleta encontrado para "${termoBusca}".</p>`;
@@ -330,7 +518,8 @@
                 return;
             }
 
-            // Fatia o array para pegar só os 9 desta página
+            tituloLista.style.display = 'flex';
+
             const inicio = (paginaAtual - 1) * itensPorPagina;
             const fim = inicio + itensPorPagina;
             const alunosPaginaAtual = alunosFiltradosGlobais.slice(inicio, fim);
@@ -356,7 +545,6 @@
             renderizarControlesPaginacao(totalPaginas);
         }
 
-        // 🔥 RENDERIZA OS BOTÕES [1] [2] [3]
         function renderizarControlesPaginacao(totalPaginas) {
             const container = document.getElementById('paginacao-container');
             if (totalPaginas <= 1) { container.innerHTML = ''; return; }
@@ -399,7 +587,7 @@
                     listaAlunosBase = listaAlunosBase.filter(a => a.id !== id);
                     fecharModal(); 
                     atualizarContadoresGerais();
-                    aplicarFiltrosEPaginacao(); // Recalcula a página correta automaticamente
+                    aplicarFiltrosEPaginacao(); 
                 } else { alert("⚠️ Servidor recusou a exclusão. Você tem permissão?"); }
             } catch (error) { alert("🚨 Erro ao tentar excluir no banco de dados."); }
         }

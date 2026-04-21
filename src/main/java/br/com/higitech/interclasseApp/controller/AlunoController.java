@@ -70,4 +70,14 @@ public class AlunoController {
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para excluir este aluno.");
     }
+    
+    @GetMapping("/public/{professorId}")
+    public ResponseEntity<?> listarAlunosPublico(@PathVariable Long professorId) {
+        try {
+            return ResponseEntity.ok(alunoRepository.findByProfessorId(professorId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Erro: " + e.getMessage());
+        }
+    }
 }

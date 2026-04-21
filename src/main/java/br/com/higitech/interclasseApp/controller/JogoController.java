@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.higitech.interclasseApp.dto.CalendarioSaveDTO;
 import br.com.higitech.interclasseApp.dto.JogoDTO;
+import br.com.higitech.interclasseApp.model.Jogo;
 import br.com.higitech.interclasseApp.model.Professor;
+import br.com.higitech.interclasseApp.repositories.JogoRepository;
 import br.com.higitech.interclasseApp.service.JogoService;
 
 @RestController
@@ -25,6 +27,9 @@ public class JogoController {
 
     @Autowired
     private JogoService jogoService;
+    
+    @Autowired
+    private JogoRepository jogoRepository;
 
     @PostMapping("/calendario")
     public ResponseEntity<?> salvarCalendario(@RequestBody CalendarioSaveDTO dto, @AuthenticationPrincipal Professor professorLogado) {
@@ -49,4 +54,24 @@ public class JogoController {
         jogoService.excluirTorneioEspecifico(genero, esporte, professorLogado);
         return ResponseEntity.ok().body("{\"mensagem\": \"Torneio removido com sucesso!\"}");
     }
+    
+   // ==========================================
+    // ROTA PÚBLICA PARA O PORTAL DO ALUNO (SEM TOKEN)
+    // ==========================================
+    @GetMapping("/public/{professorId}/lote/{genero}")
+    public ResponseEntity<?> listarJogosPublico(@PathVariable Long professorId, @PathVariable String genero) {
+        try {
+            // ATENÇÃO: Verifique se o método no seu JogoRepository se chama exatamente assim.
+            // Se a sua entidade Jogo se relaciona com 'usuario', pode ser findByUsuarioIdAndGenero.
+            List<Jogo> jogos = jogoRepository.findByProfessorIdAndGenero(professorId, genero);
+            
+            return ResponseEntity.ok(jogos);
+            
+        } catch (Exception e) {
+            System.out.println("🚨 ERRO NA ROTA PÚBLICA DE JOGOS: " + e.getMessage());
+            e.printStackTrace(); // Mostra o erro exato no terminal do Eclipse/IntelliJ
+            return ResponseEntity.internalServerError().body("Erro no servidor Java: " + e.getMessage());
+        }
+    }
+
 }

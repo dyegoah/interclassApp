@@ -21,28 +21,33 @@
 
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
+        .section-title { text-transform: uppercase; font-size: 1.3rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; }
 
-        .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); }
-        .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); }
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); overflow-x: auto; }
+        .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap;}
         .stepper-step.active { color: var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); }
         .stepper-step.completed { color: #00ff00; text-shadow: 0 0 8px rgba(0,255,0,0.4); }
-        .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; }
+        .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; min-width: 20px;}
         .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
+
+        .info-balloon { border-left: 4px solid var(--theme-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-family: 'Segoe UI'; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.85); transition: border-color 0.5s; background: rgba(0,0,0,0.4);}
 
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
         .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
         .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); padding: 10px 20px; }
 
-        .torneio-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--theme-primary); }
+        .torneio-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--theme-primary); position: relative; overflow: hidden; transition: 0.3s;}
         .torneio-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
-        .form-group select, .form-group input { width: 100%; padding: 10px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; }
+        .form-group select, .form-group input { width: 100%; padding: 10px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; transition: 0.3s; }
         .form-group select:focus, .form-group input:focus { border-color: var(--theme-primary); }
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .alerta-bloqueio { background: rgba(255,0,85,0.1); border: 1px solid #ff0055; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 0 15px rgba(255,0,85,0.2); }
+        .alerta-aviso { background: rgba(255,215,0,0.1); border: 1px solid #ffd700; padding: 10px; border-radius: 8px; margin-top: 15px; }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -64,16 +69,22 @@
         </div>
 
         <div class="glass" style="padding: 2rem; border-radius: 15px; border-top: 4px solid var(--theme-primary);">
-            <h2 class="section-title">⚙️ Passo 3: Configuração de Chaves</h2>
-            <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Defina as regras e a quantidade de equipes para cada modalidade que você ativou.</p>
+            <h2 class="section-title">⚙️ Passo 3: Regras e Chaveamento</h2>
+            
+            <div class="info-balloon">
+                <strong>💡 Inteligência de Escalação e Disputa:</strong><br>
+                O sistema conta e valida as inscrições de acordo com as regras oficiais do esporte.<br><br>
+                <b>Esportes Coletivos (Ex: Futsal):</b> A IA agrupa os alunos pela turma. Se a turma não atingir o mínimo oficial (ex: 5 inscritos), ela fica de fora. Se não houver pelo menos 2 turmas completas, o torneio é bloqueado.<br>
+                <b>Esportes Individuais (Ex: Dama):</b> Se você escolher a disputa "Coletiva por Equipes", a mesma regra se aplica: a turma precisará de no mínimo 2 alunos para formar uma equipe válida para a série de partidas.
+            </div>
 
             <div id="torneios-container">
                 <p style="text-align: center; color: var(--theme-primary);">⏳ Carregando modalidades e sincronizando alunos inscritos...</p>
             </div>
 
             <div style="display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
-                <button class="btn-acao btn-secundario" onclick="window.location.href='/modalidades.html'">🡨 Voltar para Modalidades</button>
-                <button class="btn-acao" onclick="salvarConfiguracoes()">Gravar Configurações e Avançar ➔</button>
+                <button class="btn-acao btn-secundario" onclick="window.location.href='/modalidades.html'">🡨 Voltar para Esportes</button>
+                <button class="btn-acao" id="btn-avancar" onclick="salvarConfiguracoes()">Gravar e Avançar para Calendário ➔</button>
             </div>
         </div>
     </div>
@@ -90,8 +101,15 @@
             { id: 11, nome: 'Dama', icone: '🏁' }, { id: 12, nome: 'E-Sports', icone: '🎮' }
         ];
 
+        const esportesIndividuais = ['Natação', 'Atletismo', 'Tênis de Mesa', 'Xadrez', 'Dama', 'E-Sports'];
+        
+        const minJogadoresPorEsporte = {
+            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2
+        };
+
         let setupData = null;
         let listaAlunosGlobais = [];
+        let bloqueioGeralCritico = false;
 
         window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
@@ -101,64 +119,148 @@
             
             if (!setupData || !setupData.esportes || setupData.esportes.length === 0) {
                 alert("Nenhuma modalidade foi selecionada. Redirecionando...");
-                window.location.href = '/modalidades.html';
-                return;
+                window.location.href = '/modalidades.html'; return;
             }
 
             if (setupData.genero === 'feminino') document.body.classList.add('theme-fem');
             if (setupData.genero === 'misto') document.body.classList.add('theme-misto');
 
-            // 🔥 BUSCA OS ALUNOS PARA PREENCHER A QUANTIDADE EXATA AUTOMATICAMENTE 🔥
             try {
                 const token = localStorage.getItem('interclassToken');
                 const response = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
-                if (response.ok) {
-                    listaAlunosGlobais = await response.json();
-                }
-            } catch (e) {
-                console.warn("Offline: Não foi possível buscar alunos para contagem automática.");
-            }
+                if (response.ok) { listaAlunosGlobais = await response.json(); }
+            } catch (e) { console.warn("Offline: Não foi possível buscar alunos para contagem automática."); }
 
             renderizarFormularios();
+        };
+
+        window.atualizarTipoDisputa = function(idEsporte, valorSelecionado) {
+            let esp = setupData.esportes.find(e => e.id === idEsporte);
+            if (esp) {
+                esp.tipoDisputa = valorSelecionado;
+                setupData.esportes.forEach(e => {
+                    let sF = document.getElementById(`formato-${e.id}`); if(sF) e.formato = sF.value;
+                    let sQ = document.getElementById(`qtd-${e.id}`); if(sQ) e.qtdTimes = parseInt(sQ.value);
+                    let sI = document.getElementById(`ida-${e.id}`); if(sI) e.idaEVolta = sI.checked;
+                });
+                renderizarFormularios(); 
+            }
         };
 
         function renderizarFormularios() {
             const container = document.getElementById('torneios-container');
             container.innerHTML = '';
+            bloqueioGeralCritico = false;
 
             setupData.esportes.forEach(esp => {
                 let mod = modalidadeDefs.find(m => m.id === esp.id);
                 if (!mod) return;
 
-                // 1. Filtra para saber exatamente quantos alunos estão matriculados nesta modalidade/gênero
-                let alunosInscritos = listaAlunosGlobais.filter(a => a.esporte === mod.nome && a.genero === setupData.genero).length;
+                let isIndividual = esportesIndividuais.includes(mod.nome);
+                let inscritosBrutos = listaAlunosGlobais.filter(a => a.esporte === mod.nome && a.genero === setupData.genero);
+                let tipoAtual = esp.tipoDisputa || 'individual';
                 
-                // 2. Define a quantidade padrão com prioridade para a vida real:
-                // Se o professor já digitou algo antes (esp.qtdTimes), mantém.
-                // Se não, ele tenta usar o total de inscritos. Se não houver inscritos, assume 8 por defeito.
-                let formatoAtual = esp.formato || 'eliminatoria';
-                let qtdAtual = esp.qtdTimes || (alunosInscritos > 0 ? alunosInscritos : 8);
-                if (qtdAtual < 2) qtdAtual = 2; // Previne tentar gerar torneio de 1 equipa
+                let qtdAtual = esp.qtdTimes || 8; 
+                let avisoInscritosHtml = '';
+                let bloqueioAvisoHtml = '';
+                let isBloqueado = false;
 
-                // 3. Adiciona um aviso visual discreto para o professor saber porque aquele número está lá
-                let avisoInscritosHtml = alunosInscritos > 0 
-                    ? `<span style="color:#00ff00; font-size: 0.8rem; margin-left: 10px;">(📌 ${alunosInscritos} inscrições detectadas)</span>` 
-                    : ``;
+                // ==========================================
+                // 🔥 LÓGICA DE VALIDAÇÃO DA IA 🔥
+                // ==========================================
+                
+                // TRAVA ABSOLUTA SE NÃO HOUVER INSCRIÇÕES
+                if (inscritosBrutos.length === 0) {
+                    isBloqueado = true; bloqueioGeralCritico = true;
+                    bloqueioAvisoHtml = `
+                        <div class="alerta-bloqueio">
+                            <h5 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 5px;">⚠️ Nenhuma Inscrição Encontrada</h5>
+                            <p style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffccdd; line-height: 1.4;">Para criar o torneio de <b>${mod.nome}</b>, é necessário que os alunos realizem a inscrição primeiro pelo Link do Atleta.</p>
+                        </div>`;
+                } 
+                else if (isIndividual && tipoAtual === 'individual') {
+                    qtdAtual = inscritosBrutos.length;
+                    if (inscritosBrutos.length < 2) {
+                        isBloqueado = true; bloqueioGeralCritico = true;
+                        bloqueioAvisoHtml = `
+                            <div class="alerta-bloqueio">
+                                <h5 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 5px;">⚠️ Inscrições Insuficientes</h5>
+                                <p style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffccdd; line-height: 1.4;">São necessários pelo menos <b>2 alunos</b> no total. Você possui apenas ${inscritosBrutos.length}.</p>
+                            </div>`;
+                    } else {
+                        avisoInscritosHtml = `<span style="color:#00ff00; font-size: 0.8rem; margin-left: 10px;">(📌 ${inscritosBrutos.length} inscrições válidas)</span>`;
+                    }
+                } 
+                else {
+                    let minReq = isIndividual ? 2 : (minJogadoresPorEsporte[mod.nome] || 5);
+                    
+                    let contagemPorTurma = {};
+                    inscritosBrutos.forEach(a => { contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; });
+                    
+                    let turmasValidas = Object.keys(contagemPorTurma).filter(t => contagemPorTurma[t] >= minReq);
+                    let turmasInvalidas = Object.keys(contagemPorTurma).filter(t => contagemPorTurma[t] < minReq);
+                    
+                    qtdAtual = turmasValidas.length;
+                    
+                    if (turmasValidas.length < 2) {
+                        isBloqueado = true; bloqueioGeralCritico = true;
+                        let msgComplemento = isIndividual ? `Mude para "Individual" ou aguarde mais inscrições.` : `São necessárias pelo menos 2 equipes para criar a tabela.`;
+                        
+                        bloqueioAvisoHtml = `
+                            <div class="alerta-bloqueio">
+                                <h5 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 5px;">🛑 Equipes Incompletas (Bloqueado)</h5>
+                                <p style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffccdd; line-height: 1.4;">
+                                    <b>Modo por Equipes:</b> O ${mod.nome} exige no mínimo <b>${minReq} alunos da mesma turma</b> para formar um time válido.<br>
+                                    Atualmente você tem apenas <b>${turmasValidas.length}</b> equipe(s) pronta(s). ${msgComplemento}
+                                </p>
+                            </div>`;
+                    } else {
+                        avisoInscritosHtml = `<span style="color:#00ff00; font-size: 0.8rem; margin-left: 10px;">(📌 ${turmasValidas.length} Equipes Formadas)</span>`;
+                        if (turmasInvalidas.length > 0) {
+                            bloqueioAvisoHtml = `
+                                <div class="alerta-aviso">
+                                    <p style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffd700; line-height: 1.4; margin: 0;">
+                                        💡 <b>Aviso:</b> ${turmasInvalidas.length} turma(s) não atingiram o mínimo de ${minReq} alunos e ficaram de fora da tabela.
+                                    </p>
+                                </div>`;
+                        }
+                    }
+                }
+
+                if (qtdAtual < 2 && !isBloqueado) qtdAtual = 2; 
+                let formatoAtual = esp.formato || 'eliminatoria';
+                
+                let htmlTipoDisputa = '';
+                if (isIndividual) {
+                    htmlTipoDisputa = `
+                        <div class="form-group" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                            <label style="color: #ff00de;">Modo de Disputa (Esporte Individual)</label>
+                            <select id="tipoDisputa-${mod.id}" style="border-color: #ff00de;" onchange="atualizarTipoDisputa(${mod.id}, this.value)" ${isBloqueado && inscritosBrutos.length===0 ? 'disabled' : ''}>
+                                <option value="individual" ${tipoAtual==='individual'?'selected':''}>Individual (Nome do Aluno + Turma)</option>
+                                <option value="coletiva" ${tipoAtual==='coletiva'?'selected':''}>Coletiva por Equipes (Série de Partidas por Turma)</option>
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    htmlTipoDisputa = `<input type="hidden" id="tipoDisputa-${mod.id}" value="coletiva">`;
+                }
+
+                let cardStyle = isBloqueado ? 'border-color: #ff0055; box-shadow: 0 0 20px rgba(255,0,85,0.2);' : '';
 
                 container.innerHTML += `
-                    <div class="torneio-card" id="card-${mod.id}">
+                    <div class="torneio-card" id="card-${mod.id}" style="${cardStyle}">
                         <div class="torneio-header">
-                            <div style="font-size: 2.5rem;">${mod.icone}</div>
+                            <div style="font-size: 2.5rem; ${isBloqueado ? 'filter: grayscale(1);' : ''}">${mod.icone}</div>
                             <div>
-                                <h3 style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 5px;">${mod.nome}</h3>
+                                <h3 style="color: ${isBloqueado ? '#ff0055' : 'var(--theme-primary)'}; font-family: 'Orbitron'; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 5px;">${mod.nome}</h3>
                                 <span style="font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Categoria: ${setupData.genero.toUpperCase()}</span>
                             </div>
                         </div>
                         
                         <div class="grid-2">
                             <div class="form-group">
-                                <label>Formato de Disputa</label>
-                                <select id="formato-${mod.id}">
+                                <label>Formato da Tabela</label>
+                                <select id="formato-${mod.id}" ${isBloqueado ? 'disabled' : ''}>
                                     <option value="eliminatoria" ${formatoAtual === 'eliminatoria' ? 'selected' : ''}>Mata-Mata (Eliminatória Direta)</option>
                                     <option value="grupos" ${formatoAtual === 'grupos' ? 'selected' : ''}>Fase de Grupos + Finais</option>
                                     <option value="pontos_corridos" ${formatoAtual === 'pontos_corridos' ? 'selected' : ''}>Liga (Pontos Corridos)</option>
@@ -166,32 +268,40 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>Quantidade de Equipes / Atletas ${avisoInscritosHtml}</label>
-                                <input type="number" id="qtd-${mod.id}" value="${qtdAtual}" min="2" max="100">
+                                <label>Entidades a Sorteio (Equipes/Alunos) ${avisoInscritosHtml}</label>
+                                <input type="number" id="qtd-${mod.id}" value="${qtdAtual}" min="2" max="100" ${isBloqueado ? 'disabled' : ''}>
                             </div>
                         </div>
                         
                         <div class="form-group" style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-                            <input type="checkbox" id="ida-${mod.id}" ${esp.idaEVolta ? 'checked' : ''} style="width: auto;">
+                            <input type="checkbox" id="ida-${mod.id}" ${esp.idaEVolta ? 'checked' : ''} style="width: auto;" ${isBloqueado ? 'disabled' : ''}>
                             <label for="ida-${mod.id}" style="margin: 0; cursor: pointer;">Partidas de Ida e Volta?</label>
                         </div>
+
+                        ${htmlTipoDisputa}
+                        ${bloqueioAvisoHtml}
                     </div>
                 `;
             });
         }
 
         async function salvarConfiguracoes() {
+            if (bloqueioGeralCritico) {
+                alert("🚨 IMPOSSÍVEL AVANÇAR!\n\nVocê selecionou modalidades que não possuem alunos inscritos suficientes para formar o torneio (veja os alertas vermelhos na tela).\n\nPeça aos alunos para realizarem as inscrições pelo link, ou volte no Passo 2 e desative a modalidade incompleta.");
+                return;
+            }
+
             setupData.esportes.forEach(esp => {
                 let selectFormato = document.getElementById(`formato-${esp.id}`);
                 if (selectFormato) {
                     esp.formato = selectFormato.value;
                     esp.qtdTimes = parseInt(document.getElementById(`qtd-${esp.id}`).value);
                     esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
+                    esp.tipoDisputa = document.getElementById(`tipoDisputa-${esp.id}`).value;
                     esp.configurado = true;
                 }
             });
             
-            // Remove lixos de memória e avança
             setupData.esportes = setupData.esportes.filter(esp => esp.configurado);
             localStorage.setItem('arenaSetup', JSON.stringify(setupData));
 

@@ -18,6 +18,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
     
     List<Jogo> findByProfessorIdAndGenero(Long professorId, String genero);
     
+    
     @Modifying
     @Transactional
     void deleteByProfessorIdAndGenero(Long professorId, String genero);

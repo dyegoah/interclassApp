@@ -40,10 +40,11 @@ public class SecurityConfig {
                                          
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar").permitAll()
                 
-                .requestMatchers(HttpMethod.POST, "/api/alunos/public/**").permitAll()
+                // 🚀 LIBERAÇÃO TOTAL DAS ROTAS PÚBLICAS (GET E POST) PARA O PORTAL DO ALUNO
+                .requestMatchers("/api/alunos/public/**", "/api/jogos/public/**", "/api/modalidades/public/**").permitAll()
                 
-                // 🚀 CORREÇÃO AQUI: Adicionada a pasta "/matchsheet/**" na lista VIP!
-                .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/img/**", "/setup/**", "/matchsheet/**", "/favicon.ico", "/error").permitAll()
+                // 🚀 ADICIONADO O /manifest.json NA LISTA DE LIBERAÇÃO
+                .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/img/**", "/setup/**", "/matchsheet/**", "/favicon.ico", "/manifest.json", "/error").permitAll()
                 
                 .anyRequest().authenticated() 
             )

@@ -325,39 +325,66 @@
         async function finalizarPartida() {
             if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
                 
+                const token = localStorage.getItem('interclassToken'); 
+                
+                // 🔥 INTELIGÊNCIA DE PLACAR: Resolve o problema do 0 x 0
+                // Se algum set foi fechado, manda os sets como placar (Ex: 1 x 0). 
+                // Se nenhum set fechou, manda os pontos do placar atual (Ex: 15 x 12).
+                let placarFinalA = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.A : placar.A;
+                let placarFinalB = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.B : placar.B;
+                
                 const sumulaFinalizadaDTO = { 
-                    placar: {A: setsGanhos.A, B: setsGanhos.B}, 
+                    status: 'FINALIZADO',     
+                    placarA: placarFinalA,    
+                    placarB: placarFinalB,    
+                    placar: {A: placarFinalA, B: placarFinalB}, 
                     periodoIndex: setAtualIndex, 
                     escalacao: escalacao, 
                     timeline: timeline 
                 };
 
                 try {
-                    const response = await fetch(`http://localhost:8080/api/sumulas/${idJogo}/finalizar`, {
+                    // 🔥 PASSO 1: Força um PUT direto na tabela Jogos para garantir que o PostgreSQL atualize o Placar do Card
+                    await fetch(`/api/jogos/${idJogo}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        body: JSON.stringify({ status: 'FINALIZADO', placarA: placarFinalA, placarB: placarFinalB })
+                    }).catch(e => console.warn("Fallback PUT Jogos ignorado:", e));
+
+                    // 🔥 PASSO 2: Salva o JSON completo da Súmula do Vôlei
+                    const response = await fetch(`/api/sumulas/${idJogo}/finalizar`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
                         body: JSON.stringify(sumulaFinalizadaDTO)
                     });
 
+                    // 🔥 PASSO 3: Garante o LocalStorage idêntico ao Banco para exibir instantaneamente
+                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                    rels[idJogo] = { placar: {A: placarFinalA, B: placarFinalB}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
+                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+
                     if (response.ok) {
-                        alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
-                        
-                        let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                        rels[idJogo] = { placar: {A: setsGanhos.A, B: setsGanhos.B}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
-                        localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
-                        
-                        window.location.href = '/tabelas.html';
+                        alert("🏆 Súmula e Placar gravados com sucesso no Servidor Oficial!");
                     } else {
                         const erroMsg = await response.text();
-                        alert(`⚠️ Erro ao salvar na base de dados: ${erroMsg}`);
+                        alert(`⚠️ Salvo na memória. Aviso do servidor: ${erroMsg}`);
                     }
+                    window.location.href = '/tabelas.html';
+
                 } catch (error) {
                     console.error("Erro de conexão com a API:", error);
-                    alert("🚨 Falha de comunicação com o Servidor. Salvando offline por segurança.");
                     
                     let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                    rels[idJogo] = { placar: {A: setsGanhos.A, B: setsGanhos.B}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
+                    rels[idJogo] = { placar: {A: placarFinalA, B: placarFinalB}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
                     localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                    
+                    alert("🚨 Salvo offline por segurança com o placar atualizado.");
                     window.location.href = '/tabelas.html';
                 }
             }

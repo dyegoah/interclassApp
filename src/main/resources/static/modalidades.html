@@ -38,7 +38,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
         
-        /* 4. APLICAÇÃO DO FUNDO DE TELA COM O EFEITO NEON/GRID */
         body { 
             background-color: var(--bg-deep) !important;
             background-image: 
@@ -52,7 +51,7 @@
             min-height: 100vh; 
             padding-bottom: 100px; 
             overflow-x: hidden; 
-            transition: background-image 0.5s ease-in-out; /* Suaviza a troca de cores */
+            transition: background-image 0.5s ease-in-out;
         }
 
         @keyframes moveGrid {
@@ -62,7 +61,7 @@
 
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; transition: color 0.5s, text-shadow 0.5s; }
+        .section-title { text-transform: uppercase; font-size: 1.3rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; transition: color 0.5s, text-shadow 0.5s; }
 
         .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); overflow-x: auto; }
         .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap; transition: 0.3s; }
@@ -71,17 +70,26 @@
         .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; min-width: 20px; transition: 0.3s; }
         .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
 
-        .info-balloon { border-left: 4px solid var(--theme-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-family: 'Segoe UI'; font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.85); transition: border-color 0.5s; }
+        .info-balloon { border-left: 4px solid var(--theme-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-family: 'Segoe UI'; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.85); transition: border-color 0.5s; }
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
         .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
         .btn-acao:disabled { background: #555; color: #888; cursor: not-allowed; }
         .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
         .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
 
-        .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .config-card { border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; border: 2px solid transparent; }
-        .config-card:hover { transform: translateY(-5px); border-color: var(--theme-glow); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
-        .config-card.selected { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.05); box-shadow: 0 0 25px var(--theme-glow); }
+        .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .config-card { border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 2px solid transparent; position: relative;}
+        
+        /* 🔥 ESTILOS INTELIGENTES DE STATUS (ACESO VS APAGADO) 🔥 */
+        .config-card.not-ready { opacity: 0.5; filter: grayscale(80%); border-color: rgba(255,255,255,0.05); }
+        .config-card.not-ready:hover { opacity: 0.9; filter: grayscale(30%); transform: translateY(-3px); }
+        
+        .config-card.ready { opacity: 1; border-color: rgba(255,255,255,0.2); box-shadow: inset 0 0 20px rgba(255,255,255,0.05); }
+        .config-card.ready:hover { transform: translateY(-5px); border-color: var(--theme-glow); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+        
+        .config-card.selected { border-color: var(--theme-primary) !important; background: rgba(255, 255, 255, 0.05) !important; box-shadow: 0 0 25px var(--theme-glow) !important; opacity: 1 !important; filter: none !important;}
+        
+        .status-badge { font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 12px; border-radius: 20px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -104,10 +112,13 @@
         </div>
 
         <div id="setup-step1-genero">
-            <h2 class="section-title">👥 Passo 1: Ambiente de Configuração</h2>
+            <h2 class="section-title">👥 Passo 1: Categoria (Gênero)</h2>
             <div class="info-balloon glass">
                 <strong>💡 Como funciona a Central da Arena:</strong><br>
-                A sequência de sucesso é: <span style="color: var(--theme-primary); font-weight: bold;">Gênero ➔ Modalidades ➔ Torneios ➔ Calendário ➔ Alunos.</span>
+                Você está iniciando a criação de um novo lote de torneios. O primeiro passo é escolher a Categoria (Masculino, Feminino ou Misto). 
+                <br><br>
+                <b>Por que isso é importante?</b><br>
+                Criar os lotes separados garante que a Inteligência de Agendamento organize os jogos corretamente, impedindo que, por exemplo, o futsal masculino e feminino sejam marcados para o mesmo horário e quadra. Selecione a categoria abaixo para começar:
             </div>
 
             <div class="setup-grid">
@@ -122,10 +133,16 @@
 
         <div id="setup-step2-modalidades" style="display: none;">
             <h2 class="section-title">🕹️ Passo 2: Seleção de Esportes (<span id="txt-genero-atual"></span>)</h2>
+            
+            <div class="info-balloon glass" style="border-left-color: #00ff00;">
+                <strong>🤖 Assistente de Formação Ativado:</strong><br>
+                O sistema já calculou as equipes! Os cards <b style="color:#00ff00; text-shadow: 0 0 10px #00ff00;">ACESOS</b> indicam que você possui alunos inscritos suficientes para criar um torneio válido. Os esportes apagados ainda não possuem quórum mínimo.
+            </div>
+
             <div class="setup-grid" id="setup-container"></div>
             <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
-                <button class="btn-acao btn-secundario" onclick="voltarPara(1)">🡨 Voltar Gênero</button>
-                <button class="btn-acao" onclick="irParaPaginaTorneios()">Avançar para Config. de Torneios ➔</button>
+                <button class="btn-acao btn-secundario" onclick="voltarPara(1)">🡨 Voltar Categoria</button>
+                <button class="btn-acao" onclick="irParaPaginaTorneios()">Avançar para Regras ➔</button>
             </div>
         </div>
     </div> 
@@ -142,11 +159,27 @@
             { id: 11, nome: 'Dama', icone: '🏁', cor: '#b22222' }, { id: 12, nome: 'E-Sports', icone: '🎮', cor: '#00ff00' }
         ];
 
-        let generoSelecionado = null; 
+        // 🔥 REGRAS DA INTELIGÊNCIA ARTIFICIAL DE TIMES 🔥
+        const esportesIndividuais = ['Natação', 'Atletismo', 'Tênis de Mesa', 'Xadrez', 'Dama', 'E-Sports'];
+        const minJogadoresPorEsporte = {
+            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2
+        };
 
-        window.onload = () => {
+        let generoSelecionado = null; 
+        let listaAlunosBase = [];
+
+        window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+            
+            // Busca os alunos silenciosamente no fundo enquanto a página carrega
+            try {
+                const token = localStorage.getItem('interclassToken');
+                const response = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+                if(response.ok) listaAlunosBase = await response.json();
+            } catch(e) {
+                console.warn("Falha ao puxar alunos da base. A análise de status pode ficar indisponível.");
+            }
         };
 
         function atualizarMapa(passoAtivo) {
@@ -181,12 +214,56 @@
             
             let salvos = JSON.parse(localStorage.getItem('arenaSetup')) || { esportes: [] };
             
+            // Filtra os alunos baseado no gênero que acabou de ser clicado
+            let alunosDoGenero = listaAlunosBase.filter(a => a.genero === generoSelecionado);
+            
             modalidadeDefs.forEach(mod => {
+                // 1. Pega os alunos desta modalidade e deste gênero
+                let alunosDesteEsporte = alunosDoGenero.filter(a => a.esporte === mod.nome);
+                let isIndiv = esportesIndividuais.includes(mod.nome);
+                let isReady = false;
+                let msgStatus = "";
+
+                // 2. Faz a conta mágica para acender o Card
+                if (isIndiv) {
+                    let qtdInscritos = alunosDesteEsporte.length;
+                    isReady = qtdInscritos >= 2;
+                    msgStatus = `<span style="color: ${isReady ? '#00ff00' : '#ff0055'};">${qtdInscritos} Atleta${qtdInscritos !== 1 ? 's' : ''}</span>`;
+                } else {
+                    let minExigido = minJogadoresPorEsporte[mod.nome] || 2;
+                    let contagemPorTurma = {};
+                    
+                    // Agrupa por turma
+                    alunosDesteEsporte.forEach(a => { 
+                        contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; 
+                    });
+                    
+                    // Conta quantas turmas bateram o quórum
+                    let equipesValidas = 0;
+                    for(let t in contagemPorTurma) {
+                        if(contagemPorTurma[t] >= minExigido) equipesValidas++;
+                    }
+                    
+                    isReady = equipesValidas >= 2;
+                    msgStatus = `<span style="color: ${isReady ? '#00ff00' : '#ff0055'};">${equipesValidas} Equipe${equipesValidas !== 1 ? 's' : ''}</span>`;
+                }
+
+                // 3. Monta o Card Visual
                 const card = document.createElement('div');
-                card.className = 'config-card glass';
+                card.className = `config-card glass ${isReady ? 'ready' : 'not-ready'}`;
+                
                 if(salvos.esportes.find(e => e.id === mod.id)) card.classList.add('selected');
+                
                 card.onclick = () => card.classList.toggle('selected');
-                card.innerHTML = `<div style="font-size: 3rem;">${mod.icone}</div><h3 style="color: ${mod.cor}; text-transform: uppercase;">${mod.nome}</h3>`;
+                
+                card.innerHTML = `
+                    <div style="font-size: 3.5rem; line-height: 1; filter: ${isReady ? 'drop-shadow(0 0 15px ' + mod.cor + ')' : 'none'};">${mod.icone}</div>
+                    <h3 style="color: ${isReady ? mod.cor : '#aaa'}; text-transform: uppercase; font-size: 1.1rem; margin: 5px 0;">${mod.nome}</h3>
+                    <div class="status-badge" style="border: 1px solid ${isReady ? '#00ff00' : '#ff0055'}; box-shadow: ${isReady ? '0 0 10px rgba(0,255,0,0.3)' : 'none'};">
+                        ${isReady ? '✅' : '⚠️'} ${msgStatus}
+                    </div>
+                `;
+                
                 card.setAttribute('data-id', mod.id);
                 container.appendChild(card);
             });
@@ -197,19 +274,18 @@
         }
 
 		function irParaPaginaTorneios() {
-		            // 🛡️ CORREÇÃO BUG 1: Busca as cartas APENAS dentro do #setup-container (Ignorando os Gêneros)
-		            const selecionados = document.querySelectorAll('#setup-container .config-card.selected');
-		            if (selecionados.length === 0) { alert("Selecione pelo menos um esporte!"); return; }
+            const selecionados = document.querySelectorAll('#setup-container .config-card.selected');
+            if (selecionados.length === 0) { alert("Selecione pelo menos um esporte para criar os torneios!"); return; }
 
-		            const esportesArray = Array.from(selecionados).map(card => {
-		                return { id: parseInt(card.getAttribute('data-id')), configurado: false };
-		            });
+            const esportesArray = Array.from(selecionados).map(card => {
+                return { id: parseInt(card.getAttribute('data-id')), configurado: false };
+            });
 
-		            const setupData = { genero: generoSelecionado, esportes: esportesArray };
-		            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
-		            
-		            window.location.href = '/torneios.html';
-		        }
+            const setupData = { genero: generoSelecionado, esportes: esportesArray };
+            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+            
+            window.location.href = '/torneios.html';
+        }
 
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
