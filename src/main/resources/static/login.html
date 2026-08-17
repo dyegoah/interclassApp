@@ -82,54 +82,51 @@
     </div>
 
     <script>
-        async function fazerLogin(event) {
-            event.preventDefault();
-            
-            const emailDigitado = document.getElementById('email').value.trim();
-            const senhaDigitada = document.getElementById('senha').value.trim();
+		async function fazerLogin(event) {
+		    if(event) event.preventDefault(); // Evita recarregar a página se estiver num form
 
-            const btnSubmit = document.querySelector('.btn-submit');
-            const textoOriginal = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = "⏳ Autenticando...";
-            btnSubmit.disabled = true;
+		    const email = document.getElementById('email').value;
+		    const senha = document.getElementById('senha').value;
+		    const btn = document.querySelector('button');
 
-            try {
-                // 🛡️ Chamada real para o Backend Java
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada })
-                });
+		    if(!email || !senha) {
+		        alert("Preencha todos os campos!");
+		        return;
+		    }
 
-                if (response.ok) {
-                    const dadosProfessor = await response.json();
-                    
-                    // Sucesso! Salvamos o Token JWT no navegador
-                    localStorage.setItem('interclassToken', dadosProfessor.token);
-                    
-                    // Mantendo dados visuais do professor
-                    let profsSalvos = JSON.parse(localStorage.getItem('mockProfessores')) || [];
-                    profsSalvos.push(dadosProfessor);
-                    localStorage.setItem('mockProfessores', JSON.stringify(profsSalvos));
+		    btn.innerText = "Aguarde...";
+		    btn.disabled = true;
 
-                    alert(`Bem-vindo(a) de volta, ${dadosProfessor.nome}!`);
-                    window.location.href = '/index.html'; 
-                } 
-                else if (response.status === 403) {
-                    alert("🚨 Sua conta está bloqueada. Entre em contato com o suporte Interclass Arena.");
-                } 
-                else {
-                    alert("❌ E-mail não encontrado ou senha incorreta.");
-                }
+		    try {
+		        // 🔥 A MÁGICA AQUI: Usando rota relativa sem o "localhost"
+		        const response = await fetch('/api/auth/login', {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json'
+		            },
+		            body: JSON.stringify({ email: email, senha: senha })
+		        });
 
-            } catch (error) {
-                console.error("Erro ao conectar com o servidor:", error);
-                alert("⚠️ Erro de conexão com os servidores da HighTech. Tente novamente em instantes.");
-            } finally {
-                btnSubmit.innerHTML = textoOriginal;
-                btnSubmit.disabled = false;
-            }
-        }
+		        if (response.ok) {
+		            const data = await response.json();
+		            
+		            // Salva o Crachá (Token) no navegador
+		            localStorage.setItem('interclassToken', data.token);
+		            
+		            // Vai para o painel de controle
+		            window.location.href = '/admin.html';
+		        } else {
+		            alert("❌ E-mail ou Senha incorretos! Você é mesmo o Master?");
+		            btn.innerText = "ENTRAR";
+		            btn.disabled = false;
+		        }
+		    } catch (error) {
+		        console.error(error);
+		        alert("🚨 Servidor indisponível no momento. Verifique a sua conexão.");
+		        btn.innerText = "ENTRAR";
+		        btn.disabled = false;
+		    }
+		}
     </script>
 </body>
 </html>

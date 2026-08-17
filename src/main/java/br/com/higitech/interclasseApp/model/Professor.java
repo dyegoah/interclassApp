@@ -32,6 +32,19 @@ public class Professor {
 
     @Column(nullable = false)
     private String status = "ativo"; // ativo, bloqueado, pendente
+    
+
+    @Column(name = "chave_2fa")
+    private String chave2fa;
+
+   
+    public String getChave2fa() {
+        return chave2fa;
+    }
+
+    public void setChave2fa(String chave2fa) {
+        this.chave2fa = chave2fa;
+    }
 
 	public Long getId() {
 		return id;
