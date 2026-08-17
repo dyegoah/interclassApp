@@ -40,7 +40,7 @@ public class SecurityConfig {
                                          
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar").permitAll()
                 
-                // 🚀 LIBERAÇÃO TOTAL DAS ROTAS PÚBLICAS (GET E POST) PARA O PORTAL DO ALUNO
+                // 🚀 LIBERAÇÃO TOTAL DAS ROTAS PÚBLICAS
                 .requestMatchers("/api/alunos/public/**", "/api/jogos/public/**", "/api/modalidades/public/**").permitAll()
                 
                 // 🚀 ADICIONADO O /manifest.json NA LISTA DE LIBERAÇÃO

@@ -1,5 +1,7 @@
 package br.com.higitech.interclasseApp.config;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.jboss.aerogear.security.otp.api.Base32;
@@ -35,25 +37,35 @@ public class AdminSetup implements CommandLineRunner {
 
         if (admin == null) {
             admin = new Professor();
-            admin.setNome("Dyego (Master)");
             admin.setEmail(emailMaster);
-            admin.setSenha(passwordEncoder.encode(senhaMaster)); 
             admin.setEscola("Sede Master InterclasseApp");
-            admin.setChave2fa(Base32.random()); // 🔥 Gera a chave secreta do Google Auth
-            
-            admin = professorRepository.save(admin);
-            System.out.println("✅ Conta Master e Chave 2FA criadas com sucesso!");
-        } else if (admin.getChave2fa() == null || admin.getChave2fa().isEmpty()) {
-            admin.setChave2fa(Base32.random()); // 🔥 Adiciona a chave caso a conta já exista
-            admin = professorRepository.save(admin);
-            System.out.println("✅ Nova Chave 2FA injetada na conta Master!");
+            System.out.println("✅ Criando nova conta Master no banco de dados...");
+        } else {
+            System.out.println("✅ Conta Master encontrada! Forçando atualização da senha para garantir o acesso...");
         }
 
-        // 📱 IMPRIME O LINK DO QR CODE NO CONSOLE
+        // 🔥 A MÁGICA AQUI: Força a atualização da Senha e do Nome TODA VEZ que o servidor liga!
+        admin.setNome("Dyego (Master)");
+        admin.setSenha(passwordEncoder.encode(senhaMaster)); 
+        
+        if (admin.getChave2fa() == null || admin.getChave2fa().isEmpty()) {
+            admin.setChave2fa(Base32.random()); 
+        }
+        
+        admin = professorRepository.save(admin);
+
+        // Gera o link do QR Code
+        String urlAutenticador = "otpauth://totp/InterclasseApp:Master?secret=" + admin.getChave2fa() + "&issuer=InterclasseApp";
+        String urlCodificada = URLEncoder.encode(urlAutenticador, StandardCharsets.UTF_8.toString());
+        String linkQrCode = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + urlCodificada;
+
         System.out.println("\n=================================================================");
         System.out.println("📱 GOOGLE AUTHENTICATOR (2FA) DO MASTER 📱");
-        System.out.println("Abra o aplicativo no seu celular, clique em '+' e escaneie o QR Code acessando o link abaixo:");
-        System.out.println("👉 https://chart.googleapis.com/chart?chs=250x250&chld=M|0&cht=qr&chl=otpauth://totp/InterclasseApp:Master?secret=" + admin.getChave2fa() + "&issuer=InterclasseApp");
+        System.out.println("Opção 1: Escaneie o QR Code acessando o link seguro abaixo:");
+        System.out.println("👉 " + linkQrCode);
+        System.out.println("\nOpção 2: Se preferir, digite a chave manualmente no aplicativo:");
+        System.out.println("Nome da Conta: InterclasseApp");
+        System.out.println("Chave Secreta: " + admin.getChave2fa());
         System.out.println("=================================================================\n");
     }
 }
