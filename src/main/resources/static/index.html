@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard - InterclassApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Interclass Arena</title>
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,528 +12,199 @@
 	
     <style>
         :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         
-		body { 
-            /* 1. A LUZ NEON NO TOPO + PELÍCULA NOTURNA + IMAGEM DE FUNDO */
-            background: 
-                radial-gradient(circle at 50% 0%, var(--glow-color, rgba(0, 242, 254, 0.15)) 0%, transparent 60%),
-                linear-gradient(to bottom, rgba(2, 1, 15, 0.80), rgba(2, 1, 15, 0.95)), 
-                url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
-            
-            background-size: cover; 
+        body { 
+            background-color: #05050f; 
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
+                linear-gradient(rgba(0, 242, 254, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 254, 0.06) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            animation: moveGrid 20s linear infinite;
             color: #ffffff; 
             min-height: 100vh; 
-            margin: 0;
-            padding-bottom: 50px;
-            overflow-x: hidden;
-        }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { text-transform: uppercase; font-size: 1.1rem; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
-        
-        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem;}
-        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
-        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
-        .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
-
-        .decisao-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
-        .decisao-card { padding: 2.5rem; text-align: center; border-radius: 20px; border-top: 4px solid transparent; transition: 0.4s; cursor: pointer; position: relative; overflow: hidden;}
-        .decisao-card:hover { transform: translateY(-10px); }
-        .decisao-card.rota-direta { border-top-color: #00f2fe; }
-        .decisao-card.rota-direta:hover { box-shadow: 0 10px 40px rgba(0, 242, 254, 0.2); background: rgba(0, 242, 254, 0.05); }
-        .decisao-card.rota-inscricao { border-top-color: #ff00de; }
-        .decisao-card.rota-inscricao:hover { box-shadow: 0 10px 40px rgba(255, 0, 222, 0.2); background: rgba(255, 0, 222, 0.05); }
-
-        .decisao-icone { font-size: 4rem; margin-bottom: 1rem; }
-        .decisao-titulo { font-family: 'Orbitron'; font-size: 1.3rem; margin-bottom: 1rem; }
-        .decisao-desc { font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 2rem; }
-
-        .painel-link { display: none; background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 15px; border: 1px dashed #ff00de; margin-top: 2rem; text-align: left; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .link-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; font-family: monospace; color: #ff00de; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid rgba(255,0,222,0.3); }
-
-        /* 🔥 MODAL DO CALENDÁRIO COM FOOTBAR 🔥 */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 3000; justify-content: center; align-items: center; padding: 20px; }
-        
-        .modal-box { 
-            background: rgba(10,10,20,0.95); 
-            border: 1px solid var(--theme-primary); 
-            border-radius: 15px; 
-            width: 100%; 
-            max-width: 600px; 
-            max-height: 85vh; 
             display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 0 30px rgba(0,0,0,0.8); 
-            overflow: hidden; 
-            margin-top: 40px; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 2rem; 
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: center center, 0 0, 0 0; }
+            100% { background-position: center center, 40px 40px, 40px 40px; }
         }
         
-        .dia-card { background: rgba(0,0,0,0.4); border-left: 4px solid var(--theme-primary); border-radius: 10px; padding: 1rem; margin-bottom: 15px; }
-        .dia-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px; }
-        .dia-header h5 { color: var(--theme-primary); font-size: 1.1rem; margin: 0; }
-        .jogo-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-family: 'Segoe UI'; font-size: 0.9rem; border: 1px solid transparent; }
-        .jogo-hora { color: #00ff00; font-weight: bold; font-family: 'Orbitron'; width: 70px; line-height: 1.2; }
-        .jogo-desc { flex-grow: 1; padding: 0 15px; }
-        .jogo-quadra { color: rgba(255,255,255,0.5); font-size: 0.8rem; display: block;}
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 10px; }
-
-        /* ========================================================
-           CSS DA FORJA DOS CAMPEÕES
-           ======================================================== */
-        .tutorial-section { margin-top: 5rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .hero-title { font-size: 2.2rem; color: #00f2fe; text-shadow: 0 0 15px var(--theme-glow); text-transform: uppercase; margin-bottom: 1rem; font-family: 'Orbitron'; }
-        .hero-desc { font-family: 'Segoe UI'; font-size: 1rem; color: rgba(255,255,255,0.8); max-width: 800px; margin: 0 auto 3rem auto; line-height: 1.6; }
-
-        .timeline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 3rem; }
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 3rem; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); text-align: center; transition: all 0.5s ease; }
         
-        .step-card { background: rgba(0,0,0,0.4); border-radius: 15px; padding: 25px 20px; text-align: center; position: relative; border-top: 4px solid #555; transition: 0.4s; }
-        .step-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); }
+        p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 30px; font-size: 0.95rem; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+        .form-group input { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
+        .form-group input:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
+
+        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 30px; color: #000; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(0, 242, 254, 0.8); background: #fff; }
+
+        .btn-voltar { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; box-shadow: none; margin-top: 15px; }
+        .btn-voltar:hover { background: rgba(255,255,255,0.1); color: white; transform: none; box-shadow: none; }
+
+        .links-rodape { margin-top: 25px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 10px; }
+        .links-rodape a { color: var(--theme-primary); text-decoration: none; transition: 0.3s; }
+        .links-rodape a:hover { text-shadow: 0 0 10px var(--theme-glow); text-decoration: underline; }
         
-        .step-1 { border-top-color: #ff00de; } .step-1:hover { box-shadow: 0 10px 30px rgba(255,0,222,0.2); }
-        .step-2 { border-top-color: #00f2fe; } .step-2:hover { box-shadow: 0 10px 30px rgba(0,242,254,0.2); }
-        .step-3 { border-top-color: #ffee00; } .step-3:hover { box-shadow: 0 10px 30px rgba(255,238,0,0.2); }
-        .step-4 { border-top-color: #00ff00; } .step-4:hover { box-shadow: 0 10px 30px rgba(0,255,0,0.2); }
-        .step-5 { border-top-color: #ff4500; } .step-5:hover { box-shadow: 0 10px 30px rgba(255,69,0,0.2); }
-
-        .step-icon { font-size: 3rem; margin-bottom: 15px; display: inline-block; }
-        .step-number { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #222; border: 2px solid #555; color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-family: 'Orbitron'; }
-        
-        .step-1 .step-number { border-color: #ff00de; color: #ff00de; }
-        .step-2 .step-number { border-color: #00f2fe; color: #00f2fe; }
-        .step-3 .step-number { border-color: #ffee00; color: #ffee00; }
-        .step-4 .step-number { border-color: #00ff00; color: #00ff00; }
-        .step-5 .step-number { border-color: #ff4500; color: #ff4500; }
-
-        .step-title { font-size: 1rem; margin-bottom: 10px; color: #fff; text-transform: uppercase; font-family: 'Orbitron';}
-        .step-desc { font-family: 'Segoe UI'; font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.5; }
-
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
-    <div class="arena-container">
-        <div id="topbar-placeholder"></div>
 
-        <div id="zero-state-view" style="display: none;">
-            <div style="text-align: center; margin-bottom: 3rem; margin-top: 1rem;">
-                <h2 style="font-family: 'Orbitron'; font-size: 2rem; color: #fff; text-transform: uppercase;">Bem-vindo à Arena</h2>
-                <p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); font-size: 1.1rem; max-width: 600px; margin: 10px auto 0;">Para montar um calendário perfeito, precisamos saber a quantidade exata de times. Como você deseja começar?</p>
-            </div>
+    <div class="glass-form">
+        <h1>Interclass Arena</h1>
+        
+        <div id="etapa-1">
+            <p class="subtitle">Acesse o seu painel de gestão esportiva.</p>
 
-            <div class="decisao-grid">
-                <div class="decisao-card glass rota-direta" onclick="iniciarNovoLote()">
-                    <div class="decisao-icone">📋</div>
-                    <h3 class="decisao-titulo" style="color: #00f2fe;">1. Já tenho os times prontos</h3>
-                    <p class="decisao-desc">Eu já sei exatamente quantas equipes e alunos vão jogar em cada modalidade esportiva.</p>
-                    <button class="btn-acao" style="width: 100%;">Gerar Chaves Direto ➔</button>
+            <form id="form-login" onsubmit="validarCredenciais(event)">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
                 </div>
 
-                <div class="decisao-card glass rota-inscricao" id="card-inscricao" onclick="mostrarPainelLink()">
-                    <div class="decisao-icone">📱</div>
-                    <h3 class="decisao-titulo" style="color: #ff00de;">2. Preciso abrir inscrições</h3>
-                    <p class="decisao-desc">Quero enviar um link para os alunos se cadastrarem. Depois eu vejo os números e gero os torneios.</p>
-                    <button class="btn-acao" style="background: #ff00de; width: 100%;">Gerar Link p/ Alunos ➔</button>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="senha" required placeholder="••••••••">
                 </div>
-            </div>
 
-            <div id="painel-inscricao" class="painel-link">
-                <h4 style="color: #ff00de; font-family: 'Orbitron'; margin-bottom: 10px;">🔗 Inscrições Abertas!</h4>
-                <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.8);">Copie o link abaixo e envie no grupo do WhatsApp da escola.</p>
-                <div class="link-box">
-                    <span id="link-texto">http://seusite.com/cadastro-aluno.html</span>
-                    <button class="btn-acao" style="background: transparent; border: 1px solid #ff00de; color: #ff00de; padding: 5px 15px;" onclick="copiarLink(event)">Copiar Link</button>
+                <button type="submit" class="btn-submit" id="btn-etapa1">Continuar</button>
+            </form>
+
+            <div class="links-rodape">
+                <a href="#">Esqueceu a sua senha?</a>
                 </div>
-                <div style="margin-top: 1.5rem; display: flex; gap: 15px;">
-                    <button class="btn-acao" style="background: #ff00de; flex: 1;" onclick="window.location.href='/alunos.html'">👥 Acompanhar Alunos Cadastrados</button>
-                    <button class="btn-acao btn-secundario" style="flex: 1;" onclick="esconderPainelLink()">Cancelar</button>
-                </div>
-            </div>
-
-            <div class="tutorial-section">
-                <h1 class="hero-title">A Forja dos Campeões</h1>
-                <p class="hero-desc">A nossa Inteligência de Agendamento precisa saber as regras do seu interclasse. Nós dividimos a criação do evento em <b>5 passos lógicos e sequenciais</b>. Entenda como a magia acontece antes de começar. Ou se preferir vá no ícone alunos e apertar na modalidade para criar o torneio específico direto</p>
-                
-                <div class="timeline-grid">
-                    <div class="step-card glass step-1">
-                        <div class="step-number">1</div>
-                        <div class="step-icon">🚻</div>
-                        <h3 class="step-title">Categoria / Lote</h3>
-                        <p class="step-desc">Crie um "Lote" para o Masculino, Feminino ou Misto. Isso impede que os calendários se cruzem de forma errada.</p>
-                    </div>
-
-                    <div class="step-card glass step-2">
-                        <div class="step-number">2</div>
-                        <div class="step-icon">⚽</div>
-                        <h3 class="step-title">Esportes Ativos</h3>
-                        <p class="step-desc">Selecione quais modalidades serão disputadas. Futsal, Vôlei, Xadrez? É só clicar e ativar.</p>
-                    </div>
-
-                    <div class="step-card glass step-3">
-                        <div class="step-number">3</div>
-                        <div class="step-icon">⚔️</div>
-                        <h3 class="step-title">Formato do Torneio</h3>
-                        <p class="step-desc">Mata-Mata ou Pontos Corridos? Diga a quantidade de equipas e a plataforma desenha as chaves.</p>
-                    </div>
-
-                    <div class="step-card glass step-4">
-                        <div class="step-number">4</div>
-                        <div class="step-icon">📅</div>
-                        <h3 class="step-title">Motor de Calendário</h3>
-                        <p class="step-desc">Diga os dias do evento e as quadras disponíveis. O sistema espalha as partidas sem gerar conflitos!</p>
-                    </div>
-
-                    <div class="step-card glass step-5">
-                        <div class="step-number">5</div>
-                        <div class="step-icon">👥</div>
-                        <h3 class="step-title">Encaixe de Alunos</h3>
-                        <p class="step-desc">Com a tabela pronta, envie o link de inscrição aos alunos e o sistema organiza-os magicamente.</p>
-                    </div>
-                </div>
-            </div>
-            </div>
-
-        <div id="dashboard-view" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 class="section-title">📊 Lotes da Arena (Categorias)</h2>
-                <button class="btn-acao" onclick="iniciarNovoLote()">+ Iniciar Nova Categoria</button>
-            </div>
-            
-            <div id="active-modalidades-container">
-                <p style="text-align: center; color: #00f2fe; margin-top: 2rem;">⏳ A sincronizar categorias com o servidor...</p>
-            </div>
         </div>
-    </div> 
 
-    <div id="modal-calendario" class="modal-overlay">
-        <div class="modal-box glass">
-            <div style="padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); flex-shrink: 0; text-align: center;">
-                <h3 style="color: #00f2fe; font-family: 'Orbitron'; margin: 0; font-size: 1.2rem;" id="modal-cal-title">📅 Tabela Oficial</h3>
-            </div>
-            
-            <div id="conteudo-calendario" style="padding: 1.5rem; overflow-y: auto; flex-grow: 1;"></div>
-            
-            <div style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); flex-shrink: 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                
-                <button onclick="imprimirCalendario()" style="background: transparent; border: 1px solid #00f2fe; color: #00f2fe; font-family: 'Orbitron'; font-weight: bold; font-size: 0.9rem; padding: 12px 25px; border-radius: 30px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='rgba(0,242,254,0.1)'" onmouseout="this.style.background='transparent'">
-                    🖨️ GERAR PDF / IMPRIMIR
-                </button>
-                
-                <button onclick="fecharCalendario()" style="background: #ff0055; border: none; color: white; font-family: 'Orbitron'; font-weight: bold; font-size: 0.9rem; padding: 12px 30px; border-radius: 30px; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,85,0.4); transition: 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                    ✖ FECHAR
-                </button>
-                
-            </div>
+        <div id="etapa-2" style="display: none;">
+            <p class="subtitle" style="color: #00f2fe; font-weight: bold;">🛡️ Proteção Master Ativada</p>
+            <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 20px;">Abra o seu aplicativo autenticador e digite o código de 6 dígitos para liberar o acesso.</p>
+
+            <form id="form-2fa" onsubmit="enviarLoginCompleto(event)">
+                <div class="form-group">
+                    <input type="text" id="codigo2fa" placeholder="0 0 0 0 0 0" maxlength="6" autocomplete="off" style="text-align: center; font-size: 1.8rem; letter-spacing: 12px; font-weight: bold; background: rgba(0,0,0,0.8); color: #00f2fe;">
+                </div>
+
+                <button type="submit" class="btn-submit" id="btn-etapa2">Autenticar e Entrar</button>
+                <button type="button" class="btn-submit btn-voltar" onclick="voltarParaEtapa1()">Voltar</button>
+            </form>
         </div>
+
     </div>
 
-    <div id="footbar-placeholder"></div>
-
     <script>
-        const HighTechSecurity = {
-            sanitizar: function(textoCru) {
-                if (!textoCru) return '';
-                const texto = String(textoCru);
-                const mapa = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', "/": '&#x2F;', "`": '&#x60;', "=": '&#x3D;' };
-                return texto.replace(/[&<>"'/`=]/ig, (match) => (mapa[match]));
-            }
-        };
-
-        let lotesDoBancoDeDados = {};
-
-        window.onload = async () => {
-            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+        // -------------------------------------------------------------
+        // ETAPA 1: O JAVASCRIPT BATE NA PORTA PARA VER SE A SENHA TÁ CERTA
+        // -------------------------------------------------------------
+        async function validarCredenciais(event) {
+            event.preventDefault();
             
-            await sincronizarLotesComServidorJava();
-        };
+            const emailDigitado = document.getElementById('email').value.trim();
+            const senhaDigitada = document.getElementById('senha').value.trim();
+            const btnSubmit = document.getElementById('btn-etapa1');
 
-        async function sincronizarLotesComServidorJava() {
-            const generos = ['masculino', 'feminino', 'misto'];
-            let temLoteNoBanco = false;
+            btnSubmit.innerHTML = "⏳ Verificando...";
+            btnSubmit.disabled = true;
 
-            for (let genero of generos) {
-                try {
-                    const token = localStorage.getItem('interclassToken');
+            try {
+                // Tenta logar mandando o 2FA vazio
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: "" })
+                });
 
-                    let response = await fetch(`/api/jogos/lote/${genero}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`, 
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.status === 403) {
-                        alert("Sua sessão expirou. Por favor, faça login novamente.");
-                        window.location.href = '/login.html';
-                        return;
-                    }
-                    if (response.ok) {
-                        let jogos = await response.json();
-                        if (jogos && jogos.length > 0) {
-                            let esportesUnicos = [...new Set(jogos.map(j => j.esporte))];
-                            
-                            lotesDoBancoDeDados[genero] = {
-                                genero: genero,
-                                esportes: esportesUnicos,
-                                totalJogos: jogos.length,
-                                jogos: jogos 
-                            };
-                            temLoteNoBanco = true;
-                        }
-                    }
-                } catch (error) {
-                    console.warn(`Aviso: Não foi possível buscar o lote ${genero}.`);
-                }
-            }
-
-            let profsSalvos = JSON.parse(localStorage.getItem('mockProfessores')) || [];
-            let meuId = profsSalvos.length > 0 ? profsSalvos[0].id : 1; 
-            let linkDeCadastro = window.location.origin + '/cadastro-aluno.html?ref=' + meuId;
-
-            if (temLoteNoBanco) {
-                document.getElementById('dashboard-view').style.display = 'block';
-                document.getElementById('zero-state-view').style.display = 'none';
-                renderizarLotesNaTela(lotesDoBancoDeDados);
-            } else {
-                let lotesOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-                if (Object.keys(lotesOffline).length > 0) {
-                    document.getElementById('dashboard-view').style.display = 'block';
-                    document.getElementById('zero-state-view').style.display = 'none';
-                    
-                    let lotesAdaptados = {};
-                    for(let gen in lotesOffline) {
-                        let jgs = lotesOffline[gen].jogos || [];
-                        lotesAdaptados[gen] = {
-                            genero: gen,
-                            esportes: [...new Set(jgs.map(j => j.esporte))],
-                            totalJogos: jgs.length,
-                            jogos: jgs
-                        };
-                    }
-                    lotesDoBancoDeDados = lotesAdaptados; 
-                    renderizarLotesNaTela(lotesAdaptados);
+                if (response.ok) {
+                    // Se for um usuário normal (sem 2FA), já entra direto!
+                    const dados = await response.json();
+                    localStorage.setItem('interclassToken', dados.token);
+                    window.location.href = '/admin.html'; 
                 } else {
-                    document.getElementById('dashboard-view').style.display = 'none';
-                    document.getElementById('zero-state-view').style.display = 'block';
-                    document.getElementById('link-texto').textContent = linkDeCadastro;
-                }
-            }
-        }
-
-        function renderizarLotesNaTela(lotesObj) {
-            const container = document.getElementById('active-modalidades-container');
-            container.innerHTML = '';
-
-            for(let genero in lotesObj) {
-                let lote = lotesObj[genero];
-                
-                let generoSeguro = HighTechSecurity.sanitizar(genero);
-                let descEsportesSeguro = HighTechSecurity.sanitizar(lote.esportes.join(', '));
-                
-                let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
-                let icone = genero === 'masculino' ? '🚹' : (genero === 'feminino' ? '🚺' : '🚻');
-
-                container.innerHTML += `
-                    <div class="glass" style="padding: 1.5rem; border-radius: 15px; border-left: 5px solid ${corTema}; margin-bottom: 1.5rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
-                            <div style="display: flex; align-items: center; gap: 15px;">
-                                <div style="font-size: 2.5rem;">${icone}</div>
-                                <div>
-                                    <h3 style="color: ${corTema}; margin-bottom: 5px; text-transform: uppercase;">Lote da Categoria: ${generoSeguro}</h3>
-                                    <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.7);"><b>${HighTechSecurity.sanitizar(lote.esportes.length)} Modalidades Ativas:</b> ${descEsportesSeguro}</p>
-                                </div>
-                            </div>
-                            <span style="background: rgba(0,255,0,0.1); color: #00ff00; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; border: 1px solid #00ff00; height: max-content;">✔️ Sincronizado</span>
-                        </div>
-                        
-                        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: ${corTema}; color: ${corTema};" onclick="abrirCalendario('${generoSeguro}')">📅 Ver Calendário Completo</button>
-                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: rgba(255,255,255,0.3); color: white;" onclick="window.location.href='/tabelas.html'">🏆 Acessar PlayHub / Partidas</button>
-                            <button class="btn-acao btn-secundario" style="font-size: 0.8rem; padding: 8px 15px; border-color: rgba(255,255,255,0.3); color: white;" onclick="window.location.href='/alunos.html'">👥 Ver Atletas Inscritos</button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function iniciarNovoLote() {
-            localStorage.removeItem('arenaSetup');
-            window.location.href = '/modalidades.html';
-        }
-
-        function abrirCalendario(genero) {
-            const loteAtual = lotesDoBancoDeDados[genero];
-            const container = document.getElementById('conteudo-calendario');
-            
-            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
-            document.getElementById('modal-cal-title').style.color = corTema;
-            
-            document.getElementById('modal-cal-title').innerHTML = `📅 Tabela Oficial - ${HighTechSecurity.sanitizar(genero.toUpperCase())}`;
-
-            if(!loteAtual || !loteAtual.jogos || loteAtual.jogos.length === 0) {
-                container.innerHTML = `<p style="font-family: 'Segoe UI'; color: rgba(255,255,255,0.7); text-align: center; padding: 2rem;">A tabela deste lote ainda não foi gerada no sistema.</p>`;
-            } else {
-                container.innerHTML = '';
-                
-                let jogosPorDia = {};
-                loteAtual.jogos.forEach(j => {
-                    let diaChave = j.diaId || j.dataJogo || "Data Indefinida";
-                    if(!jogosPorDia[diaChave]) jogosPorDia[diaChave] = [];
-                    jogosPorDia[diaChave].push(j);
-                });
-
-                let diasOrdenados = Object.keys(jogosPorDia).sort();
-
-                diasOrdenados.forEach(diaChave => {
-                    let jogosDesteDia = jogosPorDia[diaChave];
-                    jogosDesteDia.sort((a, b) => a.hora.localeCompare(b.hora));
-
-                    let dataFormatada = diaChave;
-                    if(dataFormatada.includes('-')) {
-                        let partes = dataFormatada.split('-');
-                        if(partes.length === 3) dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    }
-
-                    let jogosHtml = '';
-                    jogosDesteDia.forEach(jogo => {
-                        jogosHtml += `
-                            <div class="jogo-item">
-                                <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora)}</div>
-                                <div class="jogo-desc">
-                                    <b>${HighTechSecurity.sanitizar(jogo.icone) || '🏅'} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="opacity:0.7; font-size: 0.8rem;">- ${HighTechSecurity.sanitizar(jogo.titulo)}</span>
-                                    <span class="jogo-quadra">📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    container.innerHTML += `
-                        <div class="dia-card" style="border-left-color: ${corTema};">
-                            <div class="dia-header">
-                                <h5 style="color: ${corTema};">Dia: ${HighTechSecurity.sanitizar(dataFormatada)}</h5>
-                                <span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${HighTechSecurity.sanitizar(jogosDesteDia.length)} Partidas</span>
-                            </div>
-                            ${jogosHtml}
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('modal-calendario').style.display = 'flex';
-        }
-
-        // 🔥 NOVA FUNÇÃO DE IMPRESSÃO COM CABEÇALHO COMPLETO 🔥
-        function imprimirCalendario() {
-            const conteudo = document.getElementById('conteudo-calendario').innerHTML;
-            const titulo = document.getElementById('modal-cal-title').innerText;
-            
-            // 1. Tenta recuperar os dados do professor/escola do LocalStorage
-            let profsSalvos = JSON.parse(localStorage.getItem('mockProfessores')) || [];
-            let nomeProfessor = (profsSalvos.length > 0 && profsSalvos[0].nome) ? profsSalvos[0].nome : "Professor(a) Responsável";
-            let nomeEscola = (profsSalvos.length > 0 && profsSalvos[0].escola) ? profsSalvos[0].escola : "Escola Não Cadastrada";
-            
-            // 2. Dados da Empresa e App
-            const empresa = "PlayHub Studio";
-            const appName = "InterclassApp";
-            const instagram = "@playhub.app";
-            const qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://instagram.com/playhub.app";
-
-            const janelaImpressao = window.open('', '', 'height=700,width=900');
-            
-            janelaImpressao.document.write(`
-                <!DOCTYPE html>
-                <html lang="pt-BR">
-                <head>
-                    <title>Impressão - ${titulo}</title>
-                    <style>
-                        /* CSS Específico para Impressão limpa no Papel */
-                        body { font-family: Arial, sans-serif; background: #fff; color: #000; padding: 15px; margin: 0; line-height: 1.4; }
-                        
-                        /* Layout Compacto do Cabeçalho */
-                        .print-header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            border-bottom: 2px solid #000;
-                            padding-bottom: 10px;
-                            margin-bottom: 20px;
-                        }
-                        
-                        .header-left { flex: 1; }
-                        .header-left h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; }
-                        .header-left p { margin: 3px 0 0 0; font-size: 0.85rem; }
-                        
-                        .header-center { flex: 1; text-align: center; }
-                        .header-center h2 { margin: 0; font-size: 1.3rem; text-transform: uppercase; }
-                        .header-center span { font-size: 0.75rem; color: #555; }
-
-                        .header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 8px; text-align: right; }
-                        .header-right .info p { margin: 0; font-size: 0.75rem; font-weight: bold; color: #333; }
-                        .header-right .info p.insta { margin-top: 2px; font-size: 0.7rem; font-weight: normal; }
-                        .header-right img { width: 45px; height: 45px; border: 1px solid #ccc; padding: 2px; }
-
-                        /* Forçando estilos limpos para o conteúdo dos jogos */
-                        * { color: #000 !important; text-shadow: none !important; box-shadow: none !important; background: transparent !important; }
-                        
-                        .dia-card { border: 1px solid #ccc !important; padding: 10px 15px; margin-bottom: 15px; border-radius: 8px; page-break-inside: avoid; }
-                        .dia-header { border-bottom: 2px solid #000 !important; margin-bottom: 8px; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: baseline;}
-                        .dia-header h5 { font-size: 1.1rem; margin: 0; font-weight: bold;}
-                        
-                        .jogo-item { display: flex; border-bottom: 1px dashed #ccc !important; padding: 6px 0; align-items: center; }
-                        .jogo-item:last-child { border-bottom: none !important; }
-                        .jogo-hora { width: 60px; font-weight: bold; font-size: 0.95rem; }
-                        .jogo-desc { flex-grow: 1; font-size: 0.9rem;}
-                        .jogo-quadra { float: right; font-size: 0.8rem; color: #555 !important; font-style: italic; }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <div class="header-left">
-                            <h1>${nomeEscola}</h1>
-                            <p>Prof. Responsável: <b>${nomeProfessor}</b></p>
-                        </div>
-                        <div class="header-center">
-                            <h2>${titulo}</h2>
-                            <span>Plataforma <b>${appName}</b></span>
-                        </div>
-                        <div class="header-right">
-                            <div class="info">
-                                <p>${empresa}</p>
-                                <p class="insta">📸 ${instagram}</p>
-                            </div>
-                            <img src="${qrCodeUrl}" alt="QR Code Instagram">
-                        </div>
-                    </div>
-
-                    ${conteudo}
+                    const erroServidor = await response.text();
                     
-                    <script>
-                        // Aguarda 800ms para a imagem do QR Code carregar antes de abrir a janela de impressão
-                        setTimeout(function() { 
-                            window.print(); 
-                            window.close(); 
-                        }, 800);
-                    <\/script>
-                </body>
-                </html>
-            `);
-            janelaImpressao.document.close();
+                    // 🕵️‍♂️ O MODO DETETIVE AQUI: O Java avisou que a conta é Master?
+                    if (erroServidor.includes("obrigatório para contas Master")) {
+                        // Esconde a Etapa 1 e Mostra a Etapa 2
+                        document.getElementById('etapa-1').style.display = 'none';
+                        document.getElementById('etapa-2').style.display = 'block';
+                        
+                        // Foca automaticamente o cursor no campo do 2FA
+                        setTimeout(() => document.getElementById('codigo2fa').focus(), 100);
+                    } else {
+                        // Se for senha errada ou usuário bloqueado, mostra o erro normal
+                        alert("❌ " + erroServidor);
+                    }
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("⚠️ Erro de conexão com os servidores.");
+            } finally {
+                btnSubmit.innerHTML = "Continuar";
+                btnSubmit.disabled = false;
+            }
         }
 
-        function fecharCalendario() { document.getElementById('modal-calendario').style.display = 'none'; }
-        function mostrarPainelLink() { document.getElementById('painel-inscricao').style.display = 'block'; document.getElementById('card-inscricao').style.borderTopColor = 'transparent'; }
-        function esconderPainelLink() { document.getElementById('painel-inscricao').style.display = 'none'; }
-        function copiarLink(event) { event.stopPropagation(); navigator.clipboard.writeText(document.getElementById('link-texto').textContent).then(() => { alert("Link copiado para a Área de Transferência!"); }); }
-        
-        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
-        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+        // -------------------------------------------------------------
+        // ETAPA 2: ENVIA A SENHA + CÓDIGO 2FA JUNTOS PARA ABRIR O COFRE
+        // -------------------------------------------------------------
+        async function enviarLoginCompleto(event) {
+            event.preventDefault();
+            
+            const emailDigitado = document.getElementById('email').value.trim();
+            const senhaDigitada = document.getElementById('senha').value.trim();
+            const codigo = document.getElementById('codigo2fa').value.trim();
+            const btnSubmit = document.getElementById('btn-etapa2');
+
+            if (codigo.length !== 6) {
+                alert("O código precisa ter exatamente 6 dígitos.");
+                return;
+            }
+
+            btnSubmit.innerHTML = "⏳ Autenticando...";
+            btnSubmit.disabled = true;
+
+            try {
+                // Agora envia tudo completo
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: codigo })
+                });
+
+                if (response.ok) {
+                    const dados = await response.json();
+                    localStorage.setItem('interclassToken', dados.token);
+                    window.location.href = '/admin.html'; // SUCESSO ABSOLUTO!
+                } else {
+                    const erroServidor = await response.text();
+                    alert("🔒 Acesso Negado: " + erroServidor);
+                    document.getElementById('codigo2fa').value = ""; // Limpa o campo pra ele tentar de novo
+                    document.getElementById('codigo2fa').focus();
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("⚠️ Erro de conexão.");
+            } finally {
+                btnSubmit.innerHTML = "Autenticar e Entrar";
+                btnSubmit.disabled = false;
+            }
+        }
+
+        // Botão de voltar (caso a pessoa precise corrigir a senha)
+        function voltarParaEtapa1() {
+            document.getElementById('etapa-2').style.display = 'none';
+            document.getElementById('etapa-1').style.display = 'block';
+            document.getElementById('codigo2fa').value = ""; // Limpa o código
+        }
     </script>
 </body>
 </html>
