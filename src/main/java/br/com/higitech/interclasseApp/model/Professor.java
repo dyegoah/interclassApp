@@ -17,8 +17,8 @@ public class Professor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🛡️ A NOVA BLINDAGEM: Hash único impossível de adivinhar
-    @Column(name = "hash_publico", unique = true, updatable = false)
+    // 🛡️ CORREÇÃO: Removido o 'updatable = false' para o Java conseguir "curar" as contas antigas
+    @Column(name = "hash_publico", unique = true)
     private String hashPublico = UUID.randomUUID().toString();
 
     @Column(nullable = false)

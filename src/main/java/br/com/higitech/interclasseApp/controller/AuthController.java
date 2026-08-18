@@ -61,6 +61,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Conta bloqueada. Contate o suporte.");
         }
 
+        // 🛡️ AUTO-CURA DO BANCO DE DADOS: 
+        // Se a conta for antiga e não tiver Hash Público, gera a chave e salva na hora!
+        if (professor.getHashPublico() == null || professor.getHashPublico().trim().isEmpty()) {
+            professor.setHashPublico(java.util.UUID.randomUUID().toString());
+            professorRepository.save(professor);
+        }
+
         if (passwordEncoder.matches(loginRequest.senha, professor.getSenha())) {
             
             if (professor.getChave2fa() != null && !professor.getChave2fa().isEmpty()) {
@@ -77,7 +84,7 @@ public class AuthController {
 
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("id", professor.getId());
-            resposta.put("hash", professor.getHashPublico()); // 🛡️ Devolve o HASH para criação do link público
+            resposta.put("hash", professor.getHashPublico()); // Agora garantido que tem um Hash válido
             resposta.put("nome", professor.getNome());
             resposta.put("escola", professor.getEscola());
             resposta.put("token", tokenReal); 
@@ -103,7 +110,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de e-mail inválido.");
         }
         if (professorRepository.findByEmail(request.email).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este e-mail já está em uso.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este e-mail já está em uso no sistema.");
         }
 
         Professor novoProfessor = new Professor();
