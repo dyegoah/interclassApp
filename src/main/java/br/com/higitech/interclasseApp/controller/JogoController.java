@@ -1,21 +1,18 @@
 package br.com.higitech.interclasseApp.controller;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.higitech.interclasseApp.dto.CalendarioSaveDTO;
-import br.com.higitech.interclasseApp.dto.JogoDTO;
 import br.com.higitech.interclasseApp.model.Jogo;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.JogoRepository;
@@ -26,52 +23,105 @@ import br.com.higitech.interclasseApp.service.JogoService;
 public class JogoController {
 
     @Autowired
-    private JogoService jogoService;
-    
-    @Autowired
     private JogoRepository jogoRepository;
 
-    @PostMapping("/calendario")
-    public ResponseEntity<?> salvarCalendario(@RequestBody CalendarioSaveDTO dto, @AuthenticationPrincipal Professor professorLogado) {
-        jogoService.salvarLoteDeJogos(dto, professorLogado);
-        return ResponseEntity.ok().body("{\"mensagem\": \"Calendário gravado com segurança!\"}");
-    }
+    @Autowired
+    private JogoService jogoService; 
 
-    @GetMapping("/lote/{genero}")
-    public ResponseEntity<List<JogoDTO>> buscarJogosPorGenero(@PathVariable String genero, @AuthenticationPrincipal Professor professorLogado) {
-        List<JogoDTO> jogos = jogoService.buscarJogosParaPlayHub(genero, professorLogado);
-        return ResponseEntity.ok(jogos);
-    }
+    // =========================================================
+    // 🛡️ DTO DE BLINDAGEM: Impede o vazamento dos dados do Professor!
+    // =========================================================
+    public static class JogoPublicoDTO {
+        public Long id;
+        public String titulo;
+        public String esporte;
+        public String genero;
+        public String quadra;
+        public String dataJogo;
+        public String hora;
+        public String status;
+        public String icone;
+        public Long equipeAId;
+        public String equipeANome;
+        public Long equipeBId;
+        public String equipeBNome;
+        public Integer placarA;
+        public Integer placarB;
 
-    // 🔥 A ROTA RESTAURADA: Devolve os dados de apenas UM jogo para a tela de Súmula
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> buscarJogoParaSumula(@PathVariable Long id, @AuthenticationPrincipal Professor professorLogado) {
-        return ResponseEntity.ok(jogoService.buscarJogoDetalhadoParaSumula(id));
-    }
-
-    @DeleteMapping("/torneio/{genero}/{esporte}")
-    public ResponseEntity<?> excluirTorneioEspecifico(@PathVariable String genero, @PathVariable String esporte, @AuthenticationPrincipal Professor professorLogado) {
-        jogoService.excluirTorneioEspecifico(genero, esporte, professorLogado);
-        return ResponseEntity.ok().body("{\"mensagem\": \"Torneio removido com sucesso!\"}");
-    }
-    
-   // ==========================================
-    // ROTA PÚBLICA PARA O PORTAL DO ALUNO (SEM TOKEN)
-    // ==========================================
-    @GetMapping("/public/{professorId}/lote/{genero}")
-    public ResponseEntity<?> listarJogosPublico(@PathVariable Long professorId, @PathVariable String genero) {
-        try {
-            // ATENÇÃO: Verifique se o método no seu JogoRepository se chama exatamente assim.
-            // Se a sua entidade Jogo se relaciona com 'usuario', pode ser findByUsuarioIdAndGenero.
-            List<Jogo> jogos = jogoRepository.findByProfessorIdAndGenero(professorId, genero);
+        public JogoPublicoDTO(Jogo jogo) {
+            this.id = jogo.getId();
+            this.titulo = jogo.getTitulo();
+            this.genero = jogo.getGenero();
+            this.quadra = jogo.getQuadra();
+            this.status = jogo.getStatus();
             
-            return ResponseEntity.ok(jogos);
+            // 🔥 CORREÇÃO 1: Acessa o Esporte e o Ícone pela Modalidade
+            this.esporte = jogo.getModalidade() != null ? jogo.getModalidade().getNomeEsporte() : "A Definir";
+            this.icone = jogo.getModalidade() != null ? jogo.getModalidade().getIcone() : "🏆";
+
+            // 🔥 CORREÇÃO 2: Converte os tipos LocalDate e LocalTime para String com segurança
+            this.dataJogo = jogo.getDataJogo() != null ? jogo.getDataJogo().toString() : "Data Indefinida";
+            this.hora = jogo.getHorario() != null ? jogo.getHorario().toString() : "Hora Indefinida";
             
-        } catch (Exception e) {
-            System.out.println("🚨 ERRO NA ROTA PÚBLICA DE JOGOS: " + e.getMessage());
-            e.printStackTrace(); // Mostra o erro exato no terminal do Eclipse/IntelliJ
-            return ResponseEntity.internalServerError().body("Erro no servidor Java: " + e.getMessage());
+            this.equipeAId = jogo.getEquipeAId();
+            this.equipeANome = jogo.getEquipeANome();
+            this.equipeBId = jogo.getEquipeBId();
+            this.equipeBNome = jogo.getEquipeBNome();
+            this.placarA = jogo.getPlacarA();
+            this.placarB = jogo.getPlacarB();
+            // 🚨 ATENÇÃO: O objeto 'Professor' NÃO é incluído aqui propositalmente!
         }
     }
 
+    // =========================================================
+    // 🔒 ROTA PRIVADA: Painel PlayHub (Dashboard do Professor)
+    // =========================================================
+    @GetMapping("/lote/{genero}")
+    public ResponseEntity<List<Jogo>> listarJogosDoProfessor(
+            @PathVariable String genero, 
+            @AuthenticationPrincipal Professor professorLogado) {
+        
+        List<Jogo> jogos = jogoRepository.findByProfessorIdAndGenero(professorLogado.getId(), genero);
+        return ResponseEntity.ok(jogos);
+    }
+
+    // =========================================================
+    // 🔓 ROTA PÚBLICA BLINDADA: Tela de Resumo (Celular do Aluno)
+    // =========================================================
+    @GetMapping("/public/{professorHash}/lote/{genero}")
+    public ResponseEntity<?> listarJogosPublicos(
+            @PathVariable String professorHash, 
+            @PathVariable String genero) {
+        try {
+            // Busca apenas se o Hash coincidir
+            List<Jogo> jogos = jogoRepository.findByProfessorHashAndGenero(professorHash, genero);
+            
+            // Converte a entidade crua para o DTO seguro, cortando vazamentos
+            List<JogoPublicoDTO> jogosSeguros = jogos.stream()
+                .map(JogoPublicoDTO::new)
+                .collect(Collectors.toList());
+                
+            return ResponseEntity.ok(jogosSeguros);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar as chaves públicas.");
+        }
+    }
+
+    // =========================================================
+    // 🔒 ROTA PRIVADA: Exclusão de Torneio inteiro
+    // =========================================================
+    @DeleteMapping("/torneio/{genero}/{esporte}")
+    public ResponseEntity<?> excluirTorneioCompleto(
+            @PathVariable String genero, 
+            @PathVariable String esporte, 
+            @AuthenticationPrincipal Professor professorLogado) {
+        
+        try {
+            jogoService.excluirTorneioEspecifico(genero, esporte, professorLogado);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Falha ao excluir o torneio.");
+        }
+    }
 }

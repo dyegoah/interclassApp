@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Setup Modalidades - InterclassApp</title>
+    
+    <!-- 🛡️ ANTI-FLICKER: Expulsa curiosos do criador de torneios instantaneamente -->
+    <script>
+        if (!localStorage.getItem('interclassToken')) {
+            window.location.replace('/index.html');
+        }
+    </script>
+    
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -165,20 +173,27 @@
             'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2
         };
 
-        let generoSelecionado = null; 
+        // 🛡️ LÓGICA BLINDADA: Tenta recuperar o gênero de uma sessão anterior (se o cara der F5)
+        let dadosSetupTemp = JSON.parse(localStorage.getItem('arenaSetupTemp')) || {};
+        let generoSelecionado = dadosSetupTemp.genero || null; 
         let listaAlunosBase = [];
 
         window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
-            // Busca os alunos silenciosamente no fundo enquanto a página carrega
             try {
                 const token = localStorage.getItem('interclassToken');
                 const response = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
                 if(response.ok) listaAlunosBase = await response.json();
             } catch(e) {
                 console.warn("Falha ao puxar alunos da base. A análise de status pode ficar indisponível.");
+            }
+
+            // Se a pessoa atualizou a página já no passo 2, restaura o estado:
+            if (generoSelecionado) {
+                selecionarGenero(generoSelecionado);
+                irParaPassoModalidades();
             }
         };
 
@@ -196,6 +211,11 @@
 
         function selecionarGenero(tipo) {
             generoSelecionado = tipo;
+            
+            // 🔥 Salva o estado para resistir ao F5 do navegador
+            dadosSetupTemp.genero = tipo;
+            localStorage.setItem('arenaSetupTemp', JSON.stringify(dadosSetupTemp));
+
             const body = document.body;
             body.classList.remove('theme-fem', 'theme-misto');
             ['masc', 'fem', 'misto'].forEach(id => document.getElementById(`card-${id}`).classList.remove('selected'));
@@ -212,19 +232,16 @@
             const container = document.getElementById('setup-container');
             container.innerHTML = '';
             
-            let salvos = JSON.parse(localStorage.getItem('arenaSetup')) || { esportes: [] };
+            let salvos = JSON.parse(localStorage.getItem('arenaSetupTemp')) || { esportes: [] };
             
-            // Filtra os alunos baseado no gênero que acabou de ser clicado
             let alunosDoGenero = listaAlunosBase.filter(a => a.genero === generoSelecionado);
             
             modalidadeDefs.forEach(mod => {
-                // 1. Pega os alunos desta modalidade e deste gênero
                 let alunosDesteEsporte = alunosDoGenero.filter(a => a.esporte === mod.nome);
                 let isIndiv = esportesIndividuais.includes(mod.nome);
                 let isReady = false;
                 let msgStatus = "";
 
-                // 2. Faz a conta mágica para acender o Card
                 if (isIndiv) {
                     let qtdInscritos = alunosDesteEsporte.length;
                     isReady = qtdInscritos >= 2;
@@ -233,12 +250,10 @@
                     let minExigido = minJogadoresPorEsporte[mod.nome] || 2;
                     let contagemPorTurma = {};
                     
-                    // Agrupa por turma
                     alunosDesteEsporte.forEach(a => { 
                         contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; 
                     });
                     
-                    // Conta quantas turmas bateram o quórum
                     let equipesValidas = 0;
                     for(let t in contagemPorTurma) {
                         if(contagemPorTurma[t] >= minExigido) equipesValidas++;
@@ -248,11 +263,11 @@
                     msgStatus = `<span style="color: ${isReady ? '#00ff00' : '#ff0055'};">${equipesValidas} Equipe${equipesValidas !== 1 ? 's' : ''}</span>`;
                 }
 
-                // 3. Monta o Card Visual
                 const card = document.createElement('div');
                 card.className = `config-card glass ${isReady ? 'ready' : 'not-ready'}`;
                 
-                if(salvos.esportes.find(e => e.id === mod.id)) card.classList.add('selected');
+                // Se já tinha sido selecionado antes (resistência ao F5)
+                if(salvos.esportes && salvos.esportes.find(e => e.id === mod.id)) card.classList.add('selected');
                 
                 card.onclick = () => card.classList.toggle('selected');
                 
@@ -281,14 +296,18 @@
                 return { id: parseInt(card.getAttribute('data-id')), configurado: false };
             });
 
+            // 🔥 A MÁGICA FINAL: Salva no Setup Real que o Passo 2 ('torneios.html') vai ler
             const setupData = { genero: generoSelecionado, esportes: esportesArray };
             localStorage.setItem('arenaSetup', JSON.stringify(setupData));
             
-            window.location.href = '/torneios.html';
+            // Limpa o temporário da Etapa 1
+            localStorage.removeItem('arenaSetupTemp');
+            
+            window.location.href = '/setup/torneios.html'; // Corrigido para a rota oficial da pasta setup!
         }
 
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
     </script>
 </body>
-</html>
+</html>´	
