@@ -85,70 +85,101 @@
         </div>
     </div>
 
-    <script>
-        async function validarCredenciais(event) {
-            event.preventDefault();
-            const emailDigitado = document.getElementById('email').value.trim();
-            const senhaDigitada = document.getElementById('senha').value.trim();
-            const btnSubmit = document.getElementById('btn-etapa1');
-            btnSubmit.innerHTML = "⏳ Verificando...";
-            btnSubmit.disabled = true;
+	<script>
+	        async function validarCredenciais(event) {
+	            event.preventDefault();
+	            const emailDigitado = document.getElementById('email').value.trim();
+	            const senhaDigitada = document.getElementById('senha').value.trim();
+	            const btnSubmit = document.getElementById('btn-etapa1');
+	            
+	            btnSubmit.innerHTML = "⏳ Verificando...";
+	            btnSubmit.disabled = true;
 
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: "" })
-                });
+	            try {
+	                const response = await fetch('/api/auth/login', {
+	                    method: 'POST', 
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: "" })
+	                });
 
-                if (response.ok) {
-                    const dados = await response.json();
-                    localStorage.setItem('interclassToken', dados.token);
-                    window.location.replace('/dashboard.html'); 
-                } else {
-                    const erroServidor = await response.text();
-                    if (erroServidor.includes("obrigatório para contas Master")) {
-                        document.getElementById('etapa-1').style.display = 'none';
-                        document.getElementById('etapa-2').style.display = 'block';
-                        setTimeout(() => document.getElementById('codigo2fa').focus(), 100);
-                    } else { alert("❌ " + erroServidor); }
-                }
-            } catch (error) { alert("⚠️ Erro de conexão com os servidores."); } 
-            finally { btnSubmit.innerHTML = "Continuar"; btnSubmit.disabled = false; }
-        }
+	                if (response.ok) {
+	                    const dados = await response.json();
+	                    
+	                    // 🔥 AQUI ESTÁ A BLINDAGEM: Salvando o Token e o Hash seguro!
+	                    localStorage.setItem('interclassToken', dados.token);
+	                    localStorage.setItem('profId', dados.hash); // Salva o Hash Criptografado
+	                    localStorage.setItem('profNome', dados.nome);
+	                    localStorage.setItem('profEscola', dados.escola);
+	                    
+	                    window.location.replace('/dashboard.html'); 
+	                } else {
+	                    const erroServidor = await response.text();
+	                    if (erroServidor.includes("obrigatório para contas Master")) {
+	                        document.getElementById('etapa-1').style.display = 'none';
+	                        document.getElementById('etapa-2').style.display = 'block';
+	                        setTimeout(() => document.getElementById('codigo2fa').focus(), 100);
+	                    } else { 
+	                        alert("❌ " + erroServidor); 
+	                    }
+	                }
+	            } catch (error) { 
+	                alert("⚠️ Erro de conexão com os servidores."); 
+	            } finally { 
+	                btnSubmit.innerHTML = "Continuar"; 
+	                btnSubmit.disabled = false; 
+	            }
+	        }
 
-        async function enviarLoginCompleto(event) {
-            event.preventDefault();
-            const emailDigitado = document.getElementById('email').value.trim();
-            const senhaDigitada = document.getElementById('senha').value.trim();
-            const codigo = document.getElementById('codigo2fa').value.trim();
-            const btnSubmit = document.getElementById('btn-etapa2');
+	        async function enviarLoginCompleto(event) {
+	            event.preventDefault();
+	            const emailDigitado = document.getElementById('email').value.trim();
+	            const senhaDigitada = document.getElementById('senha').value.trim();
+	            const codigo = document.getElementById('codigo2fa').value.trim();
+	            const btnSubmit = document.getElementById('btn-etapa2');
 
-            if (codigo.length !== 6) { alert("O código precisa ter exatamente 6 dígitos."); return; }
-            btnSubmit.innerHTML = "⏳ Autenticando..."; btnSubmit.disabled = true;
+	            if (codigo.length !== 6) { 
+	                alert("O código precisa ter exatamente 6 dígitos."); 
+	                return; 
+	            }
+	            
+	            btnSubmit.innerHTML = "⏳ Autenticando..."; 
+	            btnSubmit.disabled = true;
 
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: codigo })
-                });
+	            try {
+	                const response = await fetch('/api/auth/login', {
+	                    method: 'POST', 
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: codigo })
+	                });
 
-                if (response.ok) {
-                    const dados = await response.json();
-                    localStorage.setItem('interclassToken', dados.token);
-                    window.location.replace('/admin.html'); 
-                } else {
-                    alert("🔒 Acesso Negado: " + await response.text());
-                    document.getElementById('codigo2fa').value = ""; document.getElementById('codigo2fa').focus();
-                }
-            } catch (error) { alert("⚠️ Erro de conexão."); } 
-            finally { btnSubmit.innerHTML = "Autenticar e Entrar"; btnSubmit.disabled = false; }
-        }
+	                if (response.ok) {
+	                    const dados = await response.json();
+	                    
+	                    // 🔥 Salvando o Token e o Hash seguro para o Admin Master também!
+	                    localStorage.setItem('interclassToken', dados.token);
+	                    localStorage.setItem('profId', dados.hash); 
+	                    localStorage.setItem('profNome', dados.nome);
+	                    localStorage.setItem('profEscola', dados.escola);
+	                    
+	                    window.location.replace('/admin.html'); 
+	                } else {
+	                    alert("🔒 Acesso Negado: " + await response.text());
+	                    document.getElementById('codigo2fa').value = ""; 
+	                    document.getElementById('codigo2fa').focus();
+	                }
+	            } catch (error) { 
+	                alert("⚠️ Erro de conexão."); 
+	            } finally { 
+	                btnSubmit.innerHTML = "Autenticar e Entrar"; 
+	                btnSubmit.disabled = false; 
+	            }
+	        }
 
-        function voltarParaEtapa1() {
-            document.getElementById('etapa-2').style.display = 'none';
-            document.getElementById('etapa-1').style.display = 'block';
-            document.getElementById('codigo2fa').value = ""; 
-        }
-    </script>
+	        function voltarParaEtapa1() {
+	            document.getElementById('etapa-2').style.display = 'none';
+	            document.getElementById('etapa-1').style.display = 'block';
+	            document.getElementById('codigo2fa').value = ""; 
+	        }
+	    </script>
 </body>
 </html>
