@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscrição Atleta - InterclassApp</title>
+    <title>Inscrição - InterclassApp</title>
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
-    
     <style>
+
+        :root { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         
         body { 
-            /* AQUI ESTÁ A MÁGICA DO FUNDO DE TELA */
-            /* A película escura (rgba) garante que o formulário fique legível por cima da foto */
-            background: linear-gradient(rgba(2, 1, 17, 0.75), rgba(25, 25, 112, 0.75)), url('/img/fundo.png') no-repeat center center fixed; 
-            background-size: cover; 
+            background-color: #05050f;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
+                linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            animation: moveGrid 20s linear infinite;
             color: #ffffff; 
             min-height: 100vh; 
             display: flex; 
@@ -25,247 +29,113 @@
             align-items: center; 
             padding: 2rem; 
         }
+
+        @keyframes moveGrid {
+            0% { background-position: center center, 0 0, 0 0; }
+            100% { background-position: center center, 40px 40px, 40px 40px; }
+        }
         
-        .glass-form { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid #00f2fe; }
-        h2 { font-family: 'Orbitron'; text-align: center; color: #00f2fe; margin-bottom: 0.5rem; text-transform: uppercase; }
-        .subtitle { text-align: center; font-size: 0.9rem; opacity: 0.8; margin-bottom: 2rem; }
-
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
-        .form-group input, .form-group select { width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; outline: none; transition: 0.3s; }
-        .form-group input:focus, .form-group select:focus { border-color: #00f2fe; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); }
         
-        .form-group select optgroup { background: #191970; color: #00f2fe; font-family: 'Orbitron'; }
-        .form-group select option { background: #020111; color: white; font-family: 'Segoe UI'; }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); text-align: center;}
+        p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 25px; font-size: 0.95rem; text-align: center; }
 
-        /* Input de Arquivo Customizado */
-        input[type="file"]::file-selector-button { background: #ff00de; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-right: 15px; font-family: 'Orbitron'; transition: 0.3s; }
-        input[type="file"]::file-selector-button:hover { background: #d000b5; box-shadow: 0 0 10px #ff00de; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
+        .form-group option { background: #05050f; color: white; }
 
-        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; border-radius: 30px; color: white; font-weight: bold; font-family: 'Orbitron'; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 1rem; transition: 0.3s; }
-        .btn-submit:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.6); transform: translateY(-2px); }
+        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 30px; color: #fff; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 15px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 0, 222, 0.8); }
+        
+        .char-counter { font-size: 0.75rem; color: #888; float: right; margin-top: 5px; }
+        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 8px; font-size: 0.9rem; text-align: center; display: none; font-weight: bold; font-family: 'Segoe UI'; }
+        .alert-danger { color: #ffccdd; background-color: rgba(255, 0, 85, 0.1); border-color: #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.3); }
+        .alert-success { color: #ccffcc; background-color: rgba(0, 255, 0, 0.1); border-color: #00ff00; box-shadow: 0 0 15px rgba(0,255,0,0.3); }
+        .d-block { display: block !important; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
 
     <div class="glass-form">
-        <h2>Draft da Arena</h2>
-        <p class="subtitle">Inscreva-se para representar a sua turma.</p>
+        <h1>Inscrição de Atleta</h1>
+        <p class="subtitle">Preencha os seus dados para participar dos torneios e súmulas.</p>
 
-        <form id="form-cadastro-aluno">
+        <div id="mensagem-alerta" class="alert"></div>
+
+        <form id="form-cadastro" onsubmit="inscreverAluno(event)">
             <div class="form-group">
-                <label>Nome Completo</label>
-                <input type="text" id="nome" required placeholder="Digite o seu nome completo">
-            </div>
-
-            <div class="form-group" style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
-                    <label>Data de Nascimento</label>
-                    <input type="date" id="dataNascimento" required>
-                </div>
-                <div style="flex: 1;">
-                    <label>Turma</label>
-                    <select id="turma" required>
-                        </select>
-                </div>
-            </div>
-
-            <div class="form-group" style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
-                    <label>Categoria (Gênero)</label>
-                    <select id="genero" required>
-                        <option value="">Selecione...</option>
-                        <option value="masculino">🚹 Masculino</option>
-                        <option value="feminino">🚺 Feminino</option>
-						<option value="misto">🚺🚹 Misto</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label>Modalidade (Esporte)</label>
-					<select id="modalidade" required>
-					    <option value="" data-icone="">Selecione...</option>
-					    <option value="Futsal" data-icone="⚽">⚽ Futsal</option>
-					    <option value="Vôlei" data-icone="🏐">🏐 Vôlei</option>
-					    <option value="Basquete" data-icone="🏀">🏀 Basquete</option>
-					    <option value="Handebol" data-icone="🤾">🤾 Handebol</option>
-					    <option value="Queimada" data-icone="☄️">☄️ Queimada</option>
-					    <option value="Vôlei de Areia" data-icone="🏖️">🏖️ Vôlei de Areia</option>
-					    <option value="Natação" data-icone="🏊">🏊 Natação</option>
-					    <option value="Atletismo" data-icone="🏃">🏃 Atletismo</option>
-					    <option value="Tênis de Mesa" data-icone="🏓">🏓 Tênis de Mesa</option>
-					    <option value="Xadrez" data-icone="♟️">♟️ Xadrez</option>
-					    <option value="Dama" data-icone="🏁">🏁 Dama</option>
-					    <option value="E-Sports" data-icone="🎮">🎮 E-Sports</option>
-					</select>
-                </div>
+                <label>Nome Completo do Aluno</label>
+                <input type="text" id="nomeAluno" required minlength="3" maxlength="50" placeholder="Ex: João da Silva">
+                <div class="char-counter">Máx. 50 caracteres</div>
             </div>
 
             <div class="form-group">
-                <label>Foto do Atleta (Opcional - Para a Súmula)</label>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <img id="preview-foto" src="https://ui-avatars.com/api/?name=Atleta&background=222&color=fff" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #00f2fe;">
-                    <div>
-                        <input type="file" id="fotoAluno" accept="image/*" onchange="processarImagem(event)">
-                    </div>
-                </div>
+                <label>Turma / Ano / Classe</label>
+                <input type="text" id="turmaAluno" required minlength="2" maxlength="30" placeholder="Ex: 3º Ano A">
             </div>
 
-            <button type="button" class="btn-submit" onclick="enviarCadastro()">Enviar Inscrição</button>
+            <button type="submit" class="btn-submit">Confirmar Inscrição</button>
         </form>
     </div>
 
     <script>
-        // Variável global para guardar a foto codificada
-        let fotoBase64 = null;
-
-        window.onload = () => {
-            gerarMenuDeTurmas();
-			
-        };
-
-        // GERA AS TURMAS PADRÃO DO BRASIL AUTOMATICAMENTE
-        function gerarMenuDeTurmas() {
-            const select = document.getElementById('turma');
-            const turmas = [
-                { grupo: "Ensino Fundamental I", series: ["1º Ano", "2º Ano", "3º Ano", "4º Ano", "5º Ano"], letras: ["A", "B", "C"] },
-                { grupo: "Ensino Fundamental II", series: ["6º Ano", "7º Ano", "8º Ano", "9º Ano"], letras: ["A", "B", "C", "D"] },
-                { grupo: "Ensino Médio", series: ["1ª Série", "2ª Série", "3ª Série"], letras: ["A", "B", "C", "D", "E"] }
-            ];
-
-            let html = '<option value="">Selecione sua turma...</option>';
-            turmas.forEach(t => {
-                html += `<optgroup label="${t.grupo}">`;
-                t.series.forEach(serie => {
-                    t.letras.forEach(letra => {
-                        html += `<option value="${serie} ${letra}">${serie} ${letra}</option>`;
-                    });
-                });
-                html += `</optgroup>`;
-            });
-            select.innerHTML = html;
+        function mostrarAlerta(mensagem, tipo) {
+            const alerta = document.getElementById('mensagem-alerta');
+            alerta.textContent = mensagem;
+            alerta.className = `alert alert-${tipo} d-block`;
+            alerta.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
-		// BUSCA AS MODALIDADES ATIVAS NO BANCO DE DADOS (DA ESCOLA CORRETA)
-		        async function carregarModalidadesDoBanco() {
-		            const selectMod = document.getElementById('modalidade');
-		            
-		            // 1. Pega o ID do professor na URL (O "ref" que geramos no painel)
-		            const urlParams = new URLSearchParams(window.location.search);
-		            const professorId = urlParams.get('ref');
+        async function inscreverAluno(event) {
+            event.preventDefault();
+            
+            const nome = document.getElementById('nomeAluno').value.trim();
+            const turma = document.getElementById('turmaAluno').value.trim();
+            
+            // 🔥 RECUPERA O HASH PÚBLICO DA URL EM VEZ DO ID NUMÉRICO 🔥
+            const urlParams = new URLSearchParams(window.location.search);
+            const professorHashPublico = urlParams.get('ref');
 
-		            if (!professorId) {
-		                selectMod.innerHTML = '<option value="">Link de inscrição inválido!</option>';
-		                selectMod.disabled = true;
-		                return;
-		            }
+            if (!professorHashPublico) {
+                mostrarAlerta("❌ Link de inscrição inválido. Solicite um novo link ao seu professor.", "danger");
+                return;
+            }
 
-		            try {
-		                // 2. Chama a nova rota pública filtrando pela escola!
-		                const response = await fetch(`/api/modalidades/public/${professorId}`);
-		                
-		                if (response.ok) {
-		                    const modalidades = await response.json();
-		                    
-		                    if (modalidades.length === 0) {
-		                        selectMod.innerHTML = '<option value="">Nenhum torneio ativo ainda!</option>';
-		                        selectMod.disabled = true;
-		                        return;
-		                    }
+            const btnSubmit = document.querySelector('.btn-submit');
+            const textoOriginal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = "⏳ Enviando...";
+            btnSubmit.disabled = true;
+            document.getElementById('mensagem-alerta').className = 'alert';
 
-		                    let html = '<option value="">Selecione...</option>';
-		                    modalidades.forEach(mod => {
-		                        html += `<option value="${mod.nomeEsporte}" data-icone="${mod.icone}">${mod.icone} ${mod.nomeEsporte}</option>`;
-		                    });
-		                    
-		                    selectMod.innerHTML = html;
-		                    selectMod.disabled = false;
-		                }
-		            } catch (error) {
-		                console.error("Erro ao buscar modalidades:", error);
-		                selectMod.innerHTML = '<option value="">Erro ao conectar no servidor</option>';
-		            }
-		        }
-		
-		
-        // LÊ A FOTO DO CELULAR/PC E MOSTRA NA BOLINHA
-        function processarImagem(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    fotoBase64 = e.target.result; // Converte a imagem em texto (Base64)
-                    document.getElementById('preview-foto').src = fotoBase64;
+            try {
+                // Manda a requisição para a rota blindada usando a STRING hashPublico
+                const response = await fetch(`/api/alunos/public/${professorHashPublico}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: nome, turma: turma })
+                });
+
+                if (response.ok) {
+                    mostrarAlerta("✅ Inscrição realizada com sucesso! Você já pode fechar esta página.", "success");
+                    document.getElementById('form-cadastro').reset();
+                    btnSubmit.innerHTML = "Inscrito! ✔️";
+                } else {
+                    const msgErro = await response.text();
+                    mostrarAlerta("❌ Falha na inscrição: " + msgErro, "danger");
+                    btnSubmit.innerHTML = textoOriginal;
+                    btnSubmit.disabled = false;
                 }
-                reader.readAsDataURL(file);
-            } else {
-                fotoBase64 = null;
-                document.getElementById('preview-foto').src = "https://ui-avatars.com/api/?name=Atleta&background=222&color=fff";
+            } catch (error) {
+                console.error("Erro de comunicação:", error);
+                mostrarAlerta("⚠️ Servidor indisponível no momento. Tente novamente mais tarde.", "danger");
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
             }
         }
-
-		async function enviarCadastro() {
-				    const nome = document.getElementById('nome').value;
-				    const dataNasc = document.getElementById('dataNascimento').value;
-				    const turmaSelect = document.getElementById('turma');
-				    const generoSelect = document.getElementById('genero');
-				    const selectMod = document.getElementById('modalidade');
-
-				    if(!nome) { alert("Digite o seu nome."); return; }
-				    if(!dataNasc) { alert("Informe a data de nascimento."); return; }
-				    if(turmaSelect.value === "") { alert("Selecione a sua turma!"); return; }
-				    if(generoSelect.value === "") { alert("Selecione a sua categoria/gênero!"); return; }
-				    if(selectMod.value === "") { alert("Selecione um esporte!"); return; }
-
-				    let fotoFinal = fotoBase64;
-				    if (!fotoFinal) {
-				        fotoFinal = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=random&color=fff`;
-				    }
-
-				    const optionSelecionada = selectMod.options[selectMod.selectedIndex];
-				    const nomeEsporte = optionSelecionada.value;
-				    const iconeEsporte = optionSelecionada.getAttribute('data-icone');
-
-				    const novoAluno = {
-				        nome: nome,
-				        turma: turmaSelect.value,
-				        dataNascimento: dataNasc,
-				        fotoUrl: fotoFinal,
-				        genero: generoSelect.value,
-				        esporte: nomeEsporte,
-				        iconeEsporte: iconeEsporte
-				    };
-
-		            // 🚀 PEGA O ID DO PROFESSOR NO LINK (Ex: ?ref=1)
-		            const urlParams = new URLSearchParams(window.location.search);
-		            const professorId = urlParams.get('ref');
-
-		            if (!professorId) {
-		                alert("🚨 Link de inscrição inválido! Peça o link correto ao seu professor.");
-		                return;
-		            }
-
-				    try {
-		                // 🚀 ENVIA PARA A NOSSA NOVA ROTA PÚBLICA!
-				        const response = await fetch(`/api/alunos/public/${professorId}`, {
-				            method: 'POST',
-				            headers: { 'Content-Type': 'application/json' },
-				            body: JSON.stringify(novoAluno)
-				        });
-
-				        if(response.ok) {
-				            alert("Inscrição gravada com sucesso na Base de Dados da Escola!");
-				            document.getElementById('form-cadastro-aluno').reset();
-				            fotoBase64 = null;
-				            document.getElementById('preview-foto').src = "https://ui-avatars.com/api/?name=Atleta&background=222&color=fff";
-				        } else {
-		                    const msgErro = await response.text();
-				            alert("⚠️ Erro ao salvar: " + msgErro);
-				        }
-				    } catch (error) {
-				        console.error(error);
-				        alert("🚨 Falha de comunicação com o servidor.");
-				    }
-				}
     </script>
 </body>
 </html>

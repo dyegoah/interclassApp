@@ -210,7 +210,6 @@
         const iconesPontos = ['⚽', '🏀', '🏐', '🤾', '🎯', '🔥', '☄️', '🏓', '✅', '🥇', '🥈', '🥉', '🎮', '🧱'];
         const iconesFaltas = ['🛑', '🟨', '🟥', '✌️', '❌', '🕸️', '⚠️'];
 
-        // 🔥 EXTRATOR SEGURO INCORPORADO NO RESUMO (Resolve o Bug do Mini-Bracket Vazio)
         function obterPlacarSeguro(rel, jogo) {
             let pA = 0, pB = 0;
             if (rel) {
@@ -290,20 +289,27 @@
             carregarLotesDaAPI();
         };
 
+        // 🔥 CORREÇÃO SÊNIOR: Gera link com a Chave Hash ao invés do ID numérico 🔥
         function compartilharResumo() {
-            let pId = localStorage.getItem('id') || localStorage.getItem('userId') || localStorage.getItem('professorId') || 1;
-            let pNome = localStorage.getItem('nome') || (listaAlunosGlobais.length > 0 && listaAlunosGlobais[0].professor ? listaAlunosGlobais[0].professor.nome : "Professor");
-            let pEscola = localStorage.getItem('escola') || (listaAlunosGlobais.length > 0 && listaAlunosGlobais[0].professor ? listaAlunosGlobais[0].professor.escola : "Escola");
-            let linkPublico = `${window.location.origin}/resumo.html?ref=${pId}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
+            // Usa o 'profId' (que agora armazena a string Hash no Login)
+            let pHashPublico = localStorage.getItem('profId'); 
+            let pNome = localStorage.getItem('profNome') || "Professor";
+            let pEscola = localStorage.getItem('profEscola') || "Escola";
+            
+            if(!pHashPublico) {
+                alert("Erro: Credencial de segurança pública não encontrada. Faça login novamente.");
+                return;
+            }
+
+            let linkPublico = `${window.location.origin}/resumo.html?ref=${pHashPublico}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
             
             navigator.clipboard.writeText(linkPublico).then(() => {
-                alert("✅ Link de Resultados copiado com sucesso!\n\nOs alunos irão acessar o banco de dados diretamente pelo link e ver os resultados em Tempo Real!\n\n" + linkPublico);
+                alert("✅ Link Seguro de Resultados copiado com sucesso!\n\nEnvie este link para os alunos acessarem pelo celular!\n\n" + linkPublico);
             }).catch(err => {
                 alert("Copie o link abaixo para enviar aos alunos:\n\n" + linkPublico);
             });
         }
 
-        // 🔥 ATUALIZAÇÃO DO CONTADOR GLOBAL: Analisa textos de futsal e vôlei perfeitamente
         function calcularEstatisticasGlobaisEscola() {
             let totalJogos = 0, totalPontos = 0, totalFaltas = 0;
 
@@ -371,11 +377,6 @@
                 let headers = isModoPublico ? {} : { 'Authorization': `Bearer ${token}` };
                 let response = await fetch(urlJogos, { headers });
                 
-                if (!isModoPublico && (!response.ok || (await response.clone().json()).length === 0)) {
-                    let fallbackId = localStorage.getItem('id') || localStorage.getItem('userId') || localStorage.getItem('professorId') || 1;
-                    response = await fetch(`/api/jogos/public/${fallbackId}/lote/${genero}`);
-                }
-                
                 if (response.ok) jogos = await response.json(); 
                 if (!jogos || jogos.length === 0) throw new Error('Vazio');
 
@@ -427,12 +428,6 @@
                     let jgs = [];
                     
                     if (res.ok) { jgs = await res.json(); }
-
-                    if (!isModoPublico && (!res.ok || jgs.length === 0)) {
-                        let fallbackId = localStorage.getItem('id') || localStorage.getItem('userId') || localStorage.getItem('professorId') || 1;
-                        let resFallback = await fetch(`/api/jogos/public/${fallbackId}/lote/${gen}`);
-                        if (resFallback.ok) jgs = await resFallback.json();
-                    }
 
                     if (jgs && jgs.length > 0) {
                         jgs.forEach(j => {
@@ -560,7 +555,6 @@
             return 'eliminatoria';
         }
 
-        // 🔥 ATUALIZAÇÃO ESTATÍSTICA ESPECÍFICA (Lote): Analisa futsal e volei corretamente
         function processarResumo(jogosLote, genero) {
             const container = document.getElementById('lista-resumo-esportes');
             container.innerHTML = '';
@@ -636,9 +630,6 @@
             }
         }
 
-        // ==========================================================
-        // 🔥 TV VIEW: GERA A TABELA OU CHAVEAMENTO COM EXTRATOR SEGURO
-        // ==========================================================
         function gerarPainelVisaoGeral(formato, jogos) {
 
             let extrairM = (jObj) => {
@@ -765,9 +756,6 @@
             }
         }
 
-        // ==========================================================
-        // 🔥 GERA O TOP 5: ANALISADOR INTELIGENTE DE TIMELINE 🔥
-        // ==========================================================
         function gerarHallDaFama(jogosDoEsporte) {
             let statsAtletas = {};
 
@@ -777,11 +765,9 @@
                     rel.timeline.forEach(evt => {
                         if (!evt) return;
                         
-                        // Futsal envia "txt", antigos/volei "texto"
                         let textoEvt = evt.txt || evt.texto || evt.descricao || "";
                         let nomeAluno = null;
 
-                        // Tenta extrair o nome pelas 3 lógicas de súmulas diferentes
                         if (textoEvt.includes(': ')) {
                             nomeAluno = textoEvt.split(': ')[1].trim(); 
                         } else if (textoEvt.includes('por ')) {
@@ -794,7 +780,6 @@
                         if (nomeAluno) {
                             if(!statsAtletas[nomeAluno]) statsAtletas[nomeAluno] = { nome: nomeAluno, pts: 0, faltas: 0 };
                             
-                            // Procura o emoji/ícone ou na chave "icone" ou direto no "texto"
                             let ic = evt.icone || "";
                             let isPoint = (ic && iconesPontos.includes(ic)) || iconesPontos.some(p => textoEvt.includes(p));
                             let isFoul = (ic && iconesFaltas.includes(ic)) || iconesFaltas.some(f => textoEvt.includes(f));

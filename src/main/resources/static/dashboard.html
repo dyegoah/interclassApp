@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - InterclassApp</title>
     
-    <!-- 🛡️ ANTI-FLICKER: Redireciona para o index.html (login) se não houver token -->
+    <!-- 🛡️ ANTI-FLICKER E PROTEÇÃO DE ROTA (O Escudo Sênior) -->
     <script>
         if (!localStorage.getItem('interclassToken')) {
-            window.location.replace('/index.html');
+            window.location.replace('/index.html'); // Expulsa pro Login
+        } else if (localStorage.getItem('isMasterAdmin') === 'true') {
+            window.location.replace('/admin.html'); // Se o Master tentar entrar aqui, joga pro cofre
         }
     </script>
 

@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PlayHub - InterclassApp</title>
+
+    <!-- 🛡️ ANTI-FLICKER E PROTEÇÃO DE ROTA -->
+    <script>
+        if (!localStorage.getItem('interclassToken')) {
+            window.location.replace('/index.html'); // Expulsa pro Login
+        }
+    </script>
+  
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
