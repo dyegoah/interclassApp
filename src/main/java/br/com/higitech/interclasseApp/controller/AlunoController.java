@@ -2,6 +2,7 @@ package br.com.higitech.interclasseApp.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,17 +32,38 @@ public class AlunoController {
     private ProfessorRepository professorRepository;
 
     // =========================================================
-    // 🔓 ROTA PÚBLICA: Aluno se cadastra pelo celular
+    // 🛡️ DTO: Evita vazar dados sensíveis na rota pública
+    // =========================================================
+    public static class AlunoPublicoDTO {
+        public Long id;
+        public String nome;
+        
+        public AlunoPublicoDTO(Aluno aluno) {
+            this.id = aluno.getId();
+            this.nome = aluno.getNome();
+        }
+    }
+
+    // =========================================================
+    // 🔓 ROTA PÚBLICA BLINDADA: Aluno se cadastra pelo celular
     // =========================================================
     @PostMapping("/public/{professorId}")
     public ResponseEntity<?> inscreverAluno(@PathVariable Long professorId, @RequestBody Aluno novoAluno) {
-        Optional<Professor> profOpt = professorRepository.findById(professorId);
         
-        if (profOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Professor/Escola não encontrado(a). Link inválido.");
+        // 🛡️ TRAVA ANTI-SPAM: Impede nomes vazios, muito curtos ou gigantes
+        if(novoAluno.getNome() == null || novoAluno.getNome().trim().length() < 3 || novoAluno.getNome().length() > 50) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
         
-        novoAluno.setProfessor(profOpt.get()); // Carimba o aluno com o ID do professor
+        // 🛡️ PROTEÇÃO XSS: Limpa tags HTML (hacker) do nome do aluno
+        novoAluno.setNome(novoAluno.getNome().replaceAll("<[^>]*>", ""));
+        
+        Optional<Professor> profOpt = professorRepository.findById(professorId);
+        if (profOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Escola não encontrada. Link inválido.");
+        }
+        
+        novoAluno.setProfessor(profOpt.get()); 
         alunoRepository.save(novoAluno);
         
         return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição realizada com sucesso!");
@@ -52,7 +74,6 @@ public class AlunoController {
     // =========================================================
     @GetMapping
     public ResponseEntity<List<Aluno>> listarMeusAlunos(@AuthenticationPrincipal Professor professorLogado) {
-        // O Token JWT já nos diz quem é o professor. Buscamos apenas os alunos dele!
         List<Aluno> meusAlunos = alunoRepository.findByProfessorId(professorLogado.getId());
         return ResponseEntity.ok(meusAlunos);
     }
@@ -71,13 +92,23 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para excluir este aluno.");
     }
     
+    // =========================================================
+    // 🔓 ROTA PÚBLICA BLINDADA: Retorna apenas o ID e Nome (DTO)
+    // =========================================================
     @GetMapping("/public/{professorId}")
     public ResponseEntity<?> listarAlunosPublico(@PathVariable Long professorId) {
         try {
-            return ResponseEntity.ok(alunoRepository.findByProfessorId(professorId));
+            List<Aluno> alunos = alunoRepository.findByProfessorId(professorId);
+            
+            // Converte a lista crua do banco para a lista segura (apenas ID e Nome)
+            List<AlunoPublicoDTO> alunosSeguros = alunos.stream()
+                .map(AlunoPublicoDTO::new)
+                .collect(Collectors.toList());
+                
+            return ResponseEntity.ok(alunosSeguros);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Erro: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Erro interno no servidor.");
         }
     }
 }

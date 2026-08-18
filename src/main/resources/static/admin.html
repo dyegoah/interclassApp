@@ -139,7 +139,6 @@
                         <th>Professor Gestor</th>
                         <th>Instituição</th>
                         <th>E-mail</th>
-                        <th>Desde</th>
                         <th>Status</th>
                         <th style="text-align: center;">Ações</th>
                     </tr>
@@ -204,14 +203,52 @@
     </div>
 
     <script>
-        // AGORA ELE LÊ OS DADOS SALVOS PELO CADASTRO NA MEMÓRIA DO NAVEGADOR
-        let professores = JSON.parse(localStorage.getItem('mockProfessores')) || [];
-
+        // Agora vazio, alimentado direto pelo Java
+        let professores = [];
         let profSelecionadoId = null;
 
-        window.onload = () => {
-            renderizarTabela();
+        window.onload = async () => {
+            await carregarProfessores();
         };
+
+        // 🛡️ Função Master de Conexão com o Banco de Dados Real
+        async function apiAdmin(endpoint, method = 'GET', body = null) {
+            const token = localStorage.getItem('interclassToken');
+            if (!token) {
+                window.location.href = '/login.html';
+                return null;
+            }
+            
+            const options = {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            try {
+                const res = await fetch(endpoint, options);
+                if (res.status === 403 || res.status === 401) {
+                    alert("Acesso Negado. Você não é o Super Admin.");
+                    window.location.href = '/login.html';
+                    return null;
+                }
+                return res;
+            } catch (error) {
+                console.error("Erro no Servidor:", error);
+                return null;
+            }
+        }
+
+        async function carregarProfessores() {
+            const res = await apiAdmin('/api/admin/professores');
+            if (res && res.ok) {
+                professores = await res.json();
+                renderizarTabela();
+            }
+        }
 
         function renderizarTabela() {
             const tbody = document.getElementById('tabela-body');
@@ -221,11 +258,12 @@
             let countBlock = 0;
 
             professores.forEach(p => {
-                let badgeClass = p.status === 'ativo' ? 'badge-ativo' : (p.status === 'atrasado' ? 'badge-atrasado' : 'badge-bloqueado');
-                let badgeTexto = p.status.toUpperCase();
+                let statusVal = p.status || 'ativo';
+                let badgeClass = statusVal === 'ativo' ? 'badge-ativo' : (statusVal === 'atrasado' ? 'badge-atrasado' : 'badge-bloqueado');
+                let badgeTexto = statusVal.toUpperCase();
 
-                if(p.status === 'ativo') countAtivos++;
-                if(p.status === 'bloqueado' || p.status === 'atrasado') countBlock++;
+                if(statusVal === 'ativo') countAtivos++;
+                if(statusVal === 'bloqueado' || statusVal === 'atrasado') countBlock++;
 
                 tbody.innerHTML += `
                     <tr>
@@ -233,12 +271,11 @@
                         <td style="font-weight: bold;">${p.nome}</td>
                         <td>${p.escola}</td>
                         <td>${p.email}</td>
-                        <td>${p.data}</td>
                         <td><span class="badge ${badgeClass}">${badgeTexto}</span></td>
                         <td>
                             <div class="acoes-btn" style="justify-content: center;">
                                 <button class="btn-mini btn-edit" title="Editar Senha" onclick="abrirModalSenha(${p.id}, '${p.nome}')">🔑</button>
-                                <button class="btn-mini btn-block" title="Mudar Status" onclick="abrirModalStatus(${p.id}, '${p.nome}', '${p.status}')">🚦</button>
+                                <button class="btn-mini btn-block" title="Mudar Status" onclick="abrirModalStatus(${p.id}, '${p.nome}', '${statusVal}')">🚦</button>
                                 <button class="btn-mini btn-del" title="Excluir Cliente" onclick="excluirProfessor(${p.id})">🗑️</button>
                             </div>
                         </td>
@@ -258,16 +295,16 @@
             document.getElementById('view-config').style.display = 'none';
 
             document.getElementById(`tab-${aba}`).classList.add('active');
-            document.getElementById(`view-${aba}`).style.display = aba === 'lista' ? 'block' : 'block';
+            document.getElementById(`view-${aba}`).style.display = 'block';
         }
 
         function sairDoAdmin() {
             if(confirm("Deseja sair do painel do Super Admin?")) {
-                window.location.href = '/login.html';
+                localStorage.removeItem('interclassToken');
+                window.location.href = '/index.html'; // Voltando pro novo Index (Login)
             }
         }
 
-        // FUNÇÕES DOS MODAIS DE ADMINISTRAÇÃO
         function abrirModalSenha(id, nome) {
             profSelecionadoId = id;
             document.getElementById('nome-prof-senha').textContent = nome;
@@ -275,11 +312,17 @@
             document.getElementById('modal-senha').style.display = 'flex';
         }
 
-        function salvarSenha() {
+        async function salvarSenha() {
             const senha = document.getElementById('nova-senha').value;
             if(senha.length < 6) { alert("A senha deve ter no mínimo 6 caracteres."); return; }
-            alert(`Senha do professor atualizada com sucesso no banco de dados!`);
-            fecharModais();
+            
+            const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/senha`, 'PUT', { senha: senha });
+            if (res && res.ok) {
+                alert(`Senha do professor atualizada com sucesso no banco de dados!`);
+                fecharModais();
+            } else {
+                alert("Falha ao atualizar a senha no servidor.");
+            }
         }
 
         function abrirModalStatus(id, nome, statusAtual) {
@@ -289,29 +332,30 @@
             document.getElementById('modal-status').style.display = 'flex';
         }
 
-        function salvarStatus() {
+        async function salvarStatus() {
             const novoStatus = document.getElementById('select-status').value;
-            let prof = professores.find(p => p.id === profSelecionadoId);
-            if(prof) {
-                prof.status = novoStatus;
-                localStorage.setItem('mockProfessores', JSON.stringify(professores)); // Salva a mudança na memória!
-                renderizarTabela();
+            const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/status`, 'PUT', { status: novoStatus });
+            
+            if (res && res.ok) {
+                await carregarProfessores(); // Atualiza a tabela com o banco real
+                fecharModais();
+            } else {
+                alert("Falha ao atualizar o status no servidor.");
             }
-            fecharModais();
         }
 
-        // --- AQUI ESTÁ A FUNÇÃO ATUALIZADA COM DUPLO ALERTA E LIMPEZA DE MEMÓRIA ---
-        function excluirProfessor(id) {
-            const confirm1 = confirm("⚠️ ATENÇÃO: Deseja realmente excluir este professor? Todos os seus torneios e alunos também serão removidos.");
-            
+        async function excluirProfessor(id) {
+            const confirm1 = confirm("⚠️ ATENÇÃO: Deseja realmente excluir este professor? Todos os seus torneios e alunos também serão removidos do banco.");
             if (confirm1) {
-                const confirm2 = confirm("🚨 ÚLTIMO AVISO: Esta ação é IRREVERSÍVEL e apagará os dados do banco permanentemente. Confirma?");
-                
+                const confirm2 = confirm("🚨 ÚLTIMO AVISO: Esta ação é IRREVERSÍVEL. Confirma?");
                 if (confirm2) {
-                    professores = professores.filter(p => p.id !== id);
-                    localStorage.setItem('mockProfessores', JSON.stringify(professores));
-                    renderizarTabela();
-                    alert("✅ Registro removido com sucesso do banco de dados!");
+                    const res = await apiAdmin(`/api/admin/professores/${id}`, 'DELETE');
+                    if (res && res.ok) {
+                        alert("✅ Registro removido com sucesso do banco de dados!");
+                        await carregarProfessores();
+                    } else {
+                        alert("Erro ao remover. Verifique as dependências do usuário.");
+                    }
                 }
             }
         }

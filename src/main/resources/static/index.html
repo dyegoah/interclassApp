@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Interclass Arena</title>
+    
+    <!-- 🛡️ ANTI-FLICKER REVERSO: Se já tem token, pula o login e vai pro Dashboard -->
+    <script>
+        if (localStorage.getItem('interclassToken')) {
+            window.location.replace('/dashboard.html');
+        }
+    </script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,53 +21,32 @@
     <style>
         :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        
         body { 
             background-color: #05050f; 
-            background-image: 
-                radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
-                linear-gradient(rgba(0, 242, 254, 0.06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 254, 0.06) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
-            animation: moveGrid 20s linear infinite;
-            color: #ffffff; 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 2rem; 
+            background-image: radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%), linear-gradient(rgba(0, 242, 254, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.06) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px; animation: moveGrid 20s linear infinite; color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 2rem; 
         }
-
-        @keyframes moveGrid {
-            0% { background-position: center center, 0 0, 0 0; }
-            100% { background-position: center center, 40px 40px, 40px 40px; }
-        }
-        
-        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 3rem; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); text-align: center; transition: all 0.5s ease; }
-        
+        @keyframes moveGrid { 0% { background-position: center center, 0 0, 0 0; } 100% { background-position: center center, 40px 40px, 40px 40px; } }
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 3rem; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); text-align: center; transition: all 0.5s ease; }
         h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); }
         p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 30px; font-size: 0.95rem; }
-
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
         .form-group input { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
         .form-group input:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
-
         .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 30px; color: #000; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
         .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(0, 242, 254, 0.8); background: #fff; }
-
-        .btn-voltar { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; box-shadow: none; margin-top: 15px; }
-        .btn-voltar:hover { background: rgba(255,255,255,0.1); color: white; transform: none; box-shadow: none; }
-
+        .btn-voltar { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-top: 15px; box-shadow: none;}
+        .btn-voltar:hover { background: rgba(255,255,255,0.1); }
         .links-rodape { margin-top: 25px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 10px; }
         .links-rodape a { color: var(--theme-primary); text-decoration: none; transition: 0.3s; }
         .links-rodape a:hover { text-shadow: 0 0 10px var(--theme-glow); text-decoration: underline; }
-        
+        .btn-cadastro { background: rgba(255, 0, 222, 0.1); border: 1px solid #ff00de; color: #ff00de !important; padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; text-transform: uppercase;}
+        .btn-cadastro:hover { background: #ff00de; color: #fff !important; box-shadow: 0 0 15px rgba(255,0,222,0.5);}
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
-
     <div class="glass-form">
         <h1>Interclass Arena</h1>
         
@@ -71,139 +58,96 @@
                     <label>E-mail</label>
                     <input type="email" id="email" required placeholder="seu@email.com">
                 </div>
-
                 <div class="form-group">
                     <label>Senha</label>
                     <input type="password" id="senha" required placeholder="••••••••">
                 </div>
-
                 <button type="submit" class="btn-submit" id="btn-etapa1">Continuar</button>
             </form>
 
             <div class="links-rodape">
                 <a href="#">Esqueceu a sua senha?</a>
-                </div>
+                <!-- 🔥 BOTÃO DE CADASTRO ADICIONADO -->
+                <a href="/cadastro-professor.html" class="btn-cadastro">Nova Escola? Cadastre-se</a>
+            </div>
         </div>
 
         <div id="etapa-2" style="display: none;">
             <p class="subtitle" style="color: #00f2fe; font-weight: bold;">🛡️ Proteção Master Ativada</p>
             <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 20px;">Abra o seu aplicativo autenticador e digite o código de 6 dígitos para liberar o acesso.</p>
-
             <form id="form-2fa" onsubmit="enviarLoginCompleto(event)">
                 <div class="form-group">
                     <input type="text" id="codigo2fa" placeholder="0 0 0 0 0 0" maxlength="6" autocomplete="off" style="text-align: center; font-size: 1.8rem; letter-spacing: 12px; font-weight: bold; background: rgba(0,0,0,0.8); color: #00f2fe;">
                 </div>
-
                 <button type="submit" class="btn-submit" id="btn-etapa2">Autenticar e Entrar</button>
                 <button type="button" class="btn-submit btn-voltar" onclick="voltarParaEtapa1()">Voltar</button>
             </form>
         </div>
-
     </div>
 
     <script>
-        // -------------------------------------------------------------
-        // ETAPA 1: O JAVASCRIPT BATE NA PORTA PARA VER SE A SENHA TÁ CERTA
-        // -------------------------------------------------------------
         async function validarCredenciais(event) {
             event.preventDefault();
-            
             const emailDigitado = document.getElementById('email').value.trim();
             const senhaDigitada = document.getElementById('senha').value.trim();
             const btnSubmit = document.getElementById('btn-etapa1');
-
             btnSubmit.innerHTML = "⏳ Verificando...";
             btnSubmit.disabled = true;
 
             try {
-                // Tenta logar mandando o 2FA vazio
                 const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: "" })
                 });
 
                 if (response.ok) {
-                    // Se for um usuário normal (sem 2FA), já entra direto!
                     const dados = await response.json();
                     localStorage.setItem('interclassToken', dados.token);
-                    window.location.href = '/admin.html'; 
+                    window.location.replace('/dashboard.html'); 
                 } else {
                     const erroServidor = await response.text();
-                    
-                    // 🕵️‍♂️ O MODO DETETIVE AQUI: O Java avisou que a conta é Master?
                     if (erroServidor.includes("obrigatório para contas Master")) {
-                        // Esconde a Etapa 1 e Mostra a Etapa 2
                         document.getElementById('etapa-1').style.display = 'none';
                         document.getElementById('etapa-2').style.display = 'block';
-                        
-                        // Foca automaticamente o cursor no campo do 2FA
                         setTimeout(() => document.getElementById('codigo2fa').focus(), 100);
-                    } else {
-                        // Se for senha errada ou usuário bloqueado, mostra o erro normal
-                        alert("❌ " + erroServidor);
-                    }
+                    } else { alert("❌ " + erroServidor); }
                 }
-            } catch (error) {
-                console.error("Erro:", error);
-                alert("⚠️ Erro de conexão com os servidores.");
-            } finally {
-                btnSubmit.innerHTML = "Continuar";
-                btnSubmit.disabled = false;
-            }
+            } catch (error) { alert("⚠️ Erro de conexão com os servidores."); } 
+            finally { btnSubmit.innerHTML = "Continuar"; btnSubmit.disabled = false; }
         }
 
-        // -------------------------------------------------------------
-        // ETAPA 2: ENVIA A SENHA + CÓDIGO 2FA JUNTOS PARA ABRIR O COFRE
-        // -------------------------------------------------------------
         async function enviarLoginCompleto(event) {
             event.preventDefault();
-            
             const emailDigitado = document.getElementById('email').value.trim();
             const senhaDigitada = document.getElementById('senha').value.trim();
             const codigo = document.getElementById('codigo2fa').value.trim();
             const btnSubmit = document.getElementById('btn-etapa2');
 
-            if (codigo.length !== 6) {
-                alert("O código precisa ter exatamente 6 dígitos.");
-                return;
-            }
-
-            btnSubmit.innerHTML = "⏳ Autenticando...";
-            btnSubmit.disabled = true;
+            if (codigo.length !== 6) { alert("O código precisa ter exatamente 6 dígitos."); return; }
+            btnSubmit.innerHTML = "⏳ Autenticando..."; btnSubmit.disabled = true;
 
             try {
-                // Agora envia tudo completo
                 const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada, codigo2fa: codigo })
                 });
 
                 if (response.ok) {
                     const dados = await response.json();
                     localStorage.setItem('interclassToken', dados.token);
-                    window.location.href = '/admin.html'; // SUCESSO ABSOLUTO!
+                    window.location.replace('/admin.html'); 
                 } else {
-                    const erroServidor = await response.text();
-                    alert("🔒 Acesso Negado: " + erroServidor);
-                    document.getElementById('codigo2fa').value = ""; // Limpa o campo pra ele tentar de novo
-                    document.getElementById('codigo2fa').focus();
+                    alert("🔒 Acesso Negado: " + await response.text());
+                    document.getElementById('codigo2fa').value = ""; document.getElementById('codigo2fa').focus();
                 }
-            } catch (error) {
-                console.error("Erro:", error);
-                alert("⚠️ Erro de conexão.");
-            } finally {
-                btnSubmit.innerHTML = "Autenticar e Entrar";
-                btnSubmit.disabled = false;
-            }
+            } catch (error) { alert("⚠️ Erro de conexão."); } 
+            finally { btnSubmit.innerHTML = "Autenticar e Entrar"; btnSubmit.disabled = false; }
         }
 
-        // Botão de voltar (caso a pessoa precise corrigir a senha)
         function voltarParaEtapa1() {
             document.getElementById('etapa-2').style.display = 'none';
             document.getElementById('etapa-1').style.display = 'block';
-            document.getElementById('codigo2fa').value = ""; // Limpa o código
+            document.getElementById('codigo2fa').value = ""; 
         }
     </script>
 </body>

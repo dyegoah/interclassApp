@@ -8,21 +8,20 @@ public class PageController {
 
     @GetMapping("/")
     public String index() {
-        return "forward:/index.html";
+        return "forward:/index.html"; // Agora é o Login/2FA
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "forward:/dashboard.html"; // O antigo index agora é o Dashboard
     }
 
     @GetMapping("/setup/modalidades")
-    public String setupModalidades() {
-        return "forward:/setup/modalidades.html";
-    }
+    public String setupModalidades() { return "forward:/setup/modalidades.html"; }
 
     @GetMapping("/setup/torneios")
-    public String setupTorneios() {
-        return "forward:/setup/torneios.html";
-    }
+    public String setupTorneios() { return "forward:/setup/torneios.html"; }
 
     @GetMapping("/setup/calendario")
-    public String setupCalendario() {
-        return "forward:/setup/calendario.html";
-    }
+    public String setupCalendario() { return "forward:/setup/calendario.html"; }
 }
