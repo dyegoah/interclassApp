@@ -221,50 +221,52 @@
             return txt.replace(' (Série de Partidas)', '');
         }
 
-        window.onload = async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            professorIdPublico = urlParams.get('ref');
-            const token = localStorage.getItem('interclassToken');
+		window.onload = async () => {
+		            const urlParams = new URLSearchParams(window.location.search);
+		            professorIdPublico = urlParams.get('ref');
+		            const token = localStorage.getItem('interclassToken');
 
-            if (professorIdPublico) {
-                isModoPublico = true;
-                let profNome = urlParams.get('p') || "Professor Responsável";
-                let escolaNome = urlParams.get('e') || "Escola / Instituição";
+		            if (professorIdPublico) {
+		                isModoPublico = true;
+		                
+		                // 🛡️ TRAVA ANTI-XSS: Sanitização obrigatória de tudo o que vem da URL!
+		                let profNome = HighTechSecurity.sanitizar(urlParams.get('p') || "Professor Responsável");
+		                let escolaNome = HighTechSecurity.sanitizar(urlParams.get('e') || "Escola / Instituição");
 
-                document.getElementById('topbar-placeholder').innerHTML = `
-                    <div style="background: rgba(0,0,0,0.8); padding: 15px; text-align: center; border-bottom: 2px solid var(--theme-primary); border-radius: 10px;">
-                        <h1 style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.5rem; text-shadow: 0 0 10px var(--theme-glow); margin:0;">INTERCLASS APP</h1>
-                        <span style="color:#fff; font-family:'Segoe UI'; font-size:0.8rem; display: block; margin-top: 5px;">Portal do Aluno (Ao Vivo)</span>
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); font-family: 'Segoe UI'; font-size: 0.85rem; color: #ccc; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                            <span>🏫 <b>${escolaNome}</b></span>
-                            <span>👨‍🏫 Prof. <b>${profNome}</b></span>
-                        </div>
-                    </div>
-                `;
-            } else if (token) {
-                isModoPublico = false;
-                fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-                fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
-                document.getElementById('area-compartilhar').style.display = 'block';
-                
-                let storageRel = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                Object.assign(relatoriosSalvos, storageRel);
-            } else {
-                alert("Acesso restrito. Faça o login ou use o link público enviado pelo professor.");
-                window.location.href = '/index.html';
-                return;
-            }
-            
-            try {
-                let urlAlunos = isModoPublico ? `/api/alunos/public/${professorIdPublico}` : '/api/alunos';
-                let headers = isModoPublico ? {} : { 'Authorization': `Bearer ${token}` };
-                const resAlunos = await fetch(urlAlunos, { headers });
-                if (resAlunos.ok) listaAlunosGlobais = await resAlunos.json();
-            } catch (error) { console.warn("Falha ao buscar alunos."); }
+		                document.getElementById('topbar-placeholder').innerHTML = `
+		                    <div style="background: rgba(0,0,0,0.8); padding: 15px; text-align: center; border-bottom: 2px solid var(--theme-primary); border-radius: 10px;">
+		                        <h1 style="color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1.5rem; text-shadow: 0 0 10px var(--theme-glow); margin:0;">INTERCLASS APP</h1>
+		                        <span style="color:#fff; font-family:'Segoe UI'; font-size:0.8rem; display: block; margin-top: 5px;">Portal do Aluno (Ao Vivo)</span>
+		                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); font-family: 'Segoe UI'; font-size: 0.85rem; color: #ccc; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+		                            <span>🏫 <b>${escolaNome}</b></span>
+		                            <span>👨‍🏫 Prof. <b>${profNome}</b></span>
+		                        </div>
+		                    </div>
+		                `;
+		            } else if (token) {
+		                isModoPublico = false;
+		                fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+		                fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+		                document.getElementById('area-compartilhar').style.display = 'block';
+		                
+		                let storageRel = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+		                Object.assign(relatoriosSalvos, storageRel);
+		            } else {
+		                alert("Acesso restrito. Faça o login ou use o link público enviado pelo professor.");
+		                window.location.href = '/index.html';
+		                return;
+		            }
+		            
+		            try {
+		                let urlAlunos = isModoPublico ? `/api/alunos/public/${professorIdPublico}` : '/api/alunos';
+		                let headers = isModoPublico ? {} : { 'Authorization': `Bearer ${token}` };
+		                const resAlunos = await fetch(urlAlunos, { headers });
+		                if (resAlunos.ok) listaAlunosGlobais = await resAlunos.json();
+		            } catch (error) { console.warn("Falha ao buscar alunos."); }
 
-            calcularEstatisticasGlobaisEscola();
-            carregarLotesDaAPI();
-        };
+		            calcularEstatisticasGlobaisEscola();
+		            carregarLotesDaAPI();
+		        };;
 
         // 🔥 CORREÇÃO 1: Impede link com ID numérico falso ou vazio
         function compartilharResumo() {
