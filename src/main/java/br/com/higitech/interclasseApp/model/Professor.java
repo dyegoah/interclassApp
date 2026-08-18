@@ -1,13 +1,14 @@
 package br.com.higitech.interclasseApp.model;
 
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore; // 🚀 IMPORTAÇÃO DA BLINDAGEM
 
 @Entity
 @Table(name = "professores")
@@ -17,7 +18,6 @@ public class Professor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🛡️ CORREÇÃO: Removido o 'updatable = false' para o Java conseguir "curar" as contas antigas
     @Column(name = "hash_publico", unique = true)
     private String hashPublico = UUID.randomUUID().toString();
 
@@ -30,12 +30,16 @@ public class Professor {
     @Column(nullable = false, unique = true)
     private String email;
 
+    // 🛡️ NUNCA envia a senha para a tela (JSON)
+    @JsonIgnore
     @Column(nullable = false, length = 100) 
     private String senha;
 
     @Column(nullable = false)
     private String status = "ativo"; 
 
+    // 🛡️ NUNCA envia a chave 2FA para a tela (JSON)
+    @JsonIgnore
     @Column(name = "chave_2fa")
     private String chave2fa;
 

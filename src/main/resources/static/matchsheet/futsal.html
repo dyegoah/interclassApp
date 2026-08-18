@@ -93,7 +93,7 @@
 
         <div class="placar-board">
             <div class="team-col">
-                <div class="team-name">Equipe A</div>
+                <div class="team-name" id="nome-time-a">Equipe A</div>
                 <div class="team-score score-a" id="score-a">0</div>
                 <div class="faltas-coletivas">
                     Faltas Coletivas: <span id="faltas-text-a">0/5</span>
@@ -106,7 +106,7 @@
             <div style="font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.2);">X</div>
             
             <div class="team-col">
-                <div class="team-name">Equipe B</div>
+                <div class="team-name" id="nome-time-b">Equipe B</div>
                 <div class="team-score score-b" id="score-b">0</div>
                 <div class="faltas-coletivas">
                     Faltas Coletivas: <span id="faltas-text-b">0/5</span>
@@ -149,7 +149,7 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const idJogo = parseInt(urlParams.get('jogo'));
-        const lote = urlParams.get('lote');
+        const lote = urlParams.get('lote') || 'masculino';
         const isReadOnly = urlParams.get('read') === 'true';
 
         let matchAtiva = null;
@@ -163,32 +163,36 @@
         let periodoIndex = 1;
 
         window.onload = async () => {
-            const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-            if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
-
             const token = localStorage.getItem('interclassToken');
 
-            // 🔥 Tenta buscar o jogo na API se não achar no LocalStorage
+            // 🔥 NOVA BUSCA SEGURA VIA LOTE
+            try {
+                let res = await fetch(`/api/jogos/lote/${lote}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    let jogosLote = await res.json();
+                    matchAtiva = jogosLote.find(j => j.id === idJogo);
+                }
+            } catch(e) { console.warn("Súmula em Modo Offline."); }
+
             if (!matchAtiva) {
-                try {
-                    let res = await fetch(`/api/jogos/lote/${lote}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    if (res.ok) {
-                        let jogosLote = await res.json();
-                        matchAtiva = jogosLote.find(j => j.id === idJogo);
-                    }
-                } catch(e) { console.warn("Súmula em Modo Offline."); }
+                const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
             }
 
-            // 🔥 Mock "Anti-Crash": Se nem a API nem o LocalStorage tiverem o jogo, cria um visual vazio para não quebrar a tela
             if(!matchAtiva) {
                 matchAtiva = { id: idJogo, esporte: 'Futsal', titulo: 'Partida', quadra: 'Quadra', icone: '⚽' };
             }
 
-            document.getElementById('match-info').innerHTML = `${matchAtiva.icone} <b>${matchAtiva.esporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
+            let nomeEsporte = matchAtiva.esporte || (matchAtiva.modalidade ? matchAtiva.modalidade.nomeEsporte : "Futsal");
+            let iconeEsporte = matchAtiva.icone || (matchAtiva.modalidade ? matchAtiva.modalidade.icone : "⚽");
+
+            document.getElementById('match-info').innerHTML = `${iconeEsporte} <b>${nomeEsporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
+            document.getElementById('nome-time-a').innerText = matchAtiva.equipeANome || "Equipe A";
+            document.getElementById('nome-time-b').innerText = matchAtiva.equipeBNome || "Equipe B";
 
             if(isReadOnly) {
                 let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, faltas:{A:0,B:0}, escalacao:{A:[],B:[]}, timeline:[] }; // Escudo Anti-Crash
+                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, faltas:{A:0,B:0}, escalacao:{A:[],B:[]}, timeline:[] };
                 placar = rel.placar || {A:0,B:0};
                 faltas = rel.faltas || {A:0,B:0};
                 escalacao = rel.escalacao || {A:[],B:[]};
@@ -231,6 +235,7 @@
             const renderTime = (t, domId) => {
                 let html = '';
                 escalacao[t].forEach(j => {
+                    if(!j.stats) j.stats = [];
                     let st = j.stats.join('');
                     let pointer = isReadOnly ? 'readonly' : '';
                     let click = isReadOnly ? '' : `onclick="abrirModal('${j.id}', '${t}')"`;
@@ -262,6 +267,7 @@
             if(pts === -1) { addPontoEm = timeAcao === 'A' ? 'B' : 'A'; pts = 1; }
             if(pts > 0) placar[addPontoEm] += pts;
             
+            if(!jogadorAcao.stats) jogadorAcao.stats = [];
             jogadorAcao.stats.push(icone);
             addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`);
             fecharModal(); atualizarTela();
@@ -269,6 +275,7 @@
 
         function registrarFalta() {
             faltas[timeAcao]++;
+            if(!jogadorAcao.stats) jogadorAcao.stats = [];
             jogadorAcao.stats.push('🛑');
             addTimeline(`🛑 Falta cometida por ${jogadorAcao.nome}`);
             fecharModal(); atualizarTela();
@@ -303,10 +310,8 @@
             document.getElementById('timeline-lista').innerHTML = html;
         }
 
-        // --- INTEGRAÇÃO API SPRING BOOT ---
         async function finalizarFutsal() {
             if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
-                
                 const token = localStorage.getItem('interclassToken');
 
                 const sumulaFinalizadaDTO = { 
@@ -320,46 +325,34 @@
                 };
 
                 try {
-                    // 🔥 Passo 1: Força o envio direto para a tabela Jogos (Resolve o bug do placar vazio)
                     await fetch(`/api/jogos/${idJogo}`, {
                         method: 'PUT',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` 
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({ status: 'FINALIZADO', placarA: placar.A, placarB: placar.B })
-                    }).catch(e => console.warn("Fallback PUT Jogos ignorado:", e));
+                    }).catch(e => console.warn("Fallback PUT Jogos ignorado"));
 
-                    // 🔥 Passo 2: Rota Dinâmica (remove o localhost hardcoded) e envia a súmula
                     const response = await fetch(`/api/sumulas/${idJogo}/finalizar`, {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` 
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify(sumulaFinalizadaDTO)
                     });
 
-                    // 🔥 Passo 3: Sincroniza o LocalStorage perfeitamente para exibir instantaneamente
                     let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
                     rels[idJogo] = { placar: placar, faltas: faltas, escalacao: escalacao, timeline: timeline, periodoIndex: periodoIndex };
                     localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
 
                     if (response.ok) {
                         alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
-                        window.location.href = '/tabelas.html';
                     } else {
-                        const erroMsg = await response.text();
-                        alert(`⚠️ Erro ao salvar na base de dados: ${erroMsg}`);
-                        window.location.href = '/tabelas.html';
+                        alert(`⚠️ Salvo na memória. Erro do Servidor: ${await response.text()}`);
                     }
+                    window.location.href = '/tabelas.html';
                 } catch (error) {
-                    console.error("Erro de conexão com a API:", error);
-                    alert("🚨 Falha de comunicação com o Servidor. Salvando offline por segurança.");
-                    
+                    console.error("Erro de conexão:", error);
                     let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
                     rels[idJogo] = { placar: placar, faltas: faltas, escalacao: escalacao, timeline: timeline, periodoIndex: periodoIndex };
                     localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+                    alert("🚨 Falha de comunicação com o Servidor. Salvando offline por segurança.");
                     window.location.href = '/tabelas.html';
                 }
             }

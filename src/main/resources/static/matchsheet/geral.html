@@ -159,7 +159,8 @@
     </div>
 
     <script>
-        let jogoId = new URLSearchParams(window.location.search).get('jogo');
+        let jogoId = parseInt(new URLSearchParams(window.location.search).get('jogo'));
+        let lote = new URLSearchParams(window.location.search).get('lote') || 'masculino';
         let modoLeitura = new URLSearchParams(window.location.search).get('read') === 'true';
         
         let placarGlobal = { A: 0, B: 0 };
@@ -172,27 +173,46 @@
         let timerSegundos = 0;
         let isTimerRunning = false;
 
+        // 🔥 LÓGICA DE CARREGAMENTO SEGURO VIA LOTE E DTO 🔥
         window.onload = async () => {
             if (!jogoId) { alert("Partida não encontrada."); return; }
             
+            let jogoEncontrado = null;
+            
             try {
-                // 🔥 SEGURANÇA APLICADA AQUI PARA CARREGAR OS DADOS
                 const token = localStorage.getItem('interclassToken');
-                const resposta = await fetch(`/api/jogos/${jogoId}`, {
+                const resposta = await fetch(`/api/jogos/lote/${lote}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!resposta.ok) throw new Error("Erro de comunicação com a API.");
-                const jogo = await resposta.json();
-                processarDadosDoJogo(jogo);
                 
-                let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                if(rels[jogoId] && rels[jogoId].timeline) {
-                    timelineEventos = rels[jogoId].timeline;
-                    atualizarTimelineDOM();
-                }
+                const todosJogosDoLote = await resposta.json();
+                jogoEncontrado = todosJogosDoLote.find(j => j.id === jogoId);
+                
+                if (!jogoEncontrado) throw new Error("Jogo não encontrado no lote atual.");
+                
             } catch (err) {
-                alert("Falha ao carregar a partida. Verifique a conexão com o servidor Java.");
+                console.error("Erro na busca segura da Súmula:", err);
+                
+                // Fallback Offline Seguro
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                if (calOffline[lote] && calOffline[lote].jogos) {
+                    jogoEncontrado = calOffline[lote].jogos.find(j => j.id === jogoId);
+                }
+            }
+
+            if(!jogoEncontrado) {
+                alert("Falha ao carregar a partida. O jogo não existe ou não pertence a este lote.");
+                return;
+            }
+
+            processarDadosDoJogo(jogoEncontrado);
+            
+            let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+            if(rels[jogoId] && rels[jogoId].timeline) {
+                timelineEventos = rels[jogoId].timeline;
+                atualizarTimelineDOM();
             }
         };
 
@@ -220,12 +240,16 @@
         }
 
         function processarDadosDoJogo(jogo) {
-            document.getElementById('lbl-esporte').innerText = `${jogo.modalidade.icone || ''} ${jogo.modalidade.nomeEsporte} | ${jogo.titulo.split(' | ')[0]}`;
+            // Ajuste para DTO do Java ou Entidade Original do LocalStorage
+            let nomeEsporte = jogo.esporte || (jogo.modalidade ? jogo.modalidade.nomeEsporte : "A Definir");
+            let iconeEsporte = jogo.icone || (jogo.modalidade ? jogo.modalidade.icone : "🏅");
+
+            document.getElementById('lbl-esporte').innerText = `${iconeEsporte} ${nomeEsporte} | ${jogo.titulo.split(' | ')[0]}`;
 
             let confronto = jogo.titulo.split(' | ').length > 1 ? jogo.titulo.split(' | ')[1] : jogo.titulo;
             let lados = confronto.split(' x ');
 
-            // LÊ OS IDS REAIS VINDO DO BANCO DE DADOS
+            // LÊ OS NOMES E IDS QUE VÊM DO DTO
             let equipaA = jogo.equipeANome || "Equipe A";
             let atletaA = jogo.equipeANome || "A Definir";
             let turmaA = "Competidor";
@@ -256,7 +280,7 @@
             colA.innerHTML = ''; colB.innerHTML = '';
 
             let esportesIndividuais = ['Xadrez', 'Tênis de Mesa', 'Dama', 'E-Sports', 'Natação', 'Atletismo'];
-            let isIndividual = esportesIndividuais.includes(jogo.modalidade.nomeEsporte);
+            let isIndividual = esportesIndividuais.includes(nomeEsporte);
 
             if (jogo.escalacoes && jogo.escalacoes.length > 0) {
                 jogo.escalacoes.forEach(esc => {
@@ -294,7 +318,7 @@
             let corEq = equipe === 'A' ? '00f2fe' : 'ff00de';
             let imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=222&color=${corEq}&bold=true`;
             
-            let clickAction = modoLeitura ? '' : `onclick="abrirModalAcoes('${idAtleta}', '${equipe}', '${nome}', '${imgUrl}')"`;
+            let clickAction = modoLeitura ? '' : `onclick="abrirModalAcoes('${idAtleta}', '${equipe}', '${nome.replace(/'/g, "\\'")}', '${imgUrl}')"`;
 
             return `
                 <div class="jogador-card ${classeCard}" ${clickAction}>

@@ -146,8 +146,8 @@
             <p style="font-family:'Segoe UI'; font-size:0.8rem; color:#aaa; text-align:left; margin-bottom:5px; text-transform:uppercase;">Erros (Ponto Adversário)</p>
             <div class="action-grid" style="margin-top: 0; margin-bottom: 15px;">
                 <button class="action-btn btn-erro" onclick="registrar('Erro de Saque', '❌', 'erro')"><span style="font-size:1.5rem;">❌</span> Erro de Saque</button>
-                <button class="action-btn btn-erro" onclick="registrar('Toque/Invasão', '🕸️', 'erro')"><span style="font-size:1.5rem;">🕸️</span> Toque na Rede</button>
-                <button class="action-btn btn-erro" onclick="registrar('Ataque Fora', '⚠️', 'erro')" style="grid-column: span 2;"><span style="font-size:1.5rem;">⚠️</span> Ataque Fora</button>
+                <button class="action-btn btn-erro" onclick="registrar('Toque na Rede / Invasão', '🕸️', 'erro')"><span style="font-size:1.5rem;">🕸️</span> Toque na Rede</button>
+                <button class="action-btn btn-erro" onclick="registrar('Ataque Fora / Erro', '⚠️', 'erro')" style="grid-column: span 2;"><span style="font-size:1.5rem;">⚠️</span> Ataque Fora</button>
             </div>
 
             <div class="action-grid" style="grid-template-columns: 1fr 1fr 1fr;">
@@ -159,40 +159,78 @@
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const idJogo = parseInt(urlParams.get('jogo')) || 999;
-        const lote = urlParams.get('lote') || 'masculino';
-        const isReadOnly = urlParams.get('read') === 'true';
+        let jogoId = parseInt(new URLSearchParams(window.location.search).get('jogo'));
+        let lote = new URLSearchParams(window.location.search).get('lote') || 'masculino';
+        let modoLeitura = new URLSearchParams(window.location.search).get('read') === 'true';
+        
+        let placarGlobal = { A: 0, B: 0 };
+        let pontosAtletas = {}; 
+        let faltasAtletas = {};
+        let jogadorSelecionado = null;
+        let timelineEventos = [];
 
-        let matchAtiva = null;
-        let placar = { A: 0, B: 0 };
+        let timerInterval = null;
+        let timerSegundos = 0;
+        let isTimerRunning = false;
+        
         let setsGanhos = { A: 0, B: 0 };
         let timeoutsUsados = { A: [false], B: [false] }; 
         let escalacao = { A: [], B: [] };
-        let timeline = [];
         
-        let jogadorAcao = null; let timeAcao = null;
+        let timeAcao = null;
         let totalSetsParaVencer = 2; 
         let setAtualIndex = 1; 
 
-        window.onload = () => {
-            const calOficial = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-            if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
+        // 🔥 LÓGICA DE CARREGAMENTO SEGURO VIA LOTE E DTO 🔥
+        window.onload = async () => {
+            if (!jogoId) { alert("Partida não encontrada."); return; }
             
-            if(!matchAtiva) matchAtiva = { id: 999, esporte: 'Vôlei de Areia', titulo: 'Amistoso', quadra: 'Areia', icone: '🏖️' };
+            let jogoEncontrado = null;
+            
+            try {
+                const token = localStorage.getItem('interclassToken');
+                const resposta = await fetch(`/api/jogos/lote/${lote}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-            document.getElementById('match-info').innerHTML = `${matchAtiva.icone} <b>${matchAtiva.esporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
+                if (!resposta.ok) throw new Error("Erro de comunicação com a API.");
+                
+                const todosJogosDoLote = await resposta.json();
+                jogoEncontrado = todosJogosDoLote.find(j => j.id === jogoId);
+                
+                if (!jogoEncontrado) throw new Error("Jogo não encontrado no lote atual.");
+                
+            } catch (err) {
+                console.error("Erro na busca segura da Súmula:", err);
+                
+                // Fallback Offline Seguro
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                if (calOffline[lote] && calOffline[lote].jogos) {
+                    jogoEncontrado = calOffline[lote].jogos.find(j => j.id === jogoId);
+                }
+            }
 
-            if(isReadOnly) {
-                let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                let rel = relatorios[idJogo] || { placar:{A:0,B:0}, setsGanhos:{A:0,B:0}, setAtualIndex:0, escalacao:{A:[],B:[]}, timeline:[] };
-                placar = rel.placar; setsGanhos = rel.setsGanhos; escalacao = rel.escalacao; timeline = rel.timeline; setAtualIndex = rel.setAtualIndex;
+            if(!jogoEncontrado) {
+                alert("Falha ao carregar a partida. O jogo não existe ou não pertence a este lote.");
+                return;
+            }
+
+            processarDadosDoJogo(jogoEncontrado);
+            
+            if(modoLeitura) {
+                let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                let rel = rels[jogoId] || { placar:{A:0,B:0}, setsGanhos:{A:0,B:0}, setAtualIndex:0, escalacao:{A:[],B:[]}, timeline:[] };
+                placarGlobal = rel.placar || {A:0, B:0};
+                setsGanhos = rel.setsGanhos || {A:0,B:0};
+                escalacao = rel.escalacao || {A:[],B:[]};
+                timelineEventos = rel.timeline || [];
+                setAtualIndex = rel.setAtualIndex || 0;
                 
                 document.getElementById('btn-finalizar').style.display = 'none';
                 document.getElementById('box-timeouts-a').style.display = 'none';
                 document.getElementById('box-timeouts-b').style.display = 'none';
                 document.getElementById('timeline-container').style.display = 'block';
-                renderTimeline(); atualizarPlacarVisual(true);
+                atualizarTimelineDOM(); atualizarPlacarVisual(true);
             } else {
                 escalarMockAreia(); atualizarPlacarVisual();
             }
@@ -205,17 +243,16 @@
                 escalacao.A.push({ id: 'A'+i, numero: i+1, nome: nomes[i], foto: `https://i.pravatar.cc/150?img=${i+10}`, stats: [] });
                 escalacao.B.push({ id: 'B'+i, numero: i+1, nome: nomes[i+2] || 'Atleta B', foto: `https://i.pravatar.cc/150?img=${i+20}`, stats: [] });
             }
-            document.getElementById('placar-nome-a').textContent = `Dupla A`; document.getElementById('placar-nome-b').textContent = `Dupla B`;
         }
 
         function checarFimDeSet() {
             let ptsParaVencer = (setAtualIndex === (totalSetsParaVencer * 2 - 1)) ? 15 : 21; 
-            let venceuA = placar.A >= ptsParaVencer && (placar.A - placar.B) >= 2;
-            let venceuB = placar.B >= ptsParaVencer && (placar.B - placar.A) >= 2;
+            let venceuA = placarGlobal.A >= ptsParaVencer && (placarGlobal.A - placarGlobal.B) >= 2;
+            let venceuB = placarGlobal.B >= ptsParaVencer && (placarGlobal.B - placarGlobal.A) >= 2;
 
             if(venceuA || venceuB) {
                 let timeVencedor = venceuA ? 'A' : 'B';
-                addTimeline(`🏆 FIM DO ${setAtualIndex}º SET! Vitória da Dupla ${timeVencedor} por ${placar.A} x ${placar.B}`);
+                timelineEventos.push({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `🏆 FIM DO ${setAtualIndex}º SET! Vitória da Dupla ${timeVencedor} por ${placarGlobal.A} x ${placarGlobal.B}`});
                 setsGanhos[timeVencedor]++;
                 
                 if(setsGanhos[timeVencedor] === totalSetsParaVencer) {
@@ -223,7 +260,7 @@
                     finalizarPartida();
                 } else {
                     alert(`Fim do ${setAtualIndex}º Set! Vitória da Dupla ${timeVencedor}.\nAs duplas trocarão de lado.`);
-                    placar.A = 0; placar.B = 0; timeoutsUsados = { A: [false], B: [false] };
+                    placarGlobal.A = 0; placarGlobal.B = 0; timeoutsUsados = { A: [false], B: [false] };
                     setAtualIndex++; atualizarPlacarVisual();
                 }
                 return true;
@@ -232,8 +269,8 @@
         }
 
         function atualizarPlacarVisual(leitura = false) {
-            document.getElementById('score-a').textContent = placar.A;
-            document.getElementById('score-b').textContent = placar.B;
+            document.getElementById('score-a').textContent = placarGlobal.A;
+            document.getElementById('score-b').textContent = placarGlobal.B;
 
             let isTieBreak = setAtualIndex === (totalSetsParaVencer * 2 - 1);
             document.getElementById('set-atual-lbl').innerHTML = isTieBreak ? `🔥 TIE-BREAK` : `${setAtualIndex}º SET`;
@@ -258,8 +295,42 @@
             if(timeoutsUsados[time][index]) return; 
             if(confirm(`Confirmar Pedido de Tempo (30s) para a Dupla ${time}?`)) {
                 timeoutsUsados[time][index] = true;
-                addTimeline(`⏱️ TEMPO TÉCNICO: Solicitado pela Dupla ${time}.`); atualizarPlacarVisual();
+                timelineEventos.push({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `⏱️ TEMPO TÉCNICO: Solicitado pela Dupla ${time}.`});
+                atualizarPlacarVisual();
             }
+        }
+
+        function processarDadosDoJogo(jogo) {
+            let nomeEsporte = jogo.esporte || (jogo.modalidade ? jogo.modalidade.nomeEsporte : "A Definir");
+            let iconeEsporte = jogo.icone || (jogo.modalidade ? jogo.modalidade.icone : "🏅");
+            
+            document.getElementById('lbl-esporte').innerText = `${iconeEsporte} ${nomeEsporte} | ${jogo.titulo.split(' | ')[0]}`;
+
+            let confronto = jogo.titulo.split(' | ').length > 1 ? jogo.titulo.split(' | ')[1] : jogo.titulo;
+            let lados = confronto.split(' x ');
+
+            let equipaA = jogo.equipeANome || "Equipe A";
+            let atletaA = jogo.equipeANome || "A Definir";
+            let turmaA = "Competidor";
+            let idAtletaA = jogo.equipeAId || "ID_FANTASMA_A";
+
+            if (lados[0] && lados[0].includes('(')) {
+                turmaA = lados[0].split('(')[0].trim();
+                atletaA = lados[0].split('(')[1].replace(')', '').trim();
+            }
+
+            let equipaB = jogo.equipeBNome || "Equipe B";
+            let atletaB = jogo.equipeBNome || "A Definir";
+            let turmaB = "Competidor";
+            let idAtletaB = jogo.equipeBId || "ID_FANTASMA_B";
+
+            if (lados[1] && lados[1].includes('(')) {
+                turmaB = lados[1].split('(')[0].trim();
+                atletaB = lados[1].split('(')[1].replace(')', '').trim();
+            }
+
+            document.getElementById('placar-nome-a').innerText = equipaA;
+            document.getElementById('placar-nome-b').innerText = equipaB;
         }
 
         function renderizarListas() {
@@ -272,7 +343,7 @@
                     for(let icone in contagemStats) statsHtml += `<span class="stat-pill">${icone} <b>${contagemStats[icone]}</b></span>`;
 
                     let pointer = isReadOnly ? 'readonly' : '';
-                    let click = isReadOnly ? '' : `onclick="abrirModal('${j.id}', '${t}')"`;
+                    let click = isReadOnly ? '' : `onclick="abrirModalAcoes('${j.id}', '${t}', '${j.nome}', '${j.foto}')"`;
                     
                     html += `
                         <div class="player-row ${pointer}" ${click}>
@@ -290,103 +361,95 @@
             renderTime('A', 'lista-a'); renderTime('B', 'lista-b');
         }
 
-        function abrirModal(id, t) {
-            jogadorAcao = escalacao[t].find(j => j.id === id); timeAcao = t;
-            document.getElementById('acao-foto').src = jogadorAcao.foto;
-            document.getElementById('acao-nome').textContent = jogadorAcao.nome;
-            document.getElementById('acao-num').textContent = `Atleta ${jogadorAcao.numero}`;
+        function abrirModalAcoes(idAtleta, equipe, nome, imgUrl) {
+            jogadorSelecionado = { id: idAtleta, equipe: equipe, nome: nome };
+            timeAcao = equipe;
+            document.getElementById('acao-foto').src = imgUrl;
+            document.getElementById('acao-nome').innerText = nome;
             document.getElementById('modal-acao').style.display = 'flex';
         }
-        function fecharModal() { document.getElementById('modal-acao').style.display = 'none'; }
+
+        function fecharModal() {
+            document.getElementById('modal-acao').style.display = 'none';
+            jogadorSelecionado = null;
+        }
 
         function registrar(nome, icone, tipoAcao) {
+            if(!jogadorSelecionado) return;
+            
+            let eq = timeAcao;
+            let id = jogadorSelecionado.id;
+            let nomeAtleta = jogadorSelecionado.nome;
+            
             let timeRecebePonto = null;
-            if (tipoAcao === 'ponto') timeRecebePonto = timeAcao; 
-            else if (tipoAcao === 'erro') timeRecebePonto = timeAcao === 'A' ? 'B' : 'A'; 
-            else if (tipoAcao === 'punicao') { timeRecebePonto = timeAcao === 'A' ? 'B' : 'A'; alert("🟥 Cartão Vermelho na Areia é ponto e saque para o adversário!"); }
+            if (tipoAcao === 'ponto') timeRecebePonto = eq; 
+            else if (tipoAcao === 'erro') timeRecebePonto = eq === 'A' ? 'B' : 'A'; 
+            else if (tipoAcao === 'punicao') { timeRecebePonto = eq === 'A' ? 'B' : 'A'; alert("🟥 Cartão Vermelho na Areia é ponto e saque para o adversário!"); }
 
-            if (timeRecebePonto) placar[timeRecebePonto]++;
-            if(!jogadorAcao.stats) jogadorAcao.stats = [];
-            jogadorAcao.stats.push(icone);
+            if (timeRecebePonto) placarGlobal[timeRecebePonto]++;
+            
+            let jAcao = escalacao[eq].find(j => j.id === id);
+            if(!jAcao.stats) jAcao.stats = [];
+            jAcao.stats.push(icone);
 
-            addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`);
-            fecharModal(); atualizarPlacarVisual(); renderizarListas(); checarFimDeSet();
+            timelineEventos.unshift({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `${icone} ${nome}: ${nomeAtleta}` });
+            
+            fecharModal(); atualizarPlacarVisual(); renderizarListas(); atualizarTimelineDOM(); checarFimDeSet();
         }
 
-        function addTimeline(txt) { timeline.push({ set: setAtualIndex, placarStr: `${placar.A}x${placar.B}`, txt: txt }); }
-        
-        function renderTimeline() {
-            let html = '';
-            timeline.forEach(t => { html += `<div class="timeline-item"><span class="timeline-time">[Set ${t.set} | ${t.placarStr}]</span> <div style="flex-grow:1;">${t.txt}</div></div>`; });
-            document.getElementById('timeline-lista').innerHTML = html;
+        function atualizarTimelineDOM() {
+            const list = document.getElementById('timeline-lista');
+            if(timelineEventos.length === 0) return;
+            
+            list.innerHTML = '';
+            timelineEventos.forEach(t => {
+                list.innerHTML += `
+                    <div class="timeline-item">
+                        <span class="timeline-time">[Set ${t.set} | ${t.placarStr}]</span> 
+                        <div style="flex-grow:1;">${t.txt}</div>
+                    </div>
+                `;
+            });
         }
 
-        // --- INTEGRAÇÃO API SPRING BOOT ---
-        async function finalizarPartida() {
-            if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
-                
-                const token = localStorage.getItem('interclassToken'); 
-                
-                // 🔥 INTELIGÊNCIA DE PLACAR: Resolve o problema do 0 x 0
-                // Se algum set foi fechado, manda os sets como placar (Ex: 1 x 0). 
-                // Se nenhum set fechou, manda os pontos do placar atual (Ex: 15 x 12).
-                let placarFinalA = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.A : placar.A;
-                let placarFinalB = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.B : placar.B;
-                
-                const sumulaFinalizadaDTO = { 
-                    status: 'FINALIZADO',     
-                    placarA: placarFinalA,    
-                    placarB: placarFinalB,    
-                    placar: {A: placarFinalA, B: placarFinalB}, 
-                    periodoIndex: setAtualIndex, 
-                    escalacao: escalacao, 
-                    timeline: timeline 
-                };
+        async function enviarSumulaParaBanco() {
+            if (!confirm(`Encerrar a partida com o placar final de ${placarGlobal.A} x ${placarGlobal.B}?`)) return;
 
-                try {
-                    // 🔥 PASSO 1: Força um PUT direto na tabela Jogos para garantir que o PostgreSQL atualize o Placar do Card
-                    await fetch(`/api/jogos/${idJogo}`, {
-                        method: 'PUT',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` 
-                        },
-                        body: JSON.stringify({ status: 'FINALIZADO', placarA: placarFinalA, placarB: placarFinalB })
-                    }).catch(e => console.warn("Fallback PUT Jogos ignorado:", e));
+            const btn = document.getElementById('btn-finalizar');
+            btn.disabled = true;
+            btn.innerText = "Processando no Servidor...";
 
-                    // 🔥 PASSO 2: Salva o JSON completo da Súmula do Vôlei
-                    const response = await fetch(`/api/sumulas/${idJogo}/finalizar`, {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` 
-                        },
-                        body: JSON.stringify(sumulaFinalizadaDTO)
-                    });
+            let placarFinalA = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.A : placarGlobal.A;
+            let placarFinalB = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.B : placarGlobal.B;
 
-                    // 🔥 PASSO 3: Garante o LocalStorage idêntico ao Banco para exibir instantaneamente
-                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                    rels[idJogo] = { placar: {A: placarFinalA, B: placarFinalB}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
-                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
+            try {
+                const token = localStorage.getItem('interclassToken');
+                await fetch(`/api/jogos/${jogoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: 'FINALIZADO', placarA: placarFinalA, placarB: placarFinalB })
+                }).catch(e => console.warn("Fallback PUT Jogos ignorado"));
 
-                    if (response.ok) {
-                        alert("🏆 Súmula e Placar gravados com sucesso no Servidor Oficial!");
-                    } else {
-                        const erroMsg = await response.text();
-                        alert(`⚠️ Salvo na memória. Aviso do servidor: ${erroMsg}`);
-                    }
+                const resposta = await fetch(`/api/sumulas/${jogoId}/finalizar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ placarA: placarFinalA, placarB: placarFinalB })
+                });
+
+                if (resposta.ok) {
+                    let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                    relatorios[jogoId] = { placar: { A: placarFinalA, B: placarFinalB }, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timelineEventos };
+                    localStorage.setItem('relatoriosPartidas', JSON.stringify(relatorios));
+
+                    alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
                     window.location.href = '/tabelas.html';
-
-                } catch (error) {
-                    console.error("Erro de conexão com a API:", error);
-                    
-                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                    rels[idJogo] = { placar: {A: placarFinalA, B: placarFinalB}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timeline };
-                    localStorage.setItem('relatoriosPartidas', JSON.stringify(rels));
-                    
-                    alert("🚨 Salvo offline por segurança com o placar atualizado.");
-                    window.location.href = '/tabelas.html';
+                } else {
+                    throw new Error("Erro no servidor Java.");
                 }
+            } catch (erro) {
+                alert("Falha de conexão com o banco. Verifique o console do Spring Tools Suite.");
+                btn.disabled = false;
+                btn.innerText = "Tentar Novamente";
             }
         }
     </script>

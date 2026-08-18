@@ -152,6 +152,18 @@
             return { A: parseInt(pA) || 0, B: parseInt(pB) || 0 };
         }
 
+        // 🔥 CORREÇÃO: Lê o nome do esporte corretamente se ele vier encapsulado em objeto (do DTO do Java ou LocalStorage)
+        function extrairEsporteNomeSeguro(j) {
+            if(j.esporte && typeof j.esporte === 'string') return j.esporte;
+            if(j.modalidade && j.modalidade.nomeEsporte) return j.modalidade.nomeEsporte;
+            return "A Definir";
+        }
+        function extrairEsporteIconeSeguro(j) {
+            if(j.icone && typeof j.icone === 'string') return j.icone;
+            if(j.modalidade && j.modalidade.icone) return j.modalidade.icone;
+            return "🏅";
+        }
+
         window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
@@ -213,20 +225,26 @@
 
             try {
                 const token = localStorage.getItem('interclassToken');
+                
+                // 🔥 Usa a rota PRIVADA segura que devolve todos os dados para o Admin Dono
                 const response = await fetch(`/api/jogos/lote/${genero}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
-                // 🚨 FIM DO LOOP: Agora o PlayHub também direciona para a raiz (index.html de login)
                 if (response.status === 403 || response.status === 401) {
                     alert("A sua sessão expirou. Por favor, faça o login novamente.");
-                    window.location.href = '/'; return;
+                    window.location.href = '/index.html'; return;
                 }
                 if (!response.ok) throw new Error(`Falha API - Status: ${response.status}`);
                 
                 const jogos = await response.json(); 
                 if (jogos.length === 0) throw new Error('Banco de dados vazio.');
                 
+                // Grava o fallback mais recente para modo offline!
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                calOffline[genero] = { jogos: jogos };
+                localStorage.setItem('calendariosOficiais', JSON.stringify(calOffline));
+
                 renderizarJogosEmAcordeao(jogos, genero, false);
             } catch (error) {
                 console.error("Erro ao buscar jogos do banco:", error);
@@ -247,14 +265,9 @@
             if (isOffline) {
                 container.innerHTML += `
                     <div style="background: rgba(255,0,0,0.1); border: 1px dashed #ff0055; color: #ffccdd; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 0.85rem; font-family: 'Segoe UI';">
-                        ⚠️ <b>SISTEMA EM MODO OFFLINE:</b> Falha na comunicação com o servidor. Estamos exibindo a última versão salva no seu navegador. Os últimos placares podem não aparecer até a conexão normalizar.
+                        ⚠️ <b>SISTEMA EM MODO OFFLINE:</b> Falha na comunicação com o servidor. Exibindo dados do cache local.
                     </div>
                 `;
-            }
-
-            if (!todosJogos || todosJogos.length === 0) {
-                container.innerHTML += `<p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 50px;">Nenhum torneio gerado para a categoria ${genero}. Vá para Gestão de Alunos para criar um.</p>`;
-                return;
             }
 
             const ordemFases = { "FINAL": 4, "SEMIFINAL": 3, "QUARTAS": 2, "CLASSIFICATÓRIA": 1, "GRUPO": 1 };
@@ -264,13 +277,12 @@
                 let diaB = b.diaId || b.dataJogo || "0";
                 if (diaA !== diaB) return diaA.localeCompare(diaB);
 
-                let horaA = a.hora || "00:00";
-                let horaB = b.hora || "00:00";
+                let horaA = a.hora || a.horario || "00:00";
+                let horaB = b.hora || b.horario || "00:00";
                 if (horaA !== horaB) return horaA.localeCompare(horaB);
 
                 let tituloA = (a.titulo || "").toUpperCase();
                 let tituloB = (b.titulo || "").toUpperCase();
-                
                 const faseA = ordemFases[Object.keys(ordemFases).find(f => tituloA.includes(f))] || 0;
                 const faseB = ordemFases[Object.keys(ordemFases).find(f => tituloB.includes(f))] || 0;
                 return faseA - faseB;
@@ -278,8 +290,11 @@
 
             let torneios = {};
             todosJogos.forEach(jogo => {
-                if(!torneios[jogo.esporte]) torneios[jogo.esporte] = { icone: jogo.icone, jogos: [] };
-                torneios[jogo.esporte].jogos.push(jogo);
+                // 🔥 Usa o extrator seguro!
+                let eNome = extrairEsporteNomeSeguro(jogo);
+                let eIcon = extrairEsporteIconeSeguro(jogo);
+                if(!torneios[eNome]) torneios[eNome] = { icone: eIcon, jogos: [] };
+                torneios[eNome].jogos.push(jogo);
             });
 
             let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
@@ -320,6 +335,7 @@
                     let placares = obterPlacarSeguro(relatorio, jogo);
                     let placarAExibicao = placares.A;
                     let placarBExibicao = placares.B;
+                    let hor = jogo.hora || jogo.horario || '--:--';
 
                     if (relatorio || jogo.status === 'FINALIZADO') {
                         jogosConcluidos++;
@@ -327,7 +343,7 @@
                             <div class="playhub-card" style="border-left: 4px solid #555; background: rgba(0,0,0,0.6);">
                                 <div class="play-hora">
                                     <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
-                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${jogo.hora || '--:--'}</span>
+                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
                                     <span style="font-size:0.75rem; color: var(--theme-primary);">${dataCurta}</span>
                                 </div>
                                 <div class="play-info">
@@ -341,14 +357,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
+                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
                             </div>
                         `;
                     } else {
                         htmlJogosAgenda += `
                             <div class="playhub-card" style="border-left: 4px solid ${corTema};">
                                 <div class="play-hora">
-                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${jogo.hora || '--:--'}</span>
+                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
                                     <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corTema};">${dataCurta}</span>
                                 </div>
                                 <div class="play-info">
@@ -356,7 +372,7 @@
                                     <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${confrontoStr}</p>
                                     <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra || 'A Definir'}</p>
                                 </div>
-                                <button class="btn-play" onclick="abrirSaaS('${jogo.esporte}', ${jogo.id}, '${genero}', false)">▶️ SÚMULA</button>
+                                <button class="btn-play" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">▶️ SÚMULA</button>
                             </div>
                         `;
                     }

@@ -1,15 +1,9 @@
 package br.com.higitech.interclasseApp.model;
 
+import jakarta.persistence.*;
 import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore; // 🚀 IMPORTAÇÃO
 
 @Entity
 @Table(name = "alunos")
@@ -19,7 +13,6 @@ public class Aluno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🛡️ Hash Público do Aluno
     @Column(name = "hash_publico", unique = true, updatable = false)
     private String hashPublico = UUID.randomUUID().toString();
 
@@ -29,6 +22,8 @@ public class Aluno {
     @Column
     private String turma;
 
+    // 🛡️ CORTA O VAZAMENTO E DEIXA A LISTA MAIS RÁPIDA
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = false)
     private Professor professor;
