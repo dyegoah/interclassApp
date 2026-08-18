@@ -9,10 +9,8 @@ import br.com.higitech.interclasseApp.model.Professor;
 
 @Repository
 public interface ProfessorRepository extends JpaRepository<Professor, Long> {
-    
-    // O Spring faz a mágica aqui. Se um hacker digitar "' OR 1=1" no email, 
-    // o JPA trata isso como texto puro, bloqueando o SQL Injection instantaneamente!
     Optional<Professor> findByEmail(String email);
     
-    boolean existsByEmail(String email);
+    // 🛡️ Busca pelo Link Criptografado
+    Optional<Professor> findByHashPublico(String hashPublico);
 }

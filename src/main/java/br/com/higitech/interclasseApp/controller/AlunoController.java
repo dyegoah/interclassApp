@@ -31,34 +31,29 @@ public class AlunoController {
     @Autowired
     private ProfessorRepository professorRepository;
 
-    // =========================================================
-    // 🛡️ DTO: Evita vazar dados sensíveis na rota pública
-    // =========================================================
+    // 🛡️ DTO Blindado com Hash
     public static class AlunoPublicoDTO {
-        public Long id;
+        public String hash;
         public String nome;
         
         public AlunoPublicoDTO(Aluno aluno) {
-            this.id = aluno.getId();
+            this.hash = aluno.getHashPublico();
             this.nome = aluno.getNome();
         }
     }
 
-    // =========================================================
-    // 🔓 ROTA PÚBLICA BLINDADA: Aluno se cadastra pelo celular
-    // =========================================================
-    @PostMapping("/public/{professorId}")
-    public ResponseEntity<?> inscreverAluno(@PathVariable Long professorId, @RequestBody Aluno novoAluno) {
+    // 🔓 ROTA PÚBLICA TOTALMENTE BLINDADA: Usa HASH em vez de ID 1, 2, 3...
+    @PostMapping("/public/{professorHash}")
+    public ResponseEntity<?> inscreverAluno(@PathVariable String professorHash, @RequestBody Aluno novoAluno) {
         
-        // 🛡️ TRAVA ANTI-SPAM: Impede nomes vazios, muito curtos ou gigantes
         if(novoAluno.getNome() == null || novoAluno.getNome().trim().length() < 3 || novoAluno.getNome().length() > 50) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
         
-        // 🛡️ PROTEÇÃO XSS: Limpa tags HTML (hacker) do nome do aluno
         novoAluno.setNome(novoAluno.getNome().replaceAll("<[^>]*>", ""));
         
-        Optional<Professor> profOpt = professorRepository.findById(professorId);
+        // Busca a escola pela chave encriptada
+        Optional<Professor> profOpt = professorRepository.findByHashPublico(professorHash);
         if (profOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Escola não encontrada. Link inválido.");
         }
@@ -69,46 +64,34 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição realizada com sucesso!");
     }
 
-    // =========================================================
-    // 🔒 ROTA PRIVADA: Professor lista os seus próprios alunos
-    // =========================================================
+    // 🔓 LISTAGEM PÚBLICA (Alunos matriculados)
+    @GetMapping("/public/{professorHash}")
+    public ResponseEntity<?> listarAlunosPublico(@PathVariable String professorHash) {
+        try {
+            List<Aluno> alunos = alunoRepository.findByProfessorHashPublico(professorHash);
+            List<AlunoPublicoDTO> alunosSeguros = alunos.stream().map(AlunoPublicoDTO::new).collect(Collectors.toList());
+            return ResponseEntity.ok(alunosSeguros);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro interno no servidor.");
+        }
+    }
+
+    // 🔒 PRIVADA: Professor lista os seus
     @GetMapping
     public ResponseEntity<List<Aluno>> listarMeusAlunos(@AuthenticationPrincipal Professor professorLogado) {
         List<Aluno> meusAlunos = alunoRepository.findByProfessorId(professorLogado.getId());
         return ResponseEntity.ok(meusAlunos);
     }
 
-    // =========================================================
-    // 🔒 ROTA PRIVADA: Professor exclui um aluno
-    // =========================================================
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluirAluno(@PathVariable Long id, @AuthenticationPrincipal Professor professorLogado) {
-        Optional<Aluno> alunoOpt = alunoRepository.findById(id);
+    // 🔒 PRIVADA: Exclui através do Hash Público do Aluno
+    @DeleteMapping("/{hashAluno}")
+    public ResponseEntity<?> excluirAluno(@PathVariable String hashAluno, @AuthenticationPrincipal Professor professorLogado) {
+        Optional<Aluno> alunoOpt = alunoRepository.findByHashPublico(hashAluno);
         
         if (alunoOpt.isPresent() && alunoOpt.get().getProfessor().getId().equals(professorLogado.getId())) {
-            alunoRepository.deleteById(id);
+            alunoRepository.delete(alunoOpt.get());
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para excluir este aluno.");
-    }
-    
-    // =========================================================
-    // 🔓 ROTA PÚBLICA BLINDADA: Retorna apenas o ID e Nome (DTO)
-    // =========================================================
-    @GetMapping("/public/{professorId}")
-    public ResponseEntity<?> listarAlunosPublico(@PathVariable Long professorId) {
-        try {
-            List<Aluno> alunos = alunoRepository.findByProfessorId(professorId);
-            
-            // Converte a lista crua do banco para a lista segura (apenas ID e Nome)
-            List<AlunoPublicoDTO> alunosSeguros = alunos.stream()
-                .map(AlunoPublicoDTO::new)
-                .collect(Collectors.toList());
-                
-            return ResponseEntity.ok(alunosSeguros);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Erro interno no servidor.");
-        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
     }
 }

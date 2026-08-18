@@ -32,7 +32,6 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
-    // Regex de validação de e-mail estrito
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public static class LoginRequest {
@@ -68,7 +67,6 @@ public class AuthController {
                 if (loginRequest.codigo2fa == null || loginRequest.codigo2fa.trim().isEmpty()) {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código 2FA é obrigatório para contas Master!");
                 }
-                
                 Totp totp = new Totp(professor.getChave2fa());
                 if (!totp.verify(loginRequest.codigo2fa)) {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código 2FA Inválido ou Expirado!");
@@ -79,6 +77,7 @@ public class AuthController {
 
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("id", professor.getId());
+            resposta.put("hash", professor.getHashPublico()); // 🛡️ Devolve o HASH para criação do link público
             resposta.put("nome", professor.getNome());
             resposta.put("escola", professor.getEscola());
             resposta.put("token", tokenReal); 
@@ -91,31 +90,23 @@ public class AuthController {
 
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarProfessor(@RequestBody RegistroRequest request) {
-        
-        // 🛡️ TRAVAS DE SEGURANÇA BACKEND (Defesa em Profundidade)
         if (request.nome == null || request.nome.trim().length() < 3 || request.nome.length() > 50) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O nome deve ter entre 3 e 50 caracteres.");
         }
-        
         if (request.escola == null || request.escola.trim().length() < 3 || request.escola.length() > 60) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O nome da escola deve ter entre 3 e 60 caracteres.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A escola deve ter entre 3 e 60 caracteres.");
         }
-        
         if (request.senha == null || request.senha.length() < 6 || request.senha.length() > 20) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A senha deve ter entre 6 e 20 caracteres.");
         }
-        
         if (request.email == null || !Pattern.compile(EMAIL_PATTERN).matcher(request.email).matches()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de e-mail inválido.");
         }
-
-        // Verifica se o e-mail já existe no banco
         if (professorRepository.findByEmail(request.email).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este e-mail já está em uso no sistema.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este e-mail já está em uso.");
         }
 
         Professor novoProfessor = new Professor();
-        // Limpa possíveis injeções de HTML/Scripts nos textos (XSS)
         novoProfessor.setNome(request.nome.replaceAll("<[^>]*>", "").trim());
         novoProfessor.setEscola(request.escola.replaceAll("<[^>]*>", "").trim());
         novoProfessor.setEmail(request.email.trim().toLowerCase());

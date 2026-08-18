@@ -121,7 +121,7 @@
                 if (response.ok) {
                     const dados = await response.json();
                     localStorage.setItem('interclassToken', dados.token);
-                    localStorage.setItem('profId', dados.id);
+                    localStorage.setItem('profId', dados.hash);
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
                     
@@ -173,7 +173,7 @@
                 if (response.ok) {
                     const dados = await response.json();
                     localStorage.setItem('interclassToken', dados.token);
-                    localStorage.setItem('profId', dados.id);
+                    localStorage.setItem('profId', dados.hash);
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
                     
