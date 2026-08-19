@@ -23,6 +23,9 @@
 
             <div id="user-dropdown" class="glass-dropdown" style="display: none;">
                 <ul>
+                    <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-reset-sistema').style.display='flex';">
+                        <span style="color: #ff0055;">⚠️</span> <span style="color: #ffccdd;">Zerar Temporada</span>
+                    </li>
                     
                     <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-pix-assinatura').style.display='flex';" style="flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 15px; padding-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
@@ -42,9 +45,6 @@
                             <a href="mailto:fut_sumula_pro@hotmail.com" title="Enviar E-mail" class="social-icon">📧</a>
                         </div>
                     </li>
-                    <li onclick="document.getElementById('modal-reset-sistema').style.display='flex';">
-                        <span style="color: #ff0055;">⚠️</span> <span style="color: #ffccdd;">Zerar Temporada</span>
-                    </li>
                     
                     <li onclick="if(confirm('Deseja realmente sair da plataforma?')) { localStorage.clear(); window.location.href = '/index.html'; }" class="logout-btn">
                         <span>🚪</span> Sair
@@ -55,6 +55,7 @@
         </div>
     </div>
 
+    <!-- 🔥 O CÉREBRO OCULTO: Executa o JS ignorando o bloqueio do innerHTML 🔥 -->
     <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none;" onload="
         try {
             let nomeProf = localStorage.getItem('profNome');
@@ -66,7 +67,53 @@
                 document.getElementById('escola-nome-top').textContent = 'Colégio Interclass';
                 document.getElementById('nome-professor-top').textContent = 'Sessão Expirada';
             }
-        } catch(e) {}
+
+            // 🚀 INJETAMOS A FUNÇÃO DE RESET NO OBJETO WINDOW PARA ELA FUNCIONAR GLOBALMENTE
+            window.executarResetDeTemporada = async function() {
+                let confirmacao = prompt('Tem certeza absoluta?\\nDigite ZERAR na caixa abaixo para confirmar a destruição de todos os dados do torneio:');
+                if(confirmacao !== 'ZERAR' && confirmacao !== 'zerar') {
+                    alert('Ação cancelada de forma segura.'); return;
+                }
+
+                const btn = document.getElementById('btn-executar-reset');
+                btn.innerHTML = '⏳ Varrendo Banco...'; btn.disabled = true;
+
+                const token = localStorage.getItem('interclassToken');
+
+                try {
+                    const resposta = await fetch('/api/setup/reset', {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if(resposta.ok) {
+                        // Preserva o Login da conta, mas tritura todo o cache local e configurações
+                        const t = localStorage.getItem('interclassToken');
+                        const pid = localStorage.getItem('profId');
+                        const pNome = localStorage.getItem('profNome');
+                        const pEscola = localStorage.getItem('profEscola');
+                        const isM = localStorage.getItem('isMasterAdmin');
+
+                        localStorage.clear();
+
+                        localStorage.setItem('interclassToken', t);
+                        localStorage.setItem('profId', pid);
+                        localStorage.setItem('profNome', pNome);
+                        localStorage.setItem('profEscola', pEscola);
+                        if(isM) localStorage.setItem('isMasterAdmin', isM);
+
+                        alert('♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado. Bem-vindo à nova Temporada Interclass!');
+                        window.location.href = '/dashboard.html';
+                    } else {
+                        alert('Erro ao tentar limpar a base de dados. Tente novamente mais tarde.');
+                        btn.innerHTML = 'Sim, Apagar Tudo'; btn.disabled = false;
+                    }
+                } catch(e) {
+                    alert('Erro de conexão. Verifique o servidor.');
+                    btn.innerHTML = 'Sim, Apagar Tudo'; btn.disabled = false;
+                }
+            };
+        } catch(e) { console.error('Erro na barra superior:', e); }
     ">
 </header>
 
@@ -85,13 +132,13 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button id="btn-executar-reset" onclick="executarResetDeTemporada()" class="btn-acao-pix" style="background: #ff0055; color: #fff; box-shadow: 0 0 20px rgba(255,0,85,0.4);">Sim, Apagar Tudo</button>
+            <button id="btn-executar-reset" onclick="window.executarResetDeTemporada()" class="btn-acao-pix" style="background: #ff0055; color: #fff; box-shadow: 0 0 20px rgba(255,0,85,0.4);">Sim, Apagar Tudo</button>
             <button onclick="document.getElementById('modal-reset-sistema').style.display='none';" class="btn-acao-pix" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; box-shadow: none;">Cancelar</button>
         </div>
     </div>
 </div>
 
-<!-- Modal PIX (Omitido para manter focado) -->
+<!-- Modal PIX (Omitido para manter focado, código já existente) -->
 <div id="modal-pix-assinatura" class="modal-overlay-pix" style="display: none;">
     <div class="modal-box-pix glass">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -110,54 +157,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    // 🔥 LÓGICA DO RESET COMPLETO DA TEMPORADA 🔥
-    async function executarResetDeTemporada() {
-        let confirmacao = prompt("Tem certeza absoluta?\nDigite ZERAR na caixa abaixo para confirmar a destruição de todos os dados do torneio:");
-        if(confirmacao !== "ZERAR" && confirmacao !== "zerar") {
-            alert("Ação cancelada de forma segura."); return;
-        }
-
-        const btn = document.getElementById('btn-executar-reset');
-        btn.innerHTML = "⏳ Varrendo Banco..."; btn.disabled = true;
-
-        const token = localStorage.getItem('interclassToken');
-
-        try {
-            const resposta = await fetch('/api/setup/reset', {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if(resposta.ok) {
-                // Preserva o Login da conta, mas tritura todo o cache local e configurações de chaveamentos
-                const t = localStorage.getItem('interclassToken');
-                const pid = localStorage.getItem('profId');
-                const pNome = localStorage.getItem('profNome');
-                const pEscola = localStorage.getItem('profEscola');
-                const isM = localStorage.getItem('isMasterAdmin');
-
-                localStorage.clear();
-
-                localStorage.setItem('interclassToken', t);
-                localStorage.setItem('profId', pid);
-                localStorage.setItem('profNome', pNome);
-                localStorage.setItem('profEscola', pEscola);
-                if(isM) localStorage.setItem('isMasterAdmin', isM);
-
-                alert("♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado. Bem-vindo à nova Temporada Interclass!");
-                window.location.href = '/dashboard.html';
-            } else {
-                alert("Erro ao tentar limpar a base de dados. Tente novamente mais tarde.");
-                btn.innerHTML = "Sim, Apagar Tudo"; btn.disabled = false;
-            }
-        } catch(e) {
-            alert("Erro de conexão. Verifique o servidor.");
-            btn.innerHTML = "Sim, Apagar Tudo"; btn.disabled = false;
-        }
-    }
-</script>
 
 <style>
     .user-profile-btn:hover { background: rgba(0, 242, 254, 0.1) !important; border-color: #00f2fe !important; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); transform: translateY(-2px); }

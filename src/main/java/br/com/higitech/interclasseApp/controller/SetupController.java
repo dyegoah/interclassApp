@@ -3,7 +3,6 @@ package br.com.higitech.interclasseApp.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +15,7 @@ import br.com.higitech.interclasseApp.service.SetupService;
 
 @RestController
 @RequestMapping("/api/setup")
-@CrossOrigin(origins = "*") 
+// 🛡️ CORREÇÃO: O @CrossOrigin("*") foi removido daqui para respeitar a trava de segurança global do seu servidor!
 public class SetupController {
 
     private final SetupService setupService;

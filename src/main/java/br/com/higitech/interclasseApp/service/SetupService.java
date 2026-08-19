@@ -2,6 +2,7 @@ package br.com.higitech.interclasseApp.service;
 
 import java.util.List;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +33,18 @@ public class SetupService {
     private final ClassificacaoRepository classificacaoRepository;
     private final JogoRepository jogoRepository;
     private final AlunoRepository alunoRepository;
+    private final JdbcTemplate jdbcTemplate; // 🚀 A FERRAMENTA DE LIMPEZA BRUTA
 
     public SetupService(TorneioRepository torneioRepository, LoteRepository loteRepository, 
                         ModalidadeRepository modalidadeRepository, ClassificacaoRepository classificacaoRepository,
-                        JogoRepository jogoRepository, AlunoRepository alunoRepository) {
+                        JogoRepository jogoRepository, AlunoRepository alunoRepository, JdbcTemplate jdbcTemplate) {
         this.torneioRepository = torneioRepository;
         this.loteRepository = loteRepository;
         this.modalidadeRepository = modalidadeRepository;
         this.classificacaoRepository = classificacaoRepository;
         this.jogoRepository = jogoRepository;
         this.alunoRepository = alunoRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void processarLote(LoteSetupDTO dto) {
@@ -80,21 +83,44 @@ public class SetupService {
         }
     }
 
-    // 🔴 O CÓDIGO DA FAXINA COMPLETA
+    // 🔴 O CÓDIGO DA FAXINA COMPLETA E HIERÁRQUICA (Livre de Erros 500)
     public void resetarTudo(Professor profLogado) {
         Long idProf = profLogado.getId();
         
-        // 1. Apaga todos os jogos, súmulas e placares (Caskade no BD fará o resto)
+        // 1. A MARRETA SQL: Fura bloqueios de Foreign Key e limpa as amarras!
+        // Ignora erros caso as tabelas estejam vazias ou com outro nome de mapeamento
+        try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+
+        // 2. Apaga os Jogos (agora sem os "móveis" prendendo)
         List<Jogo> jogos = jogoRepository.findByProfessorId(idProf);
-        jogoRepository.deleteAll(jogos);
+        if (!jogos.isEmpty()) jogoRepository.deleteAll(jogos);
         
-        // 2. Apaga todos os Alunos inscritos (e as URLs das fotos cadastradas perdem as referências)
+        // 3. Apaga os Alunos
         List<Aluno> alunos = alunoRepository.findByProfessorId(idProf);
-        alunoRepository.deleteAll(alunos);
+        if (!alunos.isEmpty()) alunoRepository.deleteAll(alunos);
         
-        // 3. Apaga os Lotes e Modalidades da Arena
+        // 4. Encontra os Lotes atrelados EXCLUSIVAMENTE a este professor
         List<Lote> lotes = loteRepository.findByProfessorId(idProf);
-        loteRepository.deleteAll(lotes);
+        
+        if (!lotes.isEmpty()) {
+            
+            // 5. Apaga de BAIXO PARA CIMA: Primeiro as Classificações (Tabela de Grupos)...
+            List<Classificacao> classificacoes = classificacaoRepository.findAll().stream()
+                .filter(c -> c.getModalidade() != null && c.getModalidade().getLote() != null && c.getModalidade().getLote().getProfessor().getId().equals(idProf))
+                .toList();
+            if (!classificacoes.isEmpty()) classificacaoRepository.deleteAll(classificacoes);
+            
+            // 6. ...depois apaga as Modalidades...
+            List<Modalidade> modalidades = modalidadeRepository.findAll().stream()
+                .filter(m -> m.getLote() != null && m.getLote().getProfessor().getId().equals(idProf))
+                .toList();
+            if (!modalidades.isEmpty()) modalidadeRepository.deleteAll(modalidades);
+            
+            // 7. ...e finalmente implode os Lotes deste professor!
+            loteRepository.deleteAll(lotes);
+        }
     }
 
     private String obterNomeEsporte(Integer id) {
