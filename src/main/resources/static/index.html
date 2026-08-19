@@ -105,8 +105,13 @@
 
                 if (response.ok) {
                     const dados = await response.json();
+                    
+                    // 🧹 FAXINA DE CACHE DE SEGURANÇA: 
+                    // Apaga os dados do professor anterior antes de logar o novo!
+                    localStorage.clear(); 
+                    
                     localStorage.setItem('interclassToken', dados.token);
-                    localStorage.setItem('profId', dados.hash); 
+                    localStorage.setItem('profId', dados.hash); // 🛡️ Salva o Hash Criptografado (Fim do ID Sequencial)
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
                     localStorage.removeItem('isMasterAdmin'); // Professor normal
@@ -120,8 +125,12 @@
                         setTimeout(() => document.getElementById('codigo2fa').focus(), 100);
                     } else { alert("❌ " + erroServidor); }
                 }
-            } catch (error) { alert("⚠️ Erro de conexão com os servidores."); } 
-            finally { btnSubmit.innerHTML = "Continuar"; btnSubmit.disabled = false; }
+            } catch (error) { 
+                alert("⚠️ Erro de conexão com os servidores."); 
+            } finally { 
+                btnSubmit.innerHTML = "Continuar"; 
+                btnSubmit.disabled = false; 
+            }
         }
 
         async function enviarLoginCompleto(event) {
@@ -142,8 +151,12 @@
 
                 if (response.ok) {
                     const dados = await response.json();
+                    
+                    // 🧹 FAXINA DE CACHE DE SEGURANÇA MÁXIMA
+                    localStorage.clear(); 
+                    
                     localStorage.setItem('interclassToken', dados.token);
-                    localStorage.setItem('profId', dados.hash); 
+                    localStorage.setItem('profId', dados.hash); // 🛡️ Hash Criptografado
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
                     localStorage.setItem('isMasterAdmin', 'true'); // Etiqueta o Master
@@ -153,8 +166,12 @@
                     alert("🔒 Acesso Negado: " + await response.text());
                     document.getElementById('codigo2fa').value = ""; document.getElementById('codigo2fa').focus();
                 }
-            } catch (error) { alert("⚠️ Erro de conexão."); } 
-            finally { btnSubmit.innerHTML = "Autenticar e Entrar"; btnSubmit.disabled = false; }
+            } catch (error) { 
+                alert("⚠️ Erro de conexão."); 
+            } finally { 
+                btnSubmit.innerHTML = "Autenticar e Entrar"; 
+                btnSubmit.disabled = false; 
+            }
         }
 
         function voltarParaEtapa1() {

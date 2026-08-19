@@ -39,35 +39,35 @@ public class JogoService {
 
     @PostConstruct
     public void higienizarBancoDeDados() {
-        System.out.println("🔄 Iniciando higienização do Banco de Dados...");
+        System.out.println("🔄 Iniciando higienização estrutural do Banco de Dados...");
         try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN dia_id DROP NOT NULL"); } catch (Exception e) {}
         try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN esporte DROP NOT NULL"); } catch (Exception e) {}
         try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN icone DROP NOT NULL"); } catch (Exception e) {}
         try { jdbcTemplate.execute("ALTER TABLE jogos ALTER COLUMN hora DROP NOT NULL"); } catch (Exception e) {}
         try { jdbcTemplate.execute("ALTER TABLE tb_lote DROP CONSTRAINT IF EXISTS tb_lote_genero_key"); } catch (Exception e) {}
         try { jdbcTemplate.execute("ALTER TABLE tb_lote DROP CONSTRAINT IF EXISTS uk_tb_lote_genero"); } catch (Exception e) {}
-        System.out.println("✅ Travas fantasmas removidas com sucesso! Servidor pronto.");
+        System.out.println("✅ Travas fantasmas removidas. Servidor Multi-Tenant pronto.");
     }
 
     @Transactional
     public void salvarLoteDeJogos(CalendarioSaveDTO dto, Professor profLogado) {
+        // Limpa os jogos antigos daquele professor específico
         jogoRepository.deleteByProfessorIdAndGenero(profLogado.getId(), dto.genero());
 
-        List<Lote> todosLotes = loteRepository.findAll();
-        Lote loteCorreto = todosLotes.stream()
-                .filter(l -> l.getGenero() != null && l.getGenero().equalsIgnoreCase(dto.genero()))
-                .findFirst()
-                .orElse(null);
+        // 🛡️ CORREÇÃO MULTI-TENANT: Busca o lote exclusivo deste professor! (Sem findAll)
+        Lote loteCorreto = loteRepository.findByProfessorIdAndGenero(profLogado.getId(), dto.genero()).orElse(null);
 
         if (loteCorreto == null) {
             loteCorreto = new Lote();
             loteCorreto.setGenero(dto.genero());
-            try { loteCorreto.setProfessor(profLogado); } catch(Exception e) {}
+            loteCorreto.setProfessor(profLogado);
             loteCorreto = loteRepository.save(loteCorreto);
         }
 
         final Lote loteParaSalvar = loteCorreto;
-        List<Modalidade> modalidadesSalvas = new java.util.ArrayList<>(modalidadeRepository.findAll());
+        
+        // 🛡️ CORREÇÃO MULTI-TENANT: Busca modalidades apenas deste Lote (Sem findAll)
+        List<Modalidade> modalidadesSalvas = new java.util.ArrayList<>(modalidadeRepository.findByLoteId(loteParaSalvar.getId()));
 
         List<Jogo> jogosParaSalvar = dto.jogos().stream().map(jogoDTO -> {
             Jogo jogo = new Jogo();
@@ -94,7 +94,7 @@ public class JogoService {
             jogo.setEquipeBNome(jogoDTO.equipeBNome());
 
             Modalidade modCorreta = modalidadesSalvas.stream()
-                    .filter(m -> m.getNomeEsporte().equalsIgnoreCase(jogoDTO.esporte()) && m.getLote() != null && m.getLote().getId().equals(loteParaSalvar.getId()))
+                    .filter(m -> m.getNomeEsporte().equalsIgnoreCase(jogoDTO.esporte()))
                     .findFirst()
                     .orElse(null);
             
@@ -155,7 +155,6 @@ public class JogoService {
         return map;
     }
 
-    // 🔥 O NOVO MOTOR DE EXCLUSÃO
     @Transactional
     public void excluirTorneioEspecifico(String genero, String esporte, Professor profLogado) {
         jogoRepository.excluirTorneioEspecificoDoBanco(profLogado.getId(), genero, esporte);

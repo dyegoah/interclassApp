@@ -20,20 +20,20 @@ public class AlunoService {
 
     @Transactional
     public Aluno salvarComTenant(Aluno aluno, Professor profLogado) {
-        // 🔒 Vincula o aluno EXATAMENTE ao professor que está logado (Fim do vazamento)
+        // 🔒 BLINDAGEM MULTI-TENANT: O aluno é forçadamente vinculado ao Gestor Atual
         aluno.setProfessor(profLogado); 
         return alunoRepository.save(aluno);
     }
 
     public List<Aluno> listarPorProfessor(Professor profLogado) {
-        // 🔒 Só devolve os alunos do professor correto
+        // 🔒 Filtra direto pelo ID de segurança do professor atual
         return alunoRepository.findByProfessorId(profLogado.getId());
     }
 
     @Transactional
     public void excluirPeloHash(String hash, Professor profLogado) {
         Aluno aluno = alunoRepository.findByHashPublico(hash).orElseThrow();
-        // 🛡️ Segurança extra: verifica se o aluno pertence a este professor
+        // 🛡️ Segurança: Garante que um professor não delete o aluno do outro
         if (aluno.getProfessor().getId().equals(profLogado.getId())) {
             alunoRepository.delete(aluno);
         }
