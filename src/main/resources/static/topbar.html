@@ -23,9 +23,6 @@
 
             <div id="user-dropdown" class="glass-dropdown" style="display: none;">
                 <ul>
-                    <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-reset-sistema').style.display='flex';">
-                        <span style="color: #ff0055;">⚠️</span> <span style="color: #ffccdd;">Zerar Temporada</span>
-                    </li>
                     
                     <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-pix-assinatura').style.display='flex';" style="flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 15px; padding-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
@@ -44,6 +41,9 @@
                             <a href="https://instagram.com/FutSumulaPro" target="_blank" title="Siga no Instagram" class="social-icon">📸</a>
                             <a href="mailto:fut_sumula_pro@hotmail.com" title="Enviar E-mail" class="social-icon">📧</a>
                         </div>
+                    </li>
+                    <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-reset-sistema').style.display='flex';">
+                        <span style="color: #ff0055;">⚠️</span> <span style="color: #ffccdd;">Zerar Temporada</span>
                     </li>
                     
                     <li onclick="if(confirm('Deseja realmente sair da plataforma?')) { localStorage.clear(); window.location.href = '/index.html'; }" class="logout-btn">
