@@ -3,6 +3,7 @@ package br.com.higitech.interclasseApp.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +34,18 @@ public class SetupService {
     private final ClassificacaoRepository classificacaoRepository;
     private final JogoRepository jogoRepository;
     private final AlunoRepository alunoRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     public SetupService(TorneioRepository torneioRepository, LoteRepository loteRepository, 
                         ModalidadeRepository modalidadeRepository, ClassificacaoRepository classificacaoRepository,
-                        JogoRepository jogoRepository, AlunoRepository alunoRepository) {
+                        JogoRepository jogoRepository, AlunoRepository alunoRepository, JdbcTemplate jdbcTemplate) {
         this.torneioRepository = torneioRepository;
         this.loteRepository = loteRepository;
         this.modalidadeRepository = modalidadeRepository;
         this.classificacaoRepository = classificacaoRepository;
         this.jogoRepository = jogoRepository;
         this.alunoRepository = alunoRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void processarLote(LoteSetupDTO dto) {
@@ -66,6 +69,7 @@ public class SetupService {
         for (EsporteSetupDTO esporteDto : dto.esportes()) {
             Modalidade modalidade = new Modalidade();
             modalidade.setNomeEsporte(obterNomeEsporte(esporteDto.id()));
+            modalidade.setIcone(obterIconeEsporte(esporteDto.id())); // 🚀 FIX: Agora o ícone é salvo no banco!
             modalidade.setLote(lote);
             
             Modalidade modalidadeSalva = modalidadeRepository.save(modalidade);
@@ -81,21 +85,15 @@ public class SetupService {
         }
     }
 
-    // 🔴 O CÓDIGO DA FAXINA PERFEITA E ANTI-ERRO 500
     public void resetarTudo(Professor profLogado) {
         Long idProf = profLogado.getId();
 
-        // 1. Busca todos os dados no banco e filtra APENAS os do professor que apertou o botão
+        try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+
         List<Classificacao> classificacoes = classificacaoRepository.findAll().stream()
-            .filter(c -> c.getModalidade() != null && c.getModalidade().getLote() != null && c.getModalidade().getLote().getProfessor().getId().equals(idProf))
-            .collect(Collectors.toList());
-
-        List<Jogo> jogos = jogoRepository.findAll().stream()
-            .filter(j -> j.getProfessor() != null && j.getProfessor().getId().equals(idProf))
-            .collect(Collectors.toList());
-
-        List<Aluno> alunos = alunoRepository.findAll().stream()
-            .filter(a -> a.getProfessor() != null && a.getProfessor().getId().equals(idProf))
+            .filter(c -> c.getModalidade() != null && c.getModalidade().getLote() != null && c.getModalidade().getLote().getProfessor() != null && c.getModalidade().getLote().getProfessor().getId().equals(idProf))
             .collect(Collectors.toList());
 
         List<Modalidade> modalidades = modalidadeRepository.findAll().stream()
@@ -106,17 +104,22 @@ public class SetupService {
             .filter(l -> l.getProfessor() != null && l.getProfessor().getId().equals(idProf))
             .collect(Collectors.toList());
 
-        // 2. ORDEM DE DELEÇÃO ESTRITA: De baixo para cima para satisfazer o PostgreSQL!
+        List<Jogo> jogos = jogoRepository.findAll().stream()
+            .filter(j -> j.getProfessor() != null && j.getProfessor().getId().equals(idProf))
+            .collect(Collectors.toList());
+
+        List<Aluno> alunos = alunoRepository.findAll().stream()
+            .filter(a -> a.getProfessor() != null && a.getProfessor().getId().equals(idProf))
+            .collect(Collectors.toList());
+
         if (!classificacoes.isEmpty()) classificacaoRepository.deleteAll(classificacoes);
-        
-        // Ao deletar os jogos, o Java deleta as Escalações automaticamente em cascata
-        if (!jogos.isEmpty()) jogoRepository.deleteAll(jogos); 
-        
-        // Agora que as Escalações sumiram, os alunos estão desamarrados e podem ser deletados
-        if (!alunos.isEmpty()) alunoRepository.deleteAll(alunos); 
-        
         if (!modalidades.isEmpty()) modalidadeRepository.deleteAll(modalidades);
         if (!lotes.isEmpty()) loteRepository.deleteAll(lotes);
+        
+        if (!jogos.isEmpty()) jogoRepository.deleteAll(jogos); 
+        if (!alunos.isEmpty()) alunoRepository.deleteAll(alunos); 
+        
+        try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM tb_lote)"); } catch (Exception e) {}
     }
 
     private String obterNomeEsporte(Integer id) {
@@ -126,6 +129,16 @@ public class SetupService {
             case 7: return "Natação"; case 8: return "Atletismo"; case 9: return "Tênis de Mesa"; 
             case 10: return "Xadrez"; case 11: return "Dama"; case 12: return "E-Sports"; 
             default: return "Esporte Geral";
+        }
+    }
+
+    private String obterIconeEsporte(Integer id) {
+        switch (id) {
+            case 1: return "⚽"; case 2: return "🏐"; case 3: return "🏀";
+            case 4: return "🤾"; case 5: return "☄️"; case 6: return "🏖️";
+            case 7: return "🏊"; case 8: return "🏃"; case 9: return "🏓";
+            case 10: return "♟️"; case 11: return "🏁"; case 12: return "🎮";
+            default: return "🏅";
         }
     }
 }

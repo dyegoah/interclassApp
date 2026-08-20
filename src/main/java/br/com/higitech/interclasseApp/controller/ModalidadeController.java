@@ -20,36 +20,29 @@ public class ModalidadeController {
     @Autowired
     private ModalidadeRepository modalidadeRepository;
 
-    // =========================================================
-    // 🛡️ DTO DE BLINDAGEM: Impede o vazamento do Lote/Professor
-    // =========================================================
+    // 🛡️ DTO DE BLINDAGEM ATUALIZADO COM O GÊNERO DA MODALIDADE
     public static class ModalidadePublicaDTO {
         public Long id;
         public String nomeEsporte;
         public String icone;
+        public String genero; // 🚀 NOVA VARIÁVEL
 
         public ModalidadePublicaDTO(Modalidade modalidade) {
             this.id = modalidade.getId();
             this.nomeEsporte = modalidade.getNomeEsporte();
             this.icone = modalidade.getIcone();
-            // Apenas os dados que o aluno/aplicativo precisam para desenhar a tela!
+            // A Inteligência: Puxa o Gênero do Lote atrelado a este esporte
+            this.genero = modalidade.getLote() != null ? modalidade.getLote().getGenero() : "Geral";
         }
     }
 
-    // =========================================================
     // 🔓 ROTA PÚBLICA: Devolve os esportes usando a chave HASH
-    // =========================================================
     @GetMapping("/public/{professorHash}")
     public ResponseEntity<List<ModalidadePublicaDTO>> listarModalidadesDaEscola(@PathVariable String professorHash) {
-        
-        // 1. Busca no banco de forma segura
         List<Modalidade> modalidades = modalidadeRepository.findByLoteProfessorHashPublico(professorHash);
-        
-        // 2. Converte a Entidade pesada em DTO leve e seguro
         List<ModalidadePublicaDTO> modalidadeDTOs = modalidades.stream()
                 .map(ModalidadePublicaDTO::new)
                 .collect(Collectors.toList());
-                
         return ResponseEntity.ok(modalidadeDTOs);
     }
 }

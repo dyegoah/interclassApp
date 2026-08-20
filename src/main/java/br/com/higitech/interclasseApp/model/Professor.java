@@ -1,14 +1,15 @@
 package br.com.higitech.interclasseApp.model;
 
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore; // 🚀 IMPORTAÇÃO DA BLINDAGEM
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonIgnore; // 🚀 IMPORTAÇÃO DA BLINDAGEM
 
 @Entity
 @Table(name = "professores")
@@ -43,7 +44,19 @@ public class Professor {
     @Column(name = "chave_2fa")
     private String chave2fa;
 
-    // Getters e Setters
+    // 🚀 A CORREÇÃO: Usamos 'Boolean' (Objeto) e passamos o comando SQL para o PostgreSQL não travar nos cadastros antigos
+    @Column(name = "inscricoes_abertas", columnDefinition = "boolean default true")
+    private Boolean inscricoesAbertas = true;
+
+    // Getter e Setter blindados contra valores nulos no banco antigo
+    public boolean isInscricoesAbertas() { 
+        return this.inscricoesAbertas != null ? this.inscricoesAbertas : true; 
+    }
+    
+    public void setInscricoesAbertas(boolean inscricoesAbertas) { 
+        this.inscricoesAbertas = inscricoesAbertas; 
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
