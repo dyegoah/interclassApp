@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Interclass Arena</title>
     
-	<script>
+	    <script>
 	        const tokenAtivo = localStorage.getItem('interclassToken');
 	        const isMaster = localStorage.getItem('isMasterAdmin');
 
-	        // Se o usuário tentou acessar a raiz e já tem token válido, redireciona
-	        if (tokenAtivo && window.location.pathname === '/' || window.location.pathname === '/index.html') {
+	        // 🚀 CORREÇÃO: Parênteses adicionados para obrigar a ter o tokenAtivo!
+	        if (tokenAtivo && (window.location.pathname === '/' || window.location.pathname === '/index.html')) {
 	            if (isMaster === 'true') {
 	                window.location.replace('/admin.html');
 	            } else {
