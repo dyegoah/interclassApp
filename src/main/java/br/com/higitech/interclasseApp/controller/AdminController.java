@@ -29,9 +29,16 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // 🛡️ O CADEADO MASTER: Só o Dyego pode usar essas rotas
+    // 🛡️ O CADEADO MASTER: Sincronizado com o AuthController
     private boolean isSuperAdmin(Professor professor) {
-        return professor != null && "dyego@master.com".equalsIgnoreCase(professor.getEmail());
+        if (professor == null || professor.getEmail() == null) return false;
+        
+        String email = professor.getEmail().toLowerCase();
+        
+        return "master".equals(professor.getStatus()) || 
+               email.contains("admin") || 
+               "fut_sumula_pro@hotmail.com".equals(email) ||
+               "dyego@master.com".equals(email);
     }
 
     @GetMapping("/professores")

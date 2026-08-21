@@ -212,35 +212,36 @@
         };
 
         // 🛡️ Função Master de Conexão com o Banco de Dados Real
-        async function apiAdmin(endpoint, method = 'GET', body = null) {
-            const token = localStorage.getItem('interclassToken');
-            if (!token) {
-                window.location.href = '/login.html';
-                return null;
-            }
-            
-            const options = {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            };
-            if (body) options.body = JSON.stringify(body);
+		// 🛡️ Função Master de Conexão com o Banco de Dados Real
+		        async function apiAdmin(endpoint, method = 'GET', body = null) {
+		            const token = localStorage.getItem('interclassToken');
+		            if (!token) {
+		                window.location.href = '/index.html';
+		                return null;
+		            }
+		            
+		            const options = {
+		                method: method,
+		                headers: {
+		                    'Authorization': `Bearer ${token}`,
+		                    'Content-Type': 'application/json'
+		                }
+		            };
+		            if (body) options.body = JSON.stringify(body);
 
-            try {
-                const res = await fetch(endpoint, options);
-                if (res.status === 403 || res.status === 401) {
-                    alert("Acesso Negado. Você não é o Super Admin.");
-                    window.location.href = '/login.html';
-                    return null;
-                }
-                return res;
-            } catch (error) {
-                console.error("Erro no Servidor:", error);
-                return null;
-            }
-        }
+		            try {
+		                const res = await fetch(endpoint, options);
+		                if (res.status === 403 || res.status === 401) {
+		                    // Manda um sinal pro index.html limpar a sujeira
+		                    window.location.replace('/index.html?error=403');
+		                    return null;
+		                }
+		                return res;
+		            } catch (error) {
+		                console.error("Erro no Servidor:", error);
+		                return null;
+		            }
+		        }
 
         async function carregarProfessores() {
             const res = await apiAdmin('/api/admin/professores');

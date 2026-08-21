@@ -5,16 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Interclass Arena</title>
     
-    <!-- 🛡️ ANTI-FLICKER REVERSO INTELIGENTE -->
-    <script>
-        if (localStorage.getItem('interclassToken')) {
-            if (localStorage.getItem('isMasterAdmin') === 'true') {
-                window.location.replace('/admin.html');
-            } else {
-                window.location.replace('/dashboard.html');
-            }
-        }
-    </script>
+	<script>
+	        const tokenAtivo = localStorage.getItem('interclassToken');
+	        const isMaster = localStorage.getItem('isMasterAdmin');
+
+	        // Se o usuário tentou acessar a raiz e já tem token válido, redireciona
+	        if (tokenAtivo && window.location.pathname === '/' || window.location.pathname === '/index.html') {
+	            if (isMaster === 'true') {
+	                window.location.replace('/admin.html');
+	            } else {
+	                window.location.replace('/dashboard.html');
+	            }
+	        }
+	        
+	        // Se a página de admin jogar o usuário de volta pra cá (Erro 403), nós limpamos o cache de segurança
+	        if (window.location.search.includes('error=403')) {
+	            localStorage.clear();
+	            alert("Acesso Negado ou Sessão Expirada. Faça o login novamente.");
+	            window.location.replace('/index.html');
+	        }
+	    </script>
 
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
