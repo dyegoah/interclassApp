@@ -29,7 +29,7 @@
     .btn-acao-pix { width: 100%; padding: 12px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 10px; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 1rem; }
     .btn-acao-pix:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,242,254,0.6); background: #fff; }
 
-    /* Responsividade para Celulares (Ex: Galaxy A72) */
+    /* Responsividade para Celulares */
     @media (max-width: 600px) {
         .game-header { padding: 12px 15px; }
         .game-header h1 { font-size: 1.15rem; }
@@ -89,41 +89,43 @@
         </div>
     </div>
 
-    <!-- Script de dados e reset da temporada oculto -->
-    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none;" onload="
+    <!-- Script blindado (Função Autoexecutável que não gera conflito de cache) -->
+    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none;" onload="(function() {
         try {
-            let nomeProf = localStorage.getItem('profNome');
-            let nomeEscola = localStorage.getItem('profEscola');
-            if(nomeProf) {
-                document.getElementById('escola-nome-top').textContent = nomeEscola;
-                document.getElementById('nome-professor-top').textContent = 'Prof. ' + nomeProf.split(' ')[0];
+            var nProf = localStorage.getItem('profNome');
+            var nEscola = localStorage.getItem('profEscola');
+            if(nProf) {
+                document.getElementById('escola-nome-top').textContent = nEscola;
+                document.getElementById('nome-professor-top').textContent = 'Prof. ' + nProf.split(' ')[0];
             } else {
                 document.getElementById('escola-nome-top').textContent = 'Colégio Interclass';
                 document.getElementById('nome-professor-top').textContent = 'Sessão Expirada';
             }
+            
             window.executarResetDeTemporada = async function() {
-                let confirmacao = prompt('Tem certeza absoluta?\\nDigite ZERAR na caixa abaixo para confirmar a destruição de todos os dados do torneio:');
+                var confirmacao = prompt('Tem certeza absoluta? Digite ZERAR na caixa abaixo para confirmar a destruição de todos os dados do torneio:');
                 if(confirmacao !== 'ZERAR' && confirmacao !== 'zerar') {
                     alert('Ação cancelada de forma segura.'); return;
                 }
-                const btn = document.getElementById('btn-executar-reset');
+                var btn = document.getElementById('btn-executar-reset');
                 btn.innerHTML = '⏳ Varrendo Banco...'; btn.disabled = true;
-                const token = localStorage.getItem('interclassToken');
+                
+                var token = localStorage.getItem('interclassToken');
                 try {
-                    const resposta = await fetch('/api/setup/reset', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                    var resposta = await fetch('/api/setup/reset', { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     if(resposta.ok) {
-                        const t = localStorage.getItem('interclassToken');
-                        const pid = localStorage.getItem('profId');
-                        const pNome = localStorage.getItem('profNome');
-                        const pEscola = localStorage.getItem('profEscola');
-                        const isM = localStorage.getItem('isMasterAdmin');
+                        var t = localStorage.getItem('interclassToken');
+                        var pid = localStorage.getItem('profId');
+                        var pNome = localStorage.getItem('profNome');
+                        var pEscola = localStorage.getItem('profEscola');
+                        var isM = localStorage.getItem('isMasterAdmin');
                         localStorage.clear();
                         localStorage.setItem('interclassToken', t);
                         localStorage.setItem('profId', pid);
                         localStorage.setItem('profNome', pNome);
                         localStorage.setItem('profEscola', pEscola);
                         if(isM) localStorage.setItem('isMasterAdmin', isM);
-                        alert('♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado.');
+                        alert('♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado. Bem-vindo à nova Temporada Interclass!');
                         window.location.href = '/dashboard.html';
                     } else {
                         alert('Erro ao tentar limpar a base de dados. Tente novamente mais tarde.');
@@ -135,11 +137,11 @@
                 }
             };
         } catch(e) { console.error('Erro na barra superior:', e); }
-    ">
+    })();">
 </header>
 
 <div id="modal-reset-sistema" class="modal-overlay-pix" style="display: none;">
-    <div class="modal-box-pix" style="border-color: #ff0055; text-align: center;">
+    <div class="modal-box-pix glass" style="border-color: #ff0055; text-align: center;">
         <h3 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 1rem; font-size: 1.4rem;">🚨 ZERAR APLICATIVO?</h3>
         <p style="font-family: 'Segoe UI'; font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-bottom: 20px; line-height: 1.5;">Esta ação excluirá <b style="color:#ffccdd;">permanentemente</b> todos os alunos matriculados, jogos, chaves, súmulas e placares criados por você na base de dados.</p>
         <div style="background: rgba(255,0,85,0.1); border: 1px dashed #ff0055; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
@@ -154,7 +156,7 @@
 </div>
 
 <div id="modal-pix-assinatura" class="modal-overlay-pix" style="display: none;">
-    <div class="modal-box-pix">
+    <div class="modal-box-pix glass">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <h3 style="color: #00f2fe; font-family: 'Orbitron'; margin: 0; font-size: 1.2rem;">💳 Renovar Assinatura</h3>
             <button onclick="document.getElementById('modal-pix-assinatura').style.display='none';" style="background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer; line-height: 1;">&times;</button>
