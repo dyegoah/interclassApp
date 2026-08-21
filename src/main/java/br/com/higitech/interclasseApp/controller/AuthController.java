@@ -2,10 +2,7 @@ package br.com.higitech.interclasseApp.controller;
 
 import java.util.Optional;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.jboss.aerogear.security.otp.api.Base32;
+import org.jboss.aerogear.security.otp.Totp; // 🚀 Importação oficial e blindada do 2FA
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,20 +66,22 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
         }
 
-        // 🚀 O AJUSTE: Agora "dyego@master.com" está na lista oficial de quem pede o 2FA!
+        // 🚀 RECONHECIMENTO MASTER (Amarrado com os seus e-mails)
         boolean isMaster = "master".equals(prof.getStatus()) || 
                            prof.getEmail().toLowerCase().contains("admin") || 
                            "fut_sumula_pro@hotmail.com".equalsIgnoreCase(prof.getEmail()) ||
                            "dyego@master.com".equalsIgnoreCase(prof.getEmail());
 
         if (isMaster) {
+            // Se não digitou o 2FA ainda, pede a tela pro HTML
             if (dto.codigo2fa == null || dto.codigo2fa.trim().isEmpty()) {
-                // É AQUI que o Java avisa o HTML para abrir a tela do celularzinho!
                 return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
                         .body("Código 2FA obrigatório para contas Master.");
             }
             
-            if (!validarTotpComTolerancia(prof.getChave2fa(), dto.codigo2fa)) {
+            // 🚀 VALIDAÇÃO NATIVA DA BIBLIOTECA (Simples, direta e à prova de falhas)
+            Totp totp = new Totp(prof.getChave2fa());
+            if (!totp.verify(dto.codigo2fa)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Código 2FA Inválido ou Expirado! Verifique a hora do seu celular.");
             }
@@ -94,49 +93,5 @@ public class AuthController {
         LoginResponseDTO resposta = new LoginResponseDTO(token, prof.getNome(), prof.getEscola(), prof.getHashPublico(), isMaster);
 
         return ResponseEntity.ok(resposta);
-    }
-
-    // 🚀 LÓGICA DE VALIDAÇÃO 2FA ESTRITAMENTE PADRÃO (RFC 6238)
-    private boolean validarTotpComTolerancia(String chaveSecreta, String codigoDigitado) {
-        if (chaveSecreta == null || chaveSecreta.isEmpty()) return false;
-        long tempoAtual = System.currentTimeMillis() / 30000L;
-        
-        // Tolerância de servidor em nuvem (Render)
-        for (int i = -1; i <= 1; i++) {
-            if (gerarTotpOficial(chaveSecreta, tempoAtual + i).equals(codigoDigitado)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String gerarTotpOficial(String secret, long time) {
-        try {
-            byte[] decodedKey = Base32.decode(secret);
-            byte[] timeBytes = new byte[8];
-            for (int i = 7; i >= 0; i--) {
-                timeBytes[i] = (byte) (time & 0xFF);
-                time >>= 8;
-            }
-            
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(new SecretKeySpec(decodedKey, "HmacSHA1"));
-            byte[] hash = mac.doFinal(timeBytes);
-            
-            int offset = hash[hash.length - 1] & 0xF;
-            long truncatedHash = 0;
-            for (int i = 0; i < 4; ++i) {
-                truncatedHash <<= 8;
-                truncatedHash |= (hash[offset + i] & 0xFF);
-            }
-            
-            truncatedHash &= 0x7FFFFFFF;
-            truncatedHash %= 1000000;
-            
-            return String.format("%06d", truncatedHash);
-            
-        } catch (Exception e) {
-            return "ERROR";
-        }
     }
 }
