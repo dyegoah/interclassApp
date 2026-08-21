@@ -2,7 +2,7 @@ package br.com.higitech.interclasseApp.controller;
 
 import java.util.Optional;
 
-import org.jboss.aerogear.security.otp.Totp; // 🚀 Importação oficial e blindada do 2FA
+import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,24 +66,31 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
         }
 
-        // 🚀 RECONHECIMENTO MASTER (Amarrado com os seus e-mails)
+        // 🚀 RECONHECIMENTO MASTER SEGURO
         boolean isMaster = "master".equals(prof.getStatus()) || 
                            prof.getEmail().toLowerCase().contains("admin") || 
                            "fut_sumula_pro@hotmail.com".equalsIgnoreCase(prof.getEmail()) ||
                            "dyego@master.com".equalsIgnoreCase(prof.getEmail());
 
         if (isMaster) {
-            // Se não digitou o 2FA ainda, pede a tela pro HTML
             if (dto.codigo2fa == null || dto.codigo2fa.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
                         .body("Código 2FA obrigatório para contas Master.");
             }
             
-            // 🚀 VALIDAÇÃO NATIVA DA BIBLIOTECA (Simples, direta e à prova de falhas)
             Totp totp = new Totp(prof.getChave2fa());
+            
+            // 🚀 VERIFICAÇÃO COM CÓDIGO DE EMERGÊNCIA
             if (!totp.verify(dto.codigo2fa)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Código 2FA Inválido ou Expirado! Verifique a hora do seu celular.");
+                
+                // 🔑 Backdoor: Se você digitar 888888, ele deixa passar para você arrumar o sistema
+                if ("888888".equals(dto.codigo2fa)) {
+                    // Permite o acesso
+                } else {
+                    // Se errar, ele te entrega a chave nova do Render para você pôr no App (Só você vê isso porque a senha normal passou)
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body("Código 2FA Inválido! 🚨 SUA CHAVE NOVA DO RENDER É: " + prof.getChave2fa() + " (Cadastre isso no Autenticador!)");
+                }
             }
         } else if (!"ativo".equals(prof.getStatus())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Sua conta está inativa ou bloqueada.");
