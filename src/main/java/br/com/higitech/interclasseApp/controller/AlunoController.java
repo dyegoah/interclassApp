@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.higitech.interclasseApp.model.Aluno;
+import br.com.higitech.interclasseApp.model.Modalidade;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.AlunoRepository;
+import br.com.higitech.interclasseApp.repositories.ModalidadeRepository;
 import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
 
 @RestController
@@ -31,6 +33,9 @@ public class AlunoController {
     @Autowired
     private ProfessorRepository professorRepository;
 
+    @Autowired
+    private ModalidadeRepository modalidadeRepository;
+
     public static class InscricaoRequestDTO {
         public String nome;
         public String turma;
@@ -40,36 +45,40 @@ public class AlunoController {
         public String genero;
     }
 
-    // 🔓 ROTA PÚBLICA BLINDADA: Com Trava de 100 Alunos e Interruptor do Professor
     @PostMapping("/public/{professorHash}")
     public ResponseEntity<?> inscreverAluno(@PathVariable String professorHash, @RequestBody InscricaoRequestDTO dto) {
-        
         Optional<Professor> profOpt = professorRepository.findByHashPublico(professorHash);
         if (profOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Escola não encontrada. Link inválido.");
         }
-        
         Professor professor = profOpt.get();
 
-        // 🛑 TRAVA 1: O professor fechou as inscrições pelo painel?
         if (!professor.isInscricoesAbertas()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("As inscrições para este evento foram encerradas pelo professor.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("As inscrições para este evento foram encerradas.");
         }
 
         if (dto.nome == null || dto.nome.trim().length() < 2 || dto.nome.length() > 50) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
-        // 🛑 TRAVA 2: Limite máximo de 100 alunos por modalidade para este professor (SINTAXE CORRIGIDA AQUI 🚀)
+        // 🔥 TRAVA DE SEGURANÇA: O professor abriu esta modalidade?
+        List<Modalidade> modalidadesAtivas = modalidadeRepository.findByProfessorId(professor.getId());
+        boolean esportePermitido = modalidadesAtivas.stream()
+                .anyMatch(m -> m.getNomeEsporte().equalsIgnoreCase(dto.esporte));
+
+        if (!esportePermitido) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta modalidade não está aberta para inscrições nesta escola.");
+        }
+
         long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()
-                .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte) && 
+                .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte) &&
                              a.getGenero() != null && a.getGenero().equalsIgnoreCase(dto.genero))
                 .count();
 
         if (totalInscritosNaModalidade >= 100) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Desculpe, as 100 vagas para " + dto.esporte + " (" + dto.genero + ") já foram esgotadas!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Desculpe, as 100 vagas para " + dto.esporte + " estão esgotadas!");
         }
-        
+
         Aluno novoAluno = new Aluno();
         novoAluno.setNome(dto.nome.replaceAll("<[^>]*>", ""));
         novoAluno.setTurma(dto.turma.replaceAll("<[^>]*>", ""));
@@ -77,22 +86,19 @@ public class AlunoController {
         novoAluno.setEsporte(dto.esporte);
         novoAluno.setIconeEsporte(dto.iconeEsporte);
         novoAluno.setGenero(dto.genero);
-        novoAluno.setProfessor(professor); 
-        
+        novoAluno.setProfessor(professor);
         alunoRepository.save(novoAluno);
-        
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição confirmada na Modalidade!");
     }
 
-    // 🚀 NOVO: Rota para o Professor alternar o status do link (Abrir/Travar Inscrições)
-    @PutMapping("/status-inscricoes")
+    @PutMapping("/status-inscrees")
     public ResponseEntity<?> alterarStatusInscricoes(@AuthenticationPrincipal Professor professorLogado) {
         professorLogado.setInscricoesAbertas(!professorLogado.isInscricoesAbertas());
         professorRepository.save(professorLogado);
         return ResponseEntity.ok(professorLogado.isInscricoesAbertas());
     }
 
-    // 🚀 NOVO: Rota para checar se o link está aberto (usado pela tela do aluno)
     @GetMapping("/public/status/{professorHash}")
     public ResponseEntity<?> checarStatusInscricoes(@PathVariable String professorHash) {
         Optional<Professor> profOpt = professorRepository.findByHashPublico(professorHash);

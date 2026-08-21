@@ -4,57 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscrição de Atleta - InterclassApp</title>
-	<link rel="manifest" href="/manifest.json">
-	<meta name="theme-color" content="#05050f">
-	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#05050f">
+    <link rel="apple-touch-icon" href="/img/icon-192x192.png">
     <style>
         :root { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        
-        body { 
+        body {
             background-color: #05050f;
-            background-image: radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%), linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px; color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 2rem 1rem; overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%);
+            color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
         }
-
-        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); margin-top: 20px; margin-bottom: 50px;}
-        
-        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); text-align: center; font-size: 1.5rem;}
+        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 10px; font-size: 1.5rem; text-shadow: 0 0 10px var(--theme-glow); }
         p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 25px; font-size: 0.9rem; text-align: center; }
-
         .profile-pic-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
-        .profile-pic-wrapper { position: relative; width: 100px; height: 100px; border-radius: 50%; padding: 4px; background: #444; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .profile-pic-wrapper:hover { transform: scale(1.05); }
-        .profile-pic-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #05050f; background: #222; }
-        .upload-icon { position: absolute; bottom: 0; right: 0; background: var(--theme-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #05050f; font-size: 0.9rem; box-shadow: 0 0 10px var(--theme-glow); }
-        
+        .profile-pic-wrapper { position: relative; width: 100px; height: 100px; border-radius: 50%; padding: 4px; background: #333; cursor: pointer; transition: 0.3s; }
+        .profile-pic-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #05050f; }
+        .upload-icon { position: absolute; bottom: 0; right: 0; background: var(--theme-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         .insta-border-masculino { background: linear-gradient(45deg, #00f2fe, #4facfe) !important; }
         .insta-border-feminino { background: linear-gradient(45deg, #ff00de, #ff73ea) !important; }
         .insta-border-misto { background: linear-gradient(45deg, #00f2fe, #ff00de) !important; }
-
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
-        .form-group input, .form-group select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 0.95rem; outline: none; transition: 0.3s; }
         .form-group input:focus, .form-group select:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
-        .form-group select option { background: #05050f; color: white; }
-
-        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 30px; color: #fff; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 15px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
+        .form-group select option { background: #05050f; color: white; padding: 5px; }
+        /* Estilo para opções bloqueadas com cadeado */
+        .form-group select option:not(:checked)[disabled] { color: #777; background: #111; }
+        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; text-transform: uppercase; margin-top: 10px; }
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 8px; font-size: 0.9rem; text-align: center; display: none; font-weight: bold; font-family: 'Segoe UI'; }
-        .alert-danger { color: #ffccdd; background-color: rgba(255, 0, 85, 0.1); border-color: #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.3); }
+        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 8px; font-size: 0.9rem; display: none; }
+        .alert-danger { color: #ffccdd; background-color: rgba(255, 0, 85, 0.1); border-color: #ff0055; }
         .alert-success { color: #ccffcc; background-color: rgba(0, 255, 0, 0.1); border-color: #00ff00; }
         .d-block { display: block !important; }
-
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
-
     <div class="glass-form">
         <h1>Inscrição de Atleta</h1>
         <p class="subtitle">Selecione a modalidade e preencha os seus dados.</p>
-
         <div id="mensagem-alerta" class="alert"></div>
 
         <div id="loading-esportes" style="text-align: center; color: #00f2fe; margin-bottom: 20px; font-family: 'Orbitron'; font-size: 0.9rem;">
@@ -62,7 +52,6 @@
         </div>
 
         <form id="form-cadastro" onsubmit="inscreverAluno(event)" style="display: none;">
-            
             <div class="profile-pic-container">
                 <div class="profile-pic-wrapper" id="profile-border" onclick="document.getElementById('file-upload').click()">
                     <img id="profile-preview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Sua Foto">
@@ -85,7 +74,7 @@
             <div class="form-group">
                 <label>2. Escolha sua Modalidade Esportiva</label>
                 <select id="esporteAluno" required>
-                    <!-- Preenchido pelo JavaScript -->
+                    <!-- Preenchido dinamicamente com cadeados -->
                 </select>
             </div>
 
@@ -96,7 +85,27 @@
 
             <div class="form-group">
                 <label>4. Sua Turma / Equipe</label>
-                <input type="text" id="turmaAluno" required minlength="2" maxlength="30" placeholder="Ex: 3º Ano A">
+                <select id="turmaAluno" required>
+                    <option value="" disabled selected>Selecione sua Turma...</option>
+                    <optgroup label="Ensino Fundamental">
+                        <option value="6º Ano A">6º Ano A</option>
+                        <option value="6º Ano B">6º Ano B</option>
+                        <option value="7º Ano A">7º Ano A</option>
+                        <option value="7º Ano B">7º Ano B</option>
+                        <option value="8º Ano A">8º Ano A</option>
+                        <option value="8º Ano B">8º Ano B</option>
+                        <option value="9º Ano A">9º Ano A</option>
+                        <option value="9º Ano B">9º Ano B</option>
+                    </optgroup>
+                    <optgroup label="Ensino Médio">
+                        <option value="1º Ano A">1º Ano A</option>
+                        <option value="1º Ano B">1º Ano B</option>
+                        <option value="2º Ano A">2º Ano A</option>
+                        <option value="2º Ano B">2º Ano B</option>
+                        <option value="3º Ano A">3º Ano A</option>
+                        <option value="3º Ano B">3º Ano B</option>
+                    </optgroup>
+                </select>
             </div>
 
             <button type="submit" class="btn-submit" id="btn-submit">Confirmar Inscrição</button>
@@ -105,7 +114,16 @@
 
     <script>
         const professorHashPublico = new URLSearchParams(window.location.search).get('ref');
-        let fotoBase64 = ""; 
+        let fotoBase64 = "";
+
+        const listaTodasModalidades = [
+            { nome: 'Futsal', icone: '⚽' }, { nome: 'Vôlei', icone: '🏐' },
+            { nome: 'Basquete', icone: '🏀' }, { nome: 'Handebol', icone: '🤾' },
+            { nome: 'Queimada', icone: '☄️' }, { nome: 'Vôlei de Areia', icone: '🏖️' },
+            { nome: 'Natação', icone: '🏊' }, { nome: 'Atletismo', icone: '🏃' },
+            { nome: 'Tênis de Mesa', icone: '🏓' }, { nome: 'Xadrez', icone: '♟️' },
+            { nome: 'Dama', icone: '🏁' }, { nome: 'E-Sports', icone: '🎮' }
+        ];
 
         window.onload = async () => {
             if (!professorHashPublico) {
@@ -114,41 +132,28 @@
             }
 
             try {
-                // 1. Checa se o professor travou as inscrições
                 const resStatus = await fetch(`/api/alunos/public/status/${professorHashPublico}`);
                 if (resStatus.ok) {
                     const isOpen = await resStatus.json();
                     if (!isOpen) {
                         document.getElementById('loading-esportes').innerHTML = `
-                            <div style="padding: 20px; background: rgba(255,0,85,0.1); border: 1px solid #ff0055; border-radius: 12px; box-shadow: 0 0 20px rgba(255,0,85,0.3);">
+                            <div style="padding: 20px; background: rgba(255,0,85,0.1); border: 1px solid #ff0055; border-radius: 10px; text-align: center;">
                                 <h3 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 10px;">🔒 INSCRIÇÕES ENCERRADAS</h3>
-                                <p style="color: #ddd; font-size: 0.85rem; font-family: 'Segoe UI';">O professor travou o recebimento de novos atletas para este evento. As chaves já estão sendo geradas!</p>
+                                <p style="color: #ddd; font-size: 0.85rem;">O professor travou o recebimento de novos atletas para este evento.</p>
                             </div>
                         `;
                         return;
                     }
                 }
 
-                // 2. Puxa as modalidades
                 const res = await fetch(`/api/modalidades/public/${professorHashPublico}`);
                 if (res.ok) {
-                    const modalidades = await res.json();
-                    
-                    if(modalidades.length === 0) {
-                        document.getElementById('loading-esportes').innerHTML = "📭 A escola ainda não abriu inscrições oficiais para nenhuma modalidade.";
-                    } else {
-                        const uniqueSportsMap = new Map();
-                        modalidades.forEach(m => {
-                            if (!uniqueSportsMap.has(m.nomeEsporte)) {
-                                uniqueSportsMap.set(m.nomeEsporte, { esporte: m.nomeEsporte, icone: m.icone });
-                            }
-                        });
-                        const uniqueSports = Array.from(uniqueSportsMap.values());
-                        
-                        renderizarOpcoesDeEsportes(uniqueSports);
-                        document.getElementById('loading-esportes').style.display = 'none';
-                        document.getElementById('form-cadastro').style.display = 'block';
-                    }
+                    const modalidadesAtivas = await res.json();
+                    const nomesAtivos = modalidadesAtivas.map(m => m.nomeEsporte.toLowerCase());
+
+                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivas);
+                    document.getElementById('loading-esportes').style.display = 'none';
+                    document.getElementById('form-cadastro').style.display = 'block';
                 } else {
                     document.getElementById('loading-esportes').innerText = "❌ Erro ao buscar modalidades ativas.";
                 }
@@ -157,6 +162,25 @@
             }
         };
 
+        function renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivas) {
+            const select = document.getElementById('esporteAluno');
+            let html = '<option value="" disabled selected>Selecione a Modalidade...</option>';
+
+            listaTodasModalidades.forEach((mod) => {
+                let ativo = nomesAtivos.includes(mod.nome.toLowerCase());
+                let modObjOriginal = modalidadesAtivas.find(m => m.nomeEsporte.toLowerCase() === mod.nome.toLowerCase());
+                let iconeSeguro = modObjOriginal ? (modObjOriginal.icone || mod.icone) : mod.icone;
+
+                if (ativo) {
+                    let modData = JSON.stringify({ esporte: mod.nome, icone: iconeSeguro });
+                    html += `<option value='${modData}'>${iconeSeguro} ${mod.nome}</option>`;
+                } else {
+                    html += `<option value="" disabled style="color: #666; background: #0a0a15;">🔒 ${mod.nome} (Não Disponível)</option>`;
+                }
+            });
+            select.innerHTML = html;
+        }
+
         function processarImagem(event) {
             const file = event.target.files[0];
             if (file) {
@@ -164,11 +188,10 @@
                     alert("A imagem é muito grande! Escolha uma foto menor que 5MB.");
                     return;
                 }
-
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('profile-preview').src = e.target.result;
-                    fotoBase64 = e.target.result; 
+                    fotoBase64 = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
@@ -176,21 +199,8 @@
 
         function mudarCorDaBorda(genero) {
             const borda = document.getElementById('profile-border');
-            borda.className = 'profile-pic-wrapper'; 
+            borda.className = 'profile-pic-wrapper';
             borda.classList.add(`insta-border-${genero}`);
-        }
-
-        function renderizarOpcoesDeEsportes(modalidadesUnicas) {
-            const select = document.getElementById('esporteAluno');
-            let html = '<option value="" disabled selected>Selecione a Modalidade...</option>';
-
-            modalidadesUnicas.forEach((mod) => {
-                let iconeSeguro = (!mod.icone || mod.icone === 'null') ? '🏅' : mod.icone;
-                let modData = JSON.stringify({ esporte: mod.esporte, icone: iconeSeguro });
-                html += `<option value='${modData}'>${iconeSeguro} ${mod.esporte}</option>`;
-            });
-
-            select.innerHTML = html;
         }
 
         function mostrarAlerta(mensagem, tipo) {
@@ -202,32 +212,25 @@
 
         async function inscreverAluno(event) {
             event.preventDefault();
-            
             const generoEscolhido = document.getElementById('generoAluno').value;
             const esporteEscolhido = document.getElementById('esporteAluno').value;
+            const turmaEscolhida = document.getElementById('turmaAluno').value;
 
-            if(!generoEscolhido) {
-                mostrarAlerta("⚠️ Selecione a sua categoria (Masculino, Feminino ou Misto).", "danger");
-                return;
-            }
-
-            if(!esporteEscolhido) {
-                mostrarAlerta("⚠️ Selecione a Modalidade que você vai participar.", "danger");
-                return;
-            }
+            if(!generoEscolhido) { mostrarAlerta("⚠️ Selecione a sua categoria.", "danger"); return; }
+            if(!esporteEscolhido) { mostrarAlerta("⚠️ Selecione uma Modalidade válida (disponível).", "danger"); return; }
+            if(!turmaEscolhida) { mostrarAlerta("⚠️ Selecione a sua Turma.", "danger"); return; }
 
             const modalidadeObj = JSON.parse(esporteEscolhido);
             const nome = document.getElementById('nomeAluno').value.trim();
-            const turma = document.getElementById('turmaAluno').value.trim();
-
             const btnSubmit = document.getElementById('btn-submit');
+            
             btnSubmit.innerHTML = "⏳ Enviando Cadastro...";
             btnSubmit.disabled = true;
 
-            const payload = { 
-                nome: nome, 
-                turma: turma, 
-                fotoUrl: fotoBase64, 
+            const payload = {
+                nome: nome,
+                turma: turmaEscolhida,
+                fotoUrl: fotoBase64,
                 esporte: modalidadeObj.esporte,
                 iconeEsporte: modalidadeObj.icone,
                 genero: generoEscolhido
@@ -241,20 +244,22 @@
                 });
 
                 if (response.ok) {
-                    mostrarAlerta(`✅ Sucesso! Inscrição confirmada na Modalidade.`, "success");
+                    mostrarAlerta("✅ Sucesso! Inscrição confirmada na Modalidade.", "success");
                     document.getElementById('form-cadastro').reset();
-                    document.getElementById('profile-preview').src = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
-                    mudarCorDaBorda(""); 
+                    document.getElementById('profile-preview').src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+                    mudarCorDaBorda("");
                     fotoBase64 = "";
-                    btnSubmit.innerHTML = "Inscrição Concluída! ✔️";
+                    btnSubmit.innerHTML = "Inscrição Concluída! ✔";
                 } else {
                     const msgErro = await response.text();
                     mostrarAlerta("❌ " + msgErro, "danger");
-                    btnSubmit.innerHTML = "Confirmar Inscrição"; btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = "Confirmar Inscrição";
+                    btnSubmit.disabled = false;
                 }
             } catch (error) {
                 mostrarAlerta("⚠️ Servidor indisponível no momento. Tente novamente mais tarde.", "danger");
-                btnSubmit.innerHTML = "Confirmar Inscrição"; btnSubmit.disabled = false;
+                btnSubmit.innerHTML = "Confirmar Inscrição";
+                btnSubmit.disabled = false;
             }
         }
     </script>
