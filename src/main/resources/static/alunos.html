@@ -44,8 +44,7 @@
         .input-dark { width: 100%; padding: 15px 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; color: white; font-family: 'Segoe UI'; font-size: 1rem; outline: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .input-dark:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); background: rgba(0,0,0,0.8); }
 
-		/* 🔥 NOVO ESTILO DOS BOTÕES DE LOTE IGUAL AO TABELAS.HTML 🔥 */
-		        .tabs-container { 
+		.tabs-container { 
 		            display: flex; 
 		            gap: 10px; 
 		            margin-bottom: 20px; 
@@ -63,19 +62,17 @@
 		            font-family: 'Orbitron'; 
 		            font-size: 0.85rem; 
 		            transition: 0.3s;
-		            white-space: nowrap; /* Impede quebra de linha no botão */
-		            display: flex;
-		            align-items: center;
-		            gap: 5px;
+		            white-space: nowrap; 
+		            flex-shrink: 0; /* 🚀 O segredo para não amassar no celular */
+		            display: inline-block;
+		            text-align: center;
 		        }
 
-		        /* Cores base dos botões inativos */
 		        #tab-masculino { color: #00f2fe; }
 		        #tab-feminino { color: #ff00de; }
 		        #tab-misto { color: #b200ff; }
 
-		        /* Estilo Dinâmico de "Ativo" via JavaScript */
-		        .tab-count { font-size: 0.75rem; opacity: 0.8; font-family: 'Segoe UI'; font-weight: normal; }
+		        .tab-count { font-size: 0.75rem; opacity: 0.8; font-family: 'Segoe UI'; font-weight: normal; margin-left: 5px; }
 
         .resumo-esportes { margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
         .badge-sport-summary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 25px; font-size: 0.9rem; font-family: 'Segoe UI'; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); }
