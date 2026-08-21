@@ -72,3 +72,8 @@ body.theme-misto {
     0% { background-position: center center, 0 0, 0 0; }
     100% { background-position: center center, 40px 40px, 40px 40px; }
 }
+
+/* Ajuste do Topbar para celulares na vertical */
+@media (max-width: 400px) {
+    .hide-on-mobile { display: none !important; }
+}

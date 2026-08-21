@@ -315,5 +315,19 @@
             container.innerHTML = html;
         }
     </script>
+	
+	<!-- Espaço onde a barra inferior será injetada -->
+	<div id="footbar-placeholder"></div>
+
+	<script>
+	    // Carregar a barra de navegação inferior dinamicamente
+	    fetch('/footbar.html')
+	        .then(r => r.text())
+	        .then(h => {
+	            document.getElementById('footbar-placeholder').innerHTML = h;
+	            // Adiciona um espaço extra no fim da página para a lista de alunos não ficar escondida atrás da barra
+	            document.body.style.paddingBottom = '80px'; 
+	        });
+	</script>
 </body>
 </html>

@@ -1,29 +1,34 @@
-<header class="game-header glass" style="border-radius: 15px; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-left: 4px solid #00f2fe; position: relative; z-index: 9999;">
+<!-- 🔥 CABEÇALHO OTIMIZADO PARA CELULARES COMPRIMIDOS 🔥 -->
+<header class="game-header glass" style="border-radius: 15px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-left: 4px solid #00f2fe; position: relative; z-index: 9999;">
     
-    <div>
-        <h1 style="font-weight: 700; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; color: #00f2fe; text-shadow: 0 0 10px #00f2fe; margin:0;">Interclass Arena</h1>
-        <p class="escola-nome" id="escola-nome-top" style="font-size: 0.9rem; font-family: 'Segoe UI'; opacity: 0.7; margin:0;">Carregando Instituição...</p>
+    <div style="flex: 1; min-width: 0; padding-right: 10px;"> <!-- min-width: 0 permite que o texto encolha sem quebrar a tela -->
+        <h1 style="font-weight: 700; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 1px; color: #00f2fe; text-shadow: 0 0 10px #00f2fe; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Interclass Arena</h1>
+        <p class="escola-nome" id="escola-nome-top" style="font-size: 0.75rem; font-family: 'Segoe UI'; opacity: 0.7; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Carregando Instituição...</p>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 20px;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
         
-        <div id="header-stats">
-            <span style="color: #ff00de; font-weight: bold; font-family: 'Orbitron'; font-size: 0.9rem;">● AO VIVO</span>
+        <div id="header-stats" class="hide-on-mobile">
+            <span style="color: #ff00de; font-weight: bold; font-family: 'Orbitron'; font-size: 0.75rem;">● AO VIVO</span>
         </div>
 
         <div style="position: relative;">
             
-            <div class="user-profile-btn" onclick="const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'none' || d.style.display === '' ? 'block' : 'none'; event.stopPropagation();" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 30px; transition: all 0.3s ease;">
-                <span id="nome-professor-top" style="font-family: 'Segoe UI'; font-size: 0.95rem; font-weight: 600; color: #fff;">Carregando...</span>
+            <!-- Botão de perfil reduzido de 6px 16px para 4px 10px -->
+            <div class="user-profile-btn" onclick="const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'none' || d.style.display === '' ? 'block' : 'none'; event.stopPropagation();" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 30px; transition: all 0.3s ease;">
                 
-                <div style="width: 38px; height: 38px; border-radius: 50%; background: #00f2fe; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">
+                <!-- O nome do professor agora corta com "..." se for muito longo -->
+                <span id="nome-professor-top" style="font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: 600; color: #fff; max-width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Carregando...</span>
+                
+                <!-- Avatar reduzido de 38px para 30px -->
+                <div style="width: 30px; height: 30px; border-radius: 50%; background: #00f2fe; display: flex; justify-content: center; align-items: center; font-size: 1rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">
                     👤
                 </div>
             </div>
 
+            <!-- O Dropdown do usuário continua idêntico aqui... -->
             <div id="user-dropdown" class="glass-dropdown" style="display: none;">
                 <ul>
-                    
                     <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-pix-assinatura').style.display='flex';" style="flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 15px; padding-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                             <div style="display: flex; gap: 12px; align-items: center;"><span>💳</span> Assinatura</div>
@@ -31,7 +36,6 @@
                         </div>
                         <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-left: 28px; font-family: 'Segoe UI';">Termina em: <span id="data-termino" style="color: #fff; font-weight: bold;">15/12/2026</span></div>
                     </li>
-
                     <li class="suporte-item" style="flex-direction: column; align-items: flex-start; cursor: default; gap: 10px;">
                         <div style="display: flex; gap: 12px; align-items: center; width: 100%;">
                             <span>❓</span> Suporte Técnico
@@ -45,17 +49,15 @@
                     <li onclick="document.getElementById('user-dropdown').style.display='none'; document.getElementById('modal-reset-sistema').style.display='flex';">
                         <span style="color: #ff0055;">⚠️</span> <span style="color: #ffccdd;">Zerar Temporada</span>
                     </li>
-                    
                     <li onclick="if(confirm('Deseja realmente sair da plataforma?')) { localStorage.clear(); window.location.href = '/index.html'; }" class="logout-btn">
                         <span>🚪</span> Sair
                     </li>
                 </ul>
             </div>
-
         </div>
     </div>
 
-    <!-- 🔥 O CÉREBRO OCULTO: Executa o JS ignorando o bloqueio do innerHTML 🔥 -->
+    <!-- Script de dados e reset mantido intacto -->
     <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none;" onload="
         try {
             let nomeProf = localStorage.getItem('profNome');
@@ -67,41 +69,28 @@
                 document.getElementById('escola-nome-top').textContent = 'Colégio Interclass';
                 document.getElementById('nome-professor-top').textContent = 'Sessão Expirada';
             }
-
-            // 🚀 INJETAMOS A FUNÇÃO DE RESET NO OBJETO WINDOW PARA ELA FUNCIONAR GLOBALMENTE
             window.executarResetDeTemporada = async function() {
                 let confirmacao = prompt('Tem certeza absoluta?\\nDigite ZERAR na caixa abaixo para confirmar a destruição de todos os dados do torneio:');
                 if(confirmacao !== 'ZERAR' && confirmacao !== 'zerar') {
                     alert('Ação cancelada de forma segura.'); return;
                 }
-
                 const btn = document.getElementById('btn-executar-reset');
                 btn.innerHTML = '⏳ Varrendo Banco...'; btn.disabled = true;
-
                 const token = localStorage.getItem('interclassToken');
-
                 try {
-                    const resposta = await fetch('/api/setup/reset', {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-
+                    const resposta = await fetch('/api/setup/reset', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
                     if(resposta.ok) {
-                        // Preserva o Login da conta, mas tritura todo o cache local e configurações
                         const t = localStorage.getItem('interclassToken');
                         const pid = localStorage.getItem('profId');
                         const pNome = localStorage.getItem('profNome');
                         const pEscola = localStorage.getItem('profEscola');
                         const isM = localStorage.getItem('isMasterAdmin');
-
                         localStorage.clear();
-
                         localStorage.setItem('interclassToken', t);
                         localStorage.setItem('profId', pid);
                         localStorage.setItem('profNome', pNome);
                         localStorage.setItem('profEscola', pEscola);
                         if(isM) localStorage.setItem('isMasterAdmin', isM);
-
                         alert('♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado. Bem-vindo à nova Temporada Interclass!');
                         window.location.href = '/dashboard.html';
                     } else {
@@ -117,63 +106,3 @@
     ">
 </header>
 
-<!-- 🔥 MODAL: ZERAR TEMPORADA -->
-<div id="modal-reset-sistema" class="modal-overlay-pix" style="display: none;">
-    <div class="modal-box-pix glass" style="border-color: #ff0055; text-align: center;">
-        <h3 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 1rem; font-size: 1.4rem;">🚨 ZERAR APLICATIVO?</h3>
-        
-        <p style="font-family: 'Segoe UI'; font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-bottom: 20px; line-height: 1.5;">
-            Esta ação excluirá <b style="color:#ffccdd;">permanentemente</b> todos os alunos matriculados, jogos, chaves, súmulas e placares criados por você na base de dados.
-        </p>
-
-        <div style="background: rgba(255,0,85,0.1); border: 1px dashed #ff0055; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-            <span style="font-family: 'Orbitron'; font-size: 0.8rem; color: #ff0055;">⚠️ ATENÇÃO</span>
-            <p style="font-family: 'Segoe UI'; font-size: 0.8rem; color: #aaa; margin-top: 5px;">Use isto apenas na virada do ano letivo ou semestre para iniciar uma nova jornada esportiva na escola do absoluto zero.</p>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button id="btn-executar-reset" onclick="window.executarResetDeTemporada()" class="btn-acao-pix" style="background: #ff0055; color: #fff; box-shadow: 0 0 20px rgba(255,0,85,0.4);">Sim, Apagar Tudo</button>
-            <button onclick="document.getElementById('modal-reset-sistema').style.display='none';" class="btn-acao-pix" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; box-shadow: none;">Cancelar</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal PIX (Omitido para manter focado, código já existente) -->
-<div id="modal-pix-assinatura" class="modal-overlay-pix" style="display: none;">
-    <div class="modal-box-pix glass">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 style="color: #00f2fe; font-family: 'Orbitron'; margin: 0; font-size: 1.2rem;">💳 Renovar Assinatura</h3>
-            <button onclick="document.getElementById('modal-pix-assinatura').style.display='none';" style="background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer; line-height: 1;">&times;</button>
-        </div>
-        
-        <div style="text-align: center;">
-            <p style="font-family: 'Segoe UI'; font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 15px;">Escaneie o QR Code abaixo no aplicativo do seu banco para liberar seu acesso imediatamente.</p>
-            
-            <div style="background: white; padding: 15px; border-radius: 10px; display: inline-block; margin-bottom: 15px; border: 3px solid #00f2fe; box-shadow: 0 0 20px rgba(0,242,254,0.3);">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=00020126580014BR.GOV.BCB.PIX0136026660663635204000053039865802BR5913InterclassApp6008Acopiara62070503***6304" alt="QR Code Pix" style="width: 180px; height: 180px; display: block;">
-            </div>
-            
-            <button onclick="navigator.clipboard.writeText('00020126580014BR.GOV.BCB.PIX0111026660663635204000053039865802BR5913InterclassApp6008Acopiara62070503***6304E2A1').then(() => alert('✅ Código Pix Copia e Cola copiado com sucesso! Abra o app do seu banco e cole.'));" class="btn-acao-pix">📋 Copiar Pix (Copia e Cola)</button>
-        </div>
-    </div>
-</div>
-
-<style>
-    .user-profile-btn:hover { background: rgba(0, 242, 254, 0.1) !important; border-color: #00f2fe !important; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); transform: translateY(-2px); }
-    .glass-dropdown { position: absolute; top: 60px; right: 0; width: 260px; background: rgba(10, 10, 20, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 15px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7); z-index: 9999; overflow: hidden; animation: slideDown 0.3s ease forwards; }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .glass-dropdown ul { list-style: none; padding: 0; margin: 0; }
-    .glass-dropdown li { padding: 12px 20px; cursor: pointer; color: rgba(255, 255, 255, 0.85); font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; transition: all 0.3s; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-    .glass-dropdown li:last-child { border-bottom: none; }
-    .glass-dropdown li:not(.suporte-item):hover { background: rgba(0, 242, 254, 0.15); color: #00f2fe; padding-left: 25px; }
-    .glass-dropdown li.logout-btn:hover { background: rgba(255, 69, 0, 0.15); color: #ff4500; }
-    .social-icon { text-decoration: none; font-size: 1.3rem; transition: transform 0.3s, filter 0.3s; filter: grayscale(100%) opacity(0.7); }
-    .social-icon:hover { transform: scale(1.3) translateY(-2px); filter: grayscale(0%) opacity(1); }
-    .badge-status { font-size: 0.65rem; font-family: 'Orbitron'; font-weight: bold; padding: 3px 8px; border-radius: 6px; }
-    .status-ativo { background: rgba(0, 255, 0, 0.1); color: #00ff00; border: 1px solid #00ff00; }
-    
-    .modal-overlay-pix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 10000; justify-content: center; align-items: center; }
-    .modal-box-pix { background: rgba(10, 10, 20, 0.98); border: 1px solid #00f2fe; border-radius: 15px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-    .btn-acao-pix { width: 100%; padding: 12px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 10px; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 1rem; }
-    .btn-acao-pix:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,242,254,0.6); background: #fff; }
-</style>
