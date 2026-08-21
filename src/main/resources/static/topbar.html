@@ -1,24 +1,19 @@
 <style>
-    /* 🔥 CSS Responsivo do Topbar 🔥 */
-    .game-header h1 { font-size: 1.5rem; transition: 0.3s; }
-    .escola-nome { font-size: 0.9rem; transition: 0.3s; }
-    .user-profile-btn { padding: 6px 16px; transition: 0.3s; }
-    .avatar-circle { width: 38px; height: 38px; font-size: 1.2rem; transition: 0.3s; }
-    .prof-name { max-width: 200px; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; transition: 0.3s; }
+    /* 🔥 CSS UNIVERSAL DO TOPBAR (PC E MOBILE) 🔥 */
+    .game-header { border-radius: 15px; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-left: 4px solid #00f2fe; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border-top: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); position: relative; z-index: 9999; }
+    .topbar-left { flex: 1; min-width: 0; padding-right: 15px; }
+    .topbar-right { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
+    
+    .game-header h1 { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; color: #00f2fe; text-shadow: 0 0 10px #00f2fe; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .escola-nome { font-family: 'Segoe UI', sans-serif; font-size: 0.95rem; opacity: 0.7; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+    
+    .user-profile-btn { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 30px; transition: 0.3s; }
+    .user-profile-btn:hover { background: rgba(0, 242, 254, 0.1); border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); transform: translateY(-2px); }
+    .prof-name { font-family: 'Segoe UI', sans-serif; font-weight: 600; color: #fff; font-size: 0.95rem; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: #00f2fe; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.4); }
 
-    /* Quando a tela for de celular (menor que 600px), ele espreme automaticamente */
-    @media (max-width: 600px) {
-        .game-header h1 { font-size: 1.15rem; }
-        .escola-nome { font-size: 0.75rem; }
-        .user-profile-btn { padding: 4px 10px; }
-        .avatar-circle { width: 30px; height: 30px; font-size: 1rem; }
-        .prof-name { max-width: 70px; font-size: 0.85rem; }
-        .hide-on-mobile { display: none !important; }
-    }
-
-    /* Estilos do Dropdown mantidos intactos */
-    .user-profile-btn:hover { background: rgba(0, 242, 254, 0.1) !important; border-color: #00f2fe !important; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); transform: translateY(-2px); }
-    .glass-dropdown { position: absolute; top: 60px; right: 0; width: 260px; background: rgba(10, 10, 20, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 15px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7); z-index: 9999; overflow: hidden; animation: slideDown 0.3s ease forwards; }
+    /* Modais e Dropdown */
+    .glass-dropdown { position: absolute; top: 60px; right: 0; width: 260px; background: rgba(10, 10, 20, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 15px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7); z-index: 9999; animation: slideDown 0.3s ease forwards; }
     @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     .glass-dropdown ul { list-style: none; padding: 0; margin: 0; }
     .glass-dropdown li { padding: 12px 20px; cursor: pointer; color: rgba(255, 255, 255, 0.85); font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; transition: all 0.3s; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
@@ -29,35 +24,39 @@
     .social-icon:hover { transform: scale(1.3) translateY(-2px); filter: grayscale(0%) opacity(1); }
     .badge-status { font-size: 0.65rem; font-family: 'Orbitron'; font-weight: bold; padding: 3px 8px; border-radius: 6px; }
     .status-ativo { background: rgba(0, 255, 0, 0.1); color: #00ff00; border: 1px solid #00ff00; }
-    
-    .modal-overlay-pix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 10000; justify-content: center; align-items: center; }
+    .modal-overlay-pix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 10000; justify-content: center; align-items: center; display:none; }
     .modal-box-pix { background: rgba(10, 10, 20, 0.98); border: 1px solid #00f2fe; border-radius: 15px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
     .btn-acao-pix { width: 100%; padding: 12px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 10px; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 1rem; }
     .btn-acao-pix:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,242,254,0.6); background: #fff; }
+
+    /* Responsividade para Celulares (Ex: Galaxy A72) */
+    @media (max-width: 600px) {
+        .game-header { padding: 12px 15px; }
+        .game-header h1 { font-size: 1.15rem; }
+        .escola-nome { font-size: 0.75rem; }
+        .topbar-right { gap: 8px; }
+        .user-profile-btn { padding: 4px 10px; gap: 8px; }
+        .prof-name { max-width: 80px; font-size: 0.85rem; }
+        .avatar-circle { width: 30px; height: 30px; font-size: 1rem; }
+        .hide-on-mobile { display: none !important; }
+    }
 </style>
 
-<header class="game-header glass" style="border-radius: 15px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-left: 4px solid #00f2fe; position: relative; z-index: 9999;">
-    
-    <div style="flex: 1; min-width: 0; padding-right: 10px;">
-        <h1 style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #00f2fe; text-shadow: 0 0 10px #00f2fe; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Interclass Arena</h1>
-        <p class="escola-nome" id="escola-nome-top" style="font-family: 'Segoe UI'; opacity: 0.7; margin:0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Carregando Instituição...</p>
+<header class="game-header">
+    <div class="topbar-left">
+        <h1>Interclass Arena</h1>
+        <p class="escola-nome" id="escola-nome-top">Carregando Instituição...</p>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-        
+    <div class="topbar-right">
         <div id="header-stats" class="hide-on-mobile">
             <span style="color: #ff00de; font-weight: bold; font-family: 'Orbitron'; font-size: 0.75rem;">● AO VIVO</span>
         </div>
 
         <div style="position: relative;">
-            
-            <div class="user-profile-btn" onclick="const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'none' || d.style.display === '' ? 'block' : 'none'; event.stopPropagation();" style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 30px;">
-                
-                <span id="nome-professor-top" class="prof-name" style="font-family: 'Segoe UI'; font-weight: 600; color: #fff;">Carregando...</span>
-                
-                <div class="avatar-circle" style="border-radius: 50%; background: #00f2fe; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">
-                    👤
-                </div>
+            <div class="user-profile-btn" onclick="const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'none' || d.style.display === '' ? 'block' : 'none'; event.stopPropagation();">
+                <span id="nome-professor-top" class="prof-name">Carregando...</span>
+                <div class="avatar-circle">👤</div>
             </div>
 
             <div id="user-dropdown" class="glass-dropdown" style="display: none;">
@@ -90,7 +89,7 @@
         </div>
     </div>
 
-    <!-- Script de injecao de dados e reset da temporada -->
+    <!-- Script de dados e reset da temporada oculto -->
     <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none;" onload="
         try {
             let nomeProf = localStorage.getItem('profNome');
@@ -124,7 +123,7 @@
                         localStorage.setItem('profNome', pNome);
                         localStorage.setItem('profEscola', pEscola);
                         if(isM) localStorage.setItem('isMasterAdmin', isM);
-                        alert('♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado. Bem-vindo à nova Temporada Interclass!');
+                        alert('♻️ RECOMEÇO PRONTO! O seu aplicativo foi completamente zerado.');
                         window.location.href = '/dashboard.html';
                     } else {
                         alert('Erro ao tentar limpar a base de dados. Tente novamente mais tarde.');
@@ -139,13 +138,10 @@
     ">
 </header>
 
-<!-- 🔥 MODAIS MANTIDOS INTACTOS 🔥 -->
 <div id="modal-reset-sistema" class="modal-overlay-pix" style="display: none;">
-    <div class="modal-box-pix glass" style="border-color: #ff0055; text-align: center;">
+    <div class="modal-box-pix" style="border-color: #ff0055; text-align: center;">
         <h3 style="color: #ff0055; font-family: 'Orbitron'; margin-bottom: 1rem; font-size: 1.4rem;">🚨 ZERAR APLICATIVO?</h3>
-        <p style="font-family: 'Segoe UI'; font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-bottom: 20px; line-height: 1.5;">
-            Esta ação excluirá <b style="color:#ffccdd;">permanentemente</b> todos os alunos matriculados, jogos, chaves, súmulas e placares criados por você na base de dados.
-        </p>
+        <p style="font-family: 'Segoe UI'; font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-bottom: 20px; line-height: 1.5;">Esta ação excluirá <b style="color:#ffccdd;">permanentemente</b> todos os alunos matriculados, jogos, chaves, súmulas e placares criados por você na base de dados.</p>
         <div style="background: rgba(255,0,85,0.1); border: 1px dashed #ff0055; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
             <span style="font-family: 'Orbitron'; font-size: 0.8rem; color: #ff0055;">⚠️ ATENÇÃO</span>
             <p style="font-family: 'Segoe UI'; font-size: 0.8rem; color: #aaa; margin-top: 5px;">Use isto apenas na virada do ano letivo ou semestre para iniciar uma nova jornada esportiva.</p>
@@ -158,7 +154,7 @@
 </div>
 
 <div id="modal-pix-assinatura" class="modal-overlay-pix" style="display: none;">
-    <div class="modal-box-pix glass">
+    <div class="modal-box-pix">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <h3 style="color: #00f2fe; font-family: 'Orbitron'; margin: 0; font-size: 1.2rem;">💳 Renovar Assinatura</h3>
             <button onclick="document.getElementById('modal-pix-assinatura').style.display='none';" style="background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer; line-height: 1;">&times;</button>
