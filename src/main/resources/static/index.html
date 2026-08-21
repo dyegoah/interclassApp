@@ -106,17 +106,19 @@
                 if (response.ok) {
                     const dados = await response.json();
                     
-                    // 🧹 FAXINA DE CACHE DE SEGURANÇA: 
-                    // Apaga os dados do professor anterior antes de logar o novo!
                     localStorage.clear(); 
-                    
                     localStorage.setItem('interclassToken', dados.token);
-                    localStorage.setItem('profId', dados.hash); // 🛡️ Salva o Hash Criptografado (Fim do ID Sequencial)
+                    localStorage.setItem('profId', dados.hash);
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
-                    localStorage.removeItem('isMasterAdmin'); // Professor normal
-
-                    window.location.replace('/dashboard.html'); 
+                    
+                    // 🚀 Roteamento Cirúrgico com base na Etiqueta do Servidor
+                    if (dados.isMaster) {
+                        localStorage.setItem('isMasterAdmin', 'true');
+                        window.location.replace('/admin.html');
+                    } else {
+                        window.location.replace('/dashboard.html'); 
+                    }
                 } else {
                     const erroServidor = await response.text();
                     if (erroServidor.includes("obrigatório para contas Master")) {
@@ -152,16 +154,19 @@
                 if (response.ok) {
                     const dados = await response.json();
                     
-                    // 🧹 FAXINA DE CACHE DE SEGURANÇA MÁXIMA
                     localStorage.clear(); 
-                    
                     localStorage.setItem('interclassToken', dados.token);
-                    localStorage.setItem('profId', dados.hash); // 🛡️ Hash Criptografado
+                    localStorage.setItem('profId', dados.hash);
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
-                    localStorage.setItem('isMasterAdmin', 'true'); // Etiqueta o Master
-
-                    window.location.replace('/admin.html'); 
+                    
+                    // 🚀 Se passou pelo 2FA, ele é Master garantido!
+                    if (dados.isMaster) {
+                        localStorage.setItem('isMasterAdmin', 'true');
+                        window.location.replace('/admin.html');
+                    } else {
+                        window.location.replace('/dashboard.html'); 
+                    }
                 } else {
                     alert("🔒 Acesso Negado: " + await response.text());
                     document.getElementById('codigo2fa').value = ""; document.getElementById('codigo2fa').focus();

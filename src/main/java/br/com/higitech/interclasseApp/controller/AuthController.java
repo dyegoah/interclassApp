@@ -44,12 +44,14 @@ public class AuthController {
         public String nome;
         public String escola;
         public String hash;
+        public boolean isMaster; // 🚀 ETIQUETA MASTER PARA O FRONTEND
 
-        public LoginResponseDTO(String token, String nome, String escola, String hash) {
+        public LoginResponseDTO(String token, String nome, String escola, String hash, boolean isMaster) {
             this.token = token;
             this.nome = nome;
             this.escola = escola;
             this.hash = hash;
+            this.isMaster = isMaster;
         }
     }
 
@@ -68,8 +70,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
         }
 
-        // 🛡️ VERIFICAÇÃO 2FA MASTER (Com Janela de Tolerância para Servidores Nuvem)
-        if ("master".equals(prof.getStatus())) {
+        // 🚀 RECONHECIMENTO BLINDADO: Mesmo se o banco errar o status, o e-mail garante o acesso Master!
+        boolean isMaster = "master".equals(prof.getStatus()) || 
+                           prof.getEmail().toLowerCase().contains("admin") || 
+                           "fut_sumula_pro@hotmail.com".equalsIgnoreCase(prof.getEmail());
+
+        if (isMaster) {
             if (dto.codigo2fa == null || dto.codigo2fa.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
                         .body("Código 2FA obrigatório para contas Master.");
@@ -84,15 +90,16 @@ public class AuthController {
         }
 
         String token = tokenService.gerarToken(prof);
-        LoginResponseDTO resposta = new LoginResponseDTO(token, prof.getNome(), prof.getEscola(), prof.getHashPublico());
+        
+        // Envia a resposta com a Etiqueta Master
+        LoginResponseDTO resposta = new LoginResponseDTO(token, prof.getNome(), prof.getEscola(), prof.getHashPublico(), isMaster);
 
         return ResponseEntity.ok(resposta);
     }
 
-    // 🚀 LÓGICA CORE DO GOOGLE AUTHENTICATOR COM TOLERÂNCIA DE TEMPO
     private boolean validarTotpComTolerancia(String chaveSecreta, String codigoDigitado) {
+        if (chaveSecreta == null || chaveSecreta.isEmpty()) return false;
         long timeWindow = System.currentTimeMillis() / 30000L;
-        // Verifica o ciclo atual, o passado (-1) e o futuro (+1) para mitigar o delay do servidor Render
         for (int i = -1; i <= 1; i++) {
             if (gerarTotp(chaveSecreta, timeWindow + i).equals(codigoDigitado)) {
                 return true;
@@ -103,7 +110,6 @@ public class AuthController {
 
     private String gerarTotp(String chaveSecreta, long timeWindow) {
         try {
-            // 🚀 CORREÇÃO: Usando o Base32 do Aerogear diretamente (sem o "new")!
             byte[] bytesChave = Base32.decode(chaveSecreta);
             
             Mac mac = Mac.getInstance("HmacSHA1");
