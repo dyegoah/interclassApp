@@ -44,11 +44,38 @@
         .input-dark { width: 100%; padding: 15px 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; color: white; font-family: 'Segoe UI'; font-size: 1rem; outline: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .input-dark:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); background: rgba(0,0,0,0.8); }
 
-        .tabs-container { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; gap: 5px; }
-        .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 12px 25px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.95rem; }
-        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .tab-btn.active { background: rgba(255, 255, 255, 0.05); color: var(--theme-primary); border-bottom: 3px solid var(--theme-primary); text-shadow: 0 0 8px var(--theme-glow); }
-        .tab-count { font-size: 0.8em; opacity: 0.7; font-family: 'Segoe UI'; margin-left: 5px; }
+		/* 🔥 NOVO ESTILO DOS BOTÕES DE LOTE IGUAL AO TABELAS.HTML 🔥 */
+		        .tabs-container { 
+		            display: flex; 
+		            gap: 10px; 
+		            margin-bottom: 20px; 
+		            overflow-x: auto; 
+		            padding-bottom: 5px; 
+		        }
+		        
+		        .tab-btn { 
+		            background: rgba(0,0,0,0.5); 
+		            border: 1px solid rgba(255,255,255,0.1); 
+		            padding: 8px 20px; 
+		            border-radius: 8px; 
+		            cursor: pointer; 
+		            text-transform: uppercase; 
+		            font-family: 'Orbitron'; 
+		            font-size: 0.85rem; 
+		            transition: 0.3s;
+		            white-space: nowrap; /* Impede quebra de linha no botão */
+		            display: flex;
+		            align-items: center;
+		            gap: 5px;
+		        }
+
+		        /* Cores base dos botões inativos */
+		        #tab-masculino { color: #00f2fe; }
+		        #tab-feminino { color: #ff00de; }
+		        #tab-misto { color: #b200ff; }
+
+		        /* Estilo Dinâmico de "Ativo" via JavaScript */
+		        .tab-count { font-size: 0.75rem; opacity: 0.8; font-family: 'Segoe UI'; font-weight: normal; }
 
         .resumo-esportes { margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
         .badge-sport-summary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 25px; font-size: 0.9rem; font-family: 'Segoe UI'; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); }
@@ -203,16 +230,39 @@
             document.getElementById('count-misto').innerText = `(${listaAlunosBase.filter(a => a.genero === 'misto').length})`;
         }
 
-        function mudarAba(genero) {
-            generoAtual = genero; paginaAtual = 1; esporteAbaSelecionada = null; 
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-${genero}`).classList.add('active');
-            const body = document.body;
-            body.classList.remove('theme-fem', 'theme-misto');
-            if (genero === 'feminino') body.classList.add('theme-fem');
-            if (genero === 'misto') body.classList.add('theme-misto');
-            aplicarFiltrosEPaginacao();
-        }
+		function mudarAba(genero) {
+		            generoAtual = genero; 
+		            paginaAtual = 1; 
+		            esporteAbaSelecionada = null; 
+		            
+		            // 1. Resetar todos os botões para o estado inicial
+		            document.querySelectorAll('.tab-btn').forEach(btn => {
+		                btn.classList.remove('active');
+		                btn.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+		                btn.style.fontWeight = 'normal';
+		                btn.style.background = 'rgba(0,0,0,0.5)';
+		            });
+
+		            // 2. Definir a cor do tema baseado na seleção
+		            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+		            
+		            // 3. Aplicar o visual "Ativo" no botão clicado (Idêntico ao tabelas.html)
+		            const btnAtivo = document.getElementById(`tab-${genero}`);
+		            if(btnAtivo) {
+		                btnAtivo.classList.add('active');
+		                btnAtivo.style.borderBottom = `3px solid ${corTema}`;
+		                btnAtivo.style.fontWeight = 'bold';
+		                btnAtivo.style.background = 'rgba(255,255,255,0.1)';
+		            }
+
+		            // 4. Mudar as variáveis de cor global da tela
+		            const body = document.body;
+		            body.classList.remove('theme-fem', 'theme-misto');
+		            if (genero === 'feminino') body.classList.add('theme-fem');
+		            if (genero === 'misto') body.classList.add('theme-misto');
+		            
+		            aplicarFiltrosEPaginacao();
+		        }
 
         function realizarBusca() { paginaAtual = 1; aplicarFiltrosEPaginacao(); }
 
