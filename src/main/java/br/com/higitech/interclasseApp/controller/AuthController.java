@@ -69,12 +69,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
         }
 
+        // 🚀 O AJUSTE: Agora "dyego@master.com" está na lista oficial de quem pede o 2FA!
         boolean isMaster = "master".equals(prof.getStatus()) || 
                            prof.getEmail().toLowerCase().contains("admin") || 
-                           "fut_sumula_pro@hotmail.com".equalsIgnoreCase(prof.getEmail());
+                           "fut_sumula_pro@hotmail.com".equalsIgnoreCase(prof.getEmail()) ||
+                           "dyego@master.com".equalsIgnoreCase(prof.getEmail());
 
         if (isMaster) {
             if (dto.codigo2fa == null || dto.codigo2fa.trim().isEmpty()) {
+                // É AQUI que o Java avisa o HTML para abrir a tela do celularzinho!
                 return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
                         .body("Código 2FA obrigatório para contas Master.");
             }
@@ -98,7 +101,7 @@ public class AuthController {
         if (chaveSecreta == null || chaveSecreta.isEmpty()) return false;
         long tempoAtual = System.currentTimeMillis() / 30000L;
         
-        // Verifica o código de agora, de 30s atrás e 30s no futuro (Garante o funcionamento no Render)
+        // Tolerância de servidor em nuvem (Render)
         for (int i = -1; i <= 1; i++) {
             if (gerarTotpOficial(chaveSecreta, tempoAtual + i).equals(codigoDigitado)) {
                 return true;
@@ -107,12 +110,9 @@ public class AuthController {
         return false;
     }
 
-    // Algoritmo infalível que não sofre com a virada de milissegundos
     private String gerarTotpOficial(String secret, long time) {
         try {
             byte[] decodedKey = Base32.decode(secret);
-            
-            // Converte o tempo (long) para byte array da forma exata que o Google Auth espera (8 bytes)
             byte[] timeBytes = new byte[8];
             for (int i = 7; i >= 0; i--) {
                 timeBytes[i] = (byte) (time & 0xFF);
