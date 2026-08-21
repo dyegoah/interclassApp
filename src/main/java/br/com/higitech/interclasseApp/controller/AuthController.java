@@ -1,11 +1,12 @@
 package br.com.higitech.interclasseApp.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.ByteBuffer;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
-import org.jboss.aerogear.security.otp.Totp;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.jboss.aerogear.security.otp.api.Base32;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,95 +33,98 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
-    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-    public static class LoginRequest {
+    public static class LoginRequestDTO {
         public String email;
         public String senha;
         public String codigo2fa;
     }
 
-    public static class RegistroRequest {
+    public static class LoginResponseDTO {
+        public String token;
         public String nome;
         public String escola;
-        public String email;
-        public String senha;
+        public String hash;
+
+        public LoginResponseDTO(String token, String nome, String escola, String hash) {
+            this.token = token;
+            this.nome = nome;
+            this.escola = escola;
+            this.hash = hash;
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> fazerLogin(@RequestBody LoginRequest loginRequest) {
-        Optional<Professor> professorOpt = professorRepository.findByEmail(loginRequest.email);
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto) {
+        
+        Optional<Professor> opt = professorRepository.findByEmail(dto.email);
+        
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
+        }
+        
+        Professor prof = opt.get();
 
-        if (professorOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail não encontrado.");
+        if (!passwordEncoder.matches(dto.senha, prof.getSenha())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
         }
 
-        Professor professor = professorOpt.get();
-
-        if ("bloqueado".equalsIgnoreCase(professor.getStatus())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Conta bloqueada. Contate o suporte.");
-        }
-
-        // 🛡️ AUTO-CURA DO BANCO DE DADOS: 
-        // Se a conta for antiga e não tiver Hash Público, gera a chave e salva na hora!
-        if (professor.getHashPublico() == null || professor.getHashPublico().trim().isEmpty()) {
-            professor.setHashPublico(java.util.UUID.randomUUID().toString());
-            professorRepository.save(professor);
-        }
-
-        if (passwordEncoder.matches(loginRequest.senha, professor.getSenha())) {
-            
-            if (professor.getChave2fa() != null && !professor.getChave2fa().isEmpty()) {
-                if (loginRequest.codigo2fa == null || loginRequest.codigo2fa.trim().isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código 2FA é obrigatório para contas Master!");
-                }
-                Totp totp = new Totp(professor.getChave2fa());
-                if (!totp.verify(loginRequest.codigo2fa)) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código 2FA Inválido ou Expirado!");
-                }
+        // 🛡️ VERIFICAÇÃO 2FA MASTER (Com Janela de Tolerância para Servidores Nuvem)
+        if ("master".equals(prof.getStatus())) {
+            if (dto.codigo2fa == null || dto.codigo2fa.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
+                        .body("Código 2FA obrigatório para contas Master.");
             }
-
-            String tokenReal = tokenService.gerarToken(professor);
-
-            Map<String, Object> resposta = new HashMap<>();
-            resposta.put("id", professor.getId());
-            resposta.put("hash", professor.getHashPublico()); // Agora garantido que tem um Hash válido
-            resposta.put("nome", professor.getNome());
-            resposta.put("escola", professor.getEscola());
-            resposta.put("token", tokenReal); 
-
-            return ResponseEntity.ok(resposta);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha incorreta.");
+            
+            if (!validarTotpComTolerancia(prof.getChave2fa(), dto.codigo2fa)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Código 2FA Inválido ou Expirado! Verifique a hora do seu celular.");
+            }
+        } else if (!"ativo".equals(prof.getStatus())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Sua conta está inativa ou bloqueada.");
         }
+
+        String token = tokenService.gerarToken(prof);
+        LoginResponseDTO resposta = new LoginResponseDTO(token, prof.getNome(), prof.getEscola(), prof.getHashPublico());
+
+        return ResponseEntity.ok(resposta);
     }
 
-    @PostMapping("/registrar")
-    public ResponseEntity<?> registrarProfessor(@RequestBody RegistroRequest request) {
-        if (request.nome == null || request.nome.trim().length() < 3 || request.nome.length() > 50) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O nome deve ter entre 3 e 50 caracteres.");
+    // 🚀 LÓGICA CORE DO GOOGLE AUTHENTICATOR COM TOLERÂNCIA DE TEMPO
+    private boolean validarTotpComTolerancia(String chaveSecreta, String codigoDigitado) {
+        long timeWindow = System.currentTimeMillis() / 30000L;
+        // Verifica o ciclo atual, o passado (-1) e o futuro (+1) para mitigar o delay do servidor Render
+        for (int i = -1; i <= 1; i++) {
+            if (gerarTotp(chaveSecreta, timeWindow + i).equals(codigoDigitado)) {
+                return true;
+            }
         }
-        if (request.escola == null || request.escola.trim().length() < 3 || request.escola.length() > 60) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A escola deve ter entre 3 e 60 caracteres.");
-        }
-        if (request.senha == null || request.senha.length() < 6 || request.senha.length() > 20) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A senha deve ter entre 6 e 20 caracteres.");
-        }
-        if (request.email == null || !Pattern.compile(EMAIL_PATTERN).matcher(request.email).matches()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de e-mail inválido.");
-        }
-        if (professorRepository.findByEmail(request.email).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este e-mail já está em uso no sistema.");
-        }
+        return false;
+    }
 
-        Professor novoProfessor = new Professor();
-        novoProfessor.setNome(request.nome.replaceAll("<[^>]*>", "").trim());
-        novoProfessor.setEscola(request.escola.replaceAll("<[^>]*>", "").trim());
-        novoProfessor.setEmail(request.email.trim().toLowerCase());
-        novoProfessor.setSenha(passwordEncoder.encode(request.senha));
-        novoProfessor.setStatus("ativo");
-
-        professorRepository.save(novoProfessor);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Conta criada com sucesso!");
+    private String gerarTotp(String chaveSecreta, long timeWindow) {
+        try {
+            // 🚀 CORREÇÃO: Usando o Base32 do Aerogear diretamente (sem o "new")!
+            byte[] bytesChave = Base32.decode(chaveSecreta);
+            
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(new SecretKeySpec(bytesChave, "HmacSHA1"));
+            
+            byte[] data = ByteBuffer.allocate(8).putLong(timeWindow).array();
+            byte[] hash = mac.doFinal(data);
+            
+            int offset = hash[hash.length - 1] & 0xF;
+            long truncatedHash = 0;
+            for (int i = 0; i < 4; ++i) {
+                truncatedHash <<= 8;
+                truncatedHash |= (hash[offset + i] & 0xFF);
+            }
+            
+            truncatedHash &= 0x7FFFFFFF;
+            truncatedHash %= 1000000;
+            
+            return String.format("%06d", truncatedHash);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
