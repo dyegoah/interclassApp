@@ -13,30 +13,26 @@ public class SetupService {
     private JdbcTemplate jdbcTemplate;
 
     // Removemos o @Transactional para o Spring não dar Rollback se uma das tabelas estiver vazia
-    public void resetarTudo(Professor professorLogado) {
-        Long idProf = professorLogado.getId();
+    public void resetarTudo(Professor profLogado) {
+        Long idProf = profLogado.getId();
 
-        // 🔥 O "ROLO COMPRESSOR" SQL: Apaga na ordem de "Filho para Pai" (Sem violar chaves)
-        
-        // 1. Limpar Eventos de Súmula e Escalações (Filhos dos Jogos)
+        // 1. Limpa Súmulas e Escalações (Filhos dos Jogos)
         try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
 
-        // 2. Limpar Classificações (Filhos de Lotes/Professores)
+        // 2. Limpa Classificações e Jogos
         try { jdbcTemplate.update("DELETE FROM classificacao WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM classificacoes WHERE professor_id = ?", idProf); } catch (Exception e) {}
-
-        // 3. Limpar Jogos
         try { jdbcTemplate.update("DELETE FROM jogos WHERE professor_id = ?", idProf); } catch (Exception e) {}
 
-        // 4. Limpar Torneios (Testa todas as chaves possíveis de ligação)
-        try { jdbcTemplate.update("DELETE FROM torneios WHERE professor_id = ?", idProf); } catch (Exception e) {}
-        try { jdbcTemplate.update("DELETE FROM torneios WHERE lote_id IN (SELECT id FROM lotes WHERE professor_id = ?)", idProf); } catch (Exception e) {}
-
-        // 5. Limpar Raízes (Alunos inscritos, Modalidades e Lotes)
+        // 3. Limpa Raízes (Alunos, Modalidades e Lotes)
         try { jdbcTemplate.update("DELETE FROM alunos WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM modalidades WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM lotes WHERE professor_id = ?", idProf); } catch (Exception e) {}
+
+        // 4. Limpa Torneios Órfãos para não deixar lixo no banco
+        try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM lotes)"); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM tb_lote)"); } catch (Exception e) {}
     }
 }
