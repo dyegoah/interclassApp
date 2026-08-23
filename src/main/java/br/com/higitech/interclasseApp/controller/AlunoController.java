@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.higitech.interclasseApp.model.Aluno;
+import br.com.higitech.interclasseApp.model.Modalidade;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.AlunoRepository;
+import br.com.higitech.interclasseApp.repositories.ModalidadeRepository;
 import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
 
 @RestController
@@ -30,6 +32,9 @@ public class AlunoController {
 
     @Autowired
     private ProfessorRepository professorRepository;
+
+    @Autowired
+    private ModalidadeRepository modalidadeRepository;
 
     public static class InscricaoRequestDTO {
         public String nome;
@@ -56,6 +61,15 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
+        // 🔥 TRAVA DE SEGURANÇA: Corrigida para usar o método correto do Repositório
+        List<Modalidade> modalidadesAtivas = modalidadeRepository.findByLoteProfessorHashPublico(professorHash);
+        boolean esportePermitido = modalidadesAtivas.stream()
+                .anyMatch(m -> m.getNomeEsporte().equalsIgnoreCase(dto.esporte));
+
+        if (!esportePermitido) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta modalidade não está aberta para inscrições nesta escola.");
+        }
+
         long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()
                 .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte) &&
                              a.getGenero() != null && a.getGenero().equalsIgnoreCase(dto.genero))
@@ -78,7 +92,6 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição confirmada na Modalidade!");
     }
 
-    // 🔥 CORREÇÃO DA ROTA: Agora o botão do Dashboard vai funcionar!
     @PutMapping("/status-inscricoes")
     public ResponseEntity<?> alterarStatusInscricoes(@AuthenticationPrincipal Professor professorLogado) {
         professorLogado.setInscricoesAbertas(!professorLogado.isInscricoesAbertas());
