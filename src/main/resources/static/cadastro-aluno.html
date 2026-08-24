@@ -29,9 +29,11 @@
         .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
         .form-group input, .form-group select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 0.95rem; outline: none; transition: 0.3s; }
         .form-group input:focus, .form-group select:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
+        
+        /* 🔥 CADEADO VISUAL 🔥 */
         .form-group select option { background: #05050f; color: white; padding: 5px; }
-        /* Estilo para opções bloqueadas com cadeado */
-        .form-group select option:not(:checked)[disabled] { color: #777; background: #111; }
+        .form-group select option:disabled { color: #666; background: #111; font-style: italic; }
+        
         .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; text-transform: uppercase; margin-top: 10px; }
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
         .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 8px; font-size: 0.9rem; display: none; }
@@ -64,17 +66,17 @@
             <div class="form-group">
                 <label>1. Qual a sua Categoria (Gênero)?</label>
                 <select id="generoAluno" required onchange="mudarCorDaBorda(this.value)">
-                    <option value="" disabled selected>Selecione...</option>
-                    <option value="masculino">🚹 Masculino</option>
-                    <option value="feminino">🚺 Feminino</option>
-                    <option value="misto">🚻 Misto</option>
+                    <option value="" disabled selected style="color:#fff; background:#05050f;">Selecione...</option>
+                    <option value="masculino" style="color:#fff; background:#05050f;">🚹 Masculino</option>
+                    <option value="feminino" style="color:#fff; background:#05050f;">🚺 Feminino</option>
+                    <option value="misto" style="color:#fff; background:#05050f;">🚻 Misto</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>2. Escolha sua Modalidade Esportiva</label>
                 <select id="esporteAluno" required>
-                    <!-- Preenchido dinamicamente com cadeados -->
+                    <!-- Preenchido pelo JavaScript com os cadeados -->
                 </select>
             </div>
 
@@ -86,24 +88,24 @@
             <div class="form-group">
                 <label>4. Sua Turma / Equipe</label>
                 <select id="turmaAluno" required>
-                    <option value="" disabled selected>Selecione sua Turma...</option>
-                    <optgroup label="Ensino Fundamental">
-                        <option value="6º Ano A">6º Ano A</option>
-                        <option value="6º Ano B">6º Ano B</option>
-                        <option value="7º Ano A">7º Ano A</option>
-                        <option value="7º Ano B">7º Ano B</option>
-                        <option value="8º Ano A">8º Ano A</option>
-                        <option value="8º Ano B">8º Ano B</option>
-                        <option value="9º Ano A">9º Ano A</option>
-                        <option value="9º Ano B">9º Ano B</option>
+                    <option value="" disabled selected style="color:#fff; background:#05050f;">Selecione sua Turma...</option>
+                    <optgroup label="Ensino Fundamental" style="color:var(--theme-primary); background:#05050f;">
+                        <option value="6º Ano A" style="color:#fff;">6º Ano A</option>
+                        <option value="6º Ano B" style="color:#fff;">6º Ano B</option>
+                        <option value="7º Ano A" style="color:#fff;">7º Ano A</option>
+                        <option value="7º Ano B" style="color:#fff;">7º Ano B</option>
+                        <option value="8º Ano A" style="color:#fff;">8º Ano A</option>
+                        <option value="8º Ano B" style="color:#fff;">8º Ano B</option>
+                        <option value="9º Ano A" style="color:#fff;">9º Ano A</option>
+                        <option value="9º Ano B" style="color:#fff;">9º Ano B</option>
                     </optgroup>
-                    <optgroup label="Ensino Médio">
-                        <option value="1º Ano A">1º Ano A</option>
-                        <option value="1º Ano B">1º Ano B</option>
-                        <option value="2º Ano A">2º Ano A</option>
-                        <option value="2º Ano B">2º Ano B</option>
-                        <option value="3º Ano A">3º Ano A</option>
-                        <option value="3º Ano B">3º Ano B</option>
+                    <optgroup label="Ensino Médio" style="color:var(--theme-primary); background:#05050f;">
+                        <option value="1º Ano A" style="color:#fff;">1º Ano A</option>
+                        <option value="1º Ano B" style="color:#fff;">1º Ano B</option>
+                        <option value="2º Ano A" style="color:#fff;">2º Ano A</option>
+                        <option value="2º Ano B" style="color:#fff;">2º Ano B</option>
+                        <option value="3º Ano A" style="color:#fff;">3º Ano A</option>
+                        <option value="3º Ano B" style="color:#fff;">3º Ano B</option>
                     </optgroup>
                 </select>
             </div>
@@ -148,10 +150,13 @@
 
                 const res = await fetch(`/api/modalidades/public/${professorHashPublico}`);
                 if (res.ok) {
-                    const modalidadesAtivas = await res.json();
-                    const nomesAtivos = modalidadesAtivas.map(m => m.nomeEsporte.toLowerCase());
-
-                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivas);
+                    const modalidadesAtivasDaAPI = await res.json();
+                    
+                    // 🔥 Tratamento infalível que retira acentos para não bugar a leitura
+                    const nomesAtivos = modalidadesAtivasDaAPI.map(m => m.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
+                    
+                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos);
+                    
                     document.getElementById('loading-esportes').style.display = 'none';
                     document.getElementById('form-cadastro').style.display = 'block';
                 } else {
@@ -162,22 +167,25 @@
             }
         };
 
-        function renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivas) {
+        // 🔥 A MÁGICA VISUAL DOS CADEADOS 🔥
+        function renderizarOpcoesDeEsportesComCadeado(nomesAtivos) {
             const select = document.getElementById('esporteAluno');
-            let html = '<option value="" disabled selected>Selecione a Modalidade...</option>';
+            let html = '<option value="" disabled selected style="color:#fff; background:#05050f;">Selecione a Modalidade...</option>';
 
             listaTodasModalidades.forEach((mod) => {
-                let ativo = nomesAtivos.includes(mod.nome.toLowerCase());
-                let modObjOriginal = modalidadesAtivas.find(m => m.nomeEsporte.toLowerCase() === mod.nome.toLowerCase());
-                let iconeSeguro = modObjOriginal ? (modObjOriginal.icone || mod.icone) : mod.icone;
+                let nomeCheck = mod.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+                let ativo = nomesAtivos.includes(nomeCheck);
 
                 if (ativo) {
-                    let modData = JSON.stringify({ esporte: mod.nome, icone: iconeSeguro });
-                    html += `<option value='${modData}'>${iconeSeguro} ${mod.nome}</option>`;
+                    // LIVRE PARA INSCRIÇÃO
+                    let modData = JSON.stringify({ esporte: mod.nome, icone: mod.icone });
+                    html += `<option value='${modData}' style="color: #fff; background: #05050f;">${mod.icone} ${mod.nome}</option>`;
                 } else {
-                    html += `<option value="" disabled style="color: #666; background: #0a0a15;">🔒 ${mod.nome} (Não Disponível)</option>`;
+                    // TRANCADO COM CADEADO E DESABILITADO
+                    html += `<option value="" disabled style="color: #666; background: #111; font-style: italic;">🔒 ${mod.nome} (Bloqueado)</option>`;
                 }
             });
+
             select.innerHTML = html;
         }
 

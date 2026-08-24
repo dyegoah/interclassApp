@@ -61,9 +61,10 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
-        // 🔥 TRAVA DE SEGURANÇA: Confirma usando APENAS o lote "geral" de Inscrições
-        List<Modalidade> modalidadesAtivas = modalidadeRepository.findByLoteProfessorHashPublicoAndLoteGenero(professorHash, "geral");
-        boolean esportePermitido = modalidadesAtivas.stream()
+        // 🔥 TRAVA DE SEGURANÇA: Verifica se a modalidade realmente foi ativada na Inscrição
+        List<Modalidade> todasModalidades = modalidadeRepository.findByLoteProfessorHashPublico(professorHash);
+        boolean esportePermitido = todasModalidades.stream()
+                .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
                 .anyMatch(m -> m.getNomeEsporte().equalsIgnoreCase(dto.esporte));
 
         if (!esportePermitido) {

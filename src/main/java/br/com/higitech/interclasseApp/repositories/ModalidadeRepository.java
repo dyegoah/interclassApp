@@ -14,6 +14,6 @@ public interface ModalidadeRepository extends JpaRepository<Modalidade, Long> {
 
     List<Modalidade> findByLoteProfessorHashPublico(String hashPublico);
 
-    // 🔥 NOVO: Busca estrita para enviar para o link de inscrição apenas o lote "geral"
+    // 🔥 A TRAVA QUE FALTAVA: Busca estrita que cruza o Hash do Professor com o Gênero do Lote
     List<Modalidade> findByLoteProfessorHashPublicoAndLoteGenero(String hashPublico, String genero);
 }

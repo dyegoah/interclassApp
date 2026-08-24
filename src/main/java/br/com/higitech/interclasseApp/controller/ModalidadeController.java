@@ -1,6 +1,7 @@
 package br.com.higitech.interclasseApp.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,14 @@ public class ModalidadeController {
 
     @GetMapping("/public/{hashPublico}")
     public ResponseEntity<List<Modalidade>> getModalidadesPublicas(@PathVariable String hashPublico) {
-        // 🔥 CORREÇÃO: Pega SOMENTE os esportes liberados na tela de inscrição (Lote "geral")
-        List<Modalidade> modalidades = modalidadeRepository.findByLoteProfessorHashPublicoAndLoteGenero(hashPublico, "geral");
-        return ResponseEntity.ok(modalidades);
+        // Puxa tudo do professor
+        List<Modalidade> todas = modalidadeRepository.findByLoteProfessorHashPublico(hashPublico);
+        
+        // 🔥 FILTRO BLINDADO: Separa APENAS o que foi aberto para inscrição (lote "geral")
+        List<Modalidade> ativas = todas.stream()
+                .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(ativas);
     }
 }

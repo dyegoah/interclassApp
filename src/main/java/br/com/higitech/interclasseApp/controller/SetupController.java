@@ -22,21 +22,18 @@ public class SetupController {
     @Autowired
     private SetupService setupService;
 
-    // 🔥 ROTA PARA SALVAR MODALIDADES E GERAR O LINK
     @PostMapping
     public ResponseEntity<Void> salvarConfiguracoesIniciais(@RequestBody Map<String, Object> payload, @AuthenticationPrincipal Professor professorLogado) {
         setupService.processarLote(payload, professorLogado);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 🗑️ ROTA PARA ZERAR A TEMPORADA (O Rolo Compressor)
     @DeleteMapping("/reset")
     public ResponseEntity<?> zerarTemporada(@AuthenticationPrincipal Professor professorLogado) {
         try {
             setupService.resetarTudo(professorLogado);
             return ResponseEntity.ok().body("Temporada zerada com sucesso!");
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao limpar a base de dados: " + e.getMessage());
         }
     }

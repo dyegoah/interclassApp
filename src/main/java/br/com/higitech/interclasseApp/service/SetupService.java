@@ -29,7 +29,6 @@ public class SetupService {
     public void processarLote(Map<String, Object> payload, Professor professorLogado) {
         String genero = payload.get("genero") != null ? payload.get("genero").toString() : "geral";
         
-        // 🔒 Limpa as configurações de inscrição antigas para não acumular
         if ("geral".equalsIgnoreCase(genero)) {
             try { 
                 jdbcTemplate.update("DELETE FROM modalidades WHERE lote_id IN (SELECT id FROM lotes WHERE professor_id = ? AND genero = 'geral')", professorLogado.getId()); 
@@ -79,7 +78,6 @@ public class SetupService {
 
     public void resetarTudo(Professor profLogado) {
         Long idProf = profLogado.getId();
-
         try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
