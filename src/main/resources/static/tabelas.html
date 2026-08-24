@@ -20,6 +20,9 @@
 	
     <style>
         :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
+        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
+        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
 		body { 
             background: 
@@ -32,6 +35,7 @@
             margin: 0;
             padding-bottom: 100px;
             overflow-x: hidden;
+            transition: background 0.5s ease;
         }
         
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
@@ -96,6 +100,7 @@
                 </div>
             </div>
 
+            <!-- 🔥 A MÁGICA ESTÁ AQUI: OS BOTÕES APARECERÃO SEMPRE 🔥 -->
             <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;" id="filtros-lote"></div>
             
             <div id="lista-jogos"></div>
@@ -133,8 +138,9 @@
 
         const rotasSaaS = {
             'Futsal': 'futsal', 'Handebol': 'handebol', 'Vôlei': 'volei', 'Vôlei de Areia': 'volei-areia',
-            'Basquete': 'basquete', 'Queimada': 'geral', 'Tênis de Mesa': 'geral',
-            'Xadrez': 'geral', 'Dama': 'geral', 'E-Sports': 'geral', 'Natação': 'geral', 'Atletismo': 'geral'
+            'Basquete': 'basquete', 'Queimada': 'geral', 
+            'Tênis de Mesa': 'individual', 'Xadrez': 'individual', 'Dama': 'individual', 
+            'E-Sports': 'individual', 'Natação': 'individual', 'Atletismo': 'individual'
         };
 
         function obterPlacarSeguro(rel, jogo) {
@@ -152,7 +158,6 @@
             return { A: parseInt(pA) || 0, B: parseInt(pB) || 0 };
         }
 
-        // 🔥 CORREÇÃO: Lê o nome do esporte corretamente se ele vier encapsulado em objeto (do DTO do Java ou LocalStorage)
         function extrairEsporteNomeSeguro(j) {
             if(j.esporte && typeof j.esporte === 'string') return j.esporte;
             if(j.modalidade && j.modalidade.nomeEsporte) return j.modalidade.nomeEsporte;
@@ -184,12 +189,8 @@
             const container = document.getElementById('filtros-lote');
             container.innerHTML = '';
             
-            let calsOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-            let generosDisponiveis = Object.keys(calsOffline);
-            
-            if(generosDisponiveis.length === 0) {
-                generosDisponiveis = ['masculino', 'feminino', 'misto'];
-            }
+            // 🔥 SOLUÇÃO DEFINITIVA: Força a existência das três abas de lotes
+            let generosDisponiveis = ['masculino', 'feminino', 'misto'];
 
             generosDisponiveis.forEach((genero, idx) => {
                 let cor = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
@@ -216,6 +217,11 @@
             btnElement.style.fontWeight = 'bold';
             btnElement.style.background = 'rgba(255,255,255,0.1)';
             
+            // 🔥 BÔNUS: Muda a cor de fundo do site de acordo com o lote
+            document.body.classList.remove('theme-fem', 'theme-misto');
+            if (genero === 'feminino') document.body.classList.add('theme-fem');
+            if (genero === 'misto') document.body.classList.add('theme-misto');
+            
             buscarJogosDoBanco(genero);
         }
 
@@ -225,8 +231,6 @@
 
             try {
                 const token = localStorage.getItem('interclassToken');
-                
-                // 🔥 Usa a rota PRIVADA segura que devolve todos os dados para o Admin Dono
                 const response = await fetch(`/api/jogos/lote/${genero}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -240,7 +244,6 @@
                 const jogos = await response.json(); 
                 if (jogos.length === 0) throw new Error('Banco de dados vazio.');
                 
-                // Grava o fallback mais recente para modo offline!
                 let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
                 calOffline[genero] = { jogos: jogos };
                 localStorage.setItem('calendariosOficiais', JSON.stringify(calOffline));
@@ -253,7 +256,7 @@
                 if(calOffline[genero] && calOffline[genero].jogos && calOffline[genero].jogos.length > 0) {
                     renderizarJogosEmAcordeao(calOffline[genero].jogos, genero, true);
                 } else {
-                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 50px;">Nenhum torneio agendado para a categoria ${genero}.</p>`;
+                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 50px;">Nenhum torneio agendado para a categoria ${genero.toUpperCase()}.</p>`;
                 }
             }
         }
@@ -290,7 +293,6 @@
 
             let torneios = {};
             todosJogos.forEach(jogo => {
-                // 🔥 Usa o extrator seguro!
                 let eNome = extrairEsporteNomeSeguro(jogo);
                 let eIcon = extrairEsporteIconeSeguro(jogo);
                 if(!torneios[eNome]) torneios[eNome] = { icone: eIcon, jogos: [] };

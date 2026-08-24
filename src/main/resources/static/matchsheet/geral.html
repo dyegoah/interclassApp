@@ -22,8 +22,8 @@
         
         .placar-board { display: flex; justify-content: center; align-items: center; gap: 15px; max-width: 800px; margin: 0 auto;}
         .team-info { display: flex; flex-direction: column; align-items: center; flex: 1; overflow: hidden;}
-        .team-class { font-family: 'Segoe UI'; font-size: 0.8rem; color: #888; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;}
-        .team-name { font-size: 1.2rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 5px;}
+        .team-class { font-family: 'Segoe UI'; font-size: 0.85rem; color: #888; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;}
+        .team-name { font-size: 1.3rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 5px; text-align: center;}
         .team-a-text { color: var(--team-a); }
         .team-b-text { color: var(--team-b); }
         
@@ -35,34 +35,60 @@
         .btn-timer { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 20px; border-radius: 20px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; font-size: 0.85rem; margin-top: 5px; }
         .btn-timer.running { background: #ff0000; color: #fff; border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.4);}
 
-        .prancheta-container { display: flex; width: 95%; max-width: 1000px; margin: 25px auto; gap: 15px; }
-        .coluna-time { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        /* 🔥 LAYOUT DE ARENA: JOGADOR A - LINHA DO TEMPO (CENTRO) - JOGADOR B 🔥 */
+        .arena-prancheta { 
+            display: flex; 
+            width: 95%; 
+            max-width: 1200px; 
+            margin: 25px auto; 
+            gap: 20px; 
+            align-items: flex-start; 
+            justify-content: center;
+        }
         
-        .jogador-card { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px 15px 15px 50px; padding: 5px 15px 5px 5px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
+        @media (max-width: 900px) {
+            .arena-prancheta { flex-direction: column; }
+        }
+
+        .coluna-time { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 280px; width: 100%; }
+        
+        .jogador-card { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px 15px 15px 50px; padding: 8px 15px 8px 8px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
         .jogador-card:active { background: rgba(255,255,255,0.1); transform: scale(0.96); }
         .jogador-card.eq-a { border-left: 4px solid var(--team-a); }
         .jogador-card.eq-b { border-left: 4px solid var(--team-b); }
         
-        .jog-img-wrapper { position: relative; width: 55px; height: 55px; flex-shrink: 0; }
+        .jog-img-wrapper { position: relative; width: 60px; height: 60px; flex-shrink: 0; }
         .jog-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #555; background: #222;}
         .eq-a .jog-img { border-color: var(--team-a); }
         .eq-b .jog-img { border-color: var(--team-b); }
         .jog-camisa { position: absolute; bottom: -5px; right: -5px; background: #000; color: #fff; font-size: 0.75rem; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid #555; font-family: 'Orbitron';}
         
         .jog-detalhes { flex-grow: 1; padding: 0 12px; overflow: hidden; }
-        .jog-nome { font-family: 'Segoe UI'; font-size: 1rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .jog-nome { font-family: 'Segoe UI'; font-size: 1.05rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .jog-stats { font-size: 0.75rem; color: #aaa; display: flex; gap: 8px; margin-top: 4px; font-family: 'Segoe UI';}
         .stat-badge { background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);}
         
-        .gols-destaque { font-size: 1.8rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
+        .gols-destaque { font-size: 2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
 
-        .timeline-container { width: 95%; max-width: 1000px; margin: 20px auto 40px; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .timeline-titulo { font-size: 1.1rem; color: var(--theme-primary); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; align-items: center; gap: 10px;}
-        .timeline-list { display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px;}
-        .timeline-item { display: flex; align-items: center; gap: 12px; font-family: 'Segoe UI'; font-size: 0.9rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #555;}
+        /* 🔥 LINHA DO TEMPO CENTRALIZADA NO MEIO 🔥 */
+        .timeline-container { 
+            flex: 1.2; 
+            min-width: 300px; 
+            width: 100%;
+            background: rgba(0,0,0,0.6); 
+            border-radius: 15px; 
+            padding: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            display: flex; 
+            flex-direction: column;
+            min-height: 250px;
+        }
+        .timeline-titulo { font-size: 1rem; color: var(--theme-primary); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;}
+        .timeline-list { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; overflow-y: auto; max-height: 350px; padding-right: 5px;}
+        .timeline-item { display: flex; align-items: center; gap: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #555;}
         .timeline-item.evt-a { border-left-color: var(--team-a); }
         .timeline-item.evt-b { border-left-color: var(--team-b); }
-        .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 60px; font-size: 1rem;}
+        .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 20px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
@@ -94,8 +120,8 @@
         
         <div class="placar-board">
             <div class="team-info">
-                <div class="team-class" id="lbl-turma-a">Turma A</div>
-                <div class="team-name team-a-text" id="lbl-equipa-a">Equipe A</div>
+                <div class="team-class" id="lbl-turma-a">A Definir</div>
+                <div class="team-name team-a-text" id="lbl-equipa-a">A Definir</div>
             </div>
             
             <div class="score-box team-a-text" id="val-placar-a">0</div>
@@ -103,8 +129,8 @@
             <div class="score-box team-b-text" id="val-placar-b">0</div>
             
             <div class="team-info">
-                <div class="team-class" id="lbl-turma-b">Turma B</div>
-                <div class="team-name team-b-text" id="lbl-equipa-b">Equipe B</div>
+                <div class="team-class" id="lbl-turma-b">A Definir</div>
+                <div class="team-name team-b-text" id="lbl-equipa-b">A Definir</div>
             </div>
         </div>
 
@@ -114,16 +140,20 @@
         </div>
     </div>
 
-    <div class="prancheta-container">
+    <!-- 🔥 PRANCHETA CENTRALIZADA (TIME A - TIMELINE NO MEIO - TIME B) 🔥 -->
+    <div class="arena-prancheta">
+        
         <div class="coluna-time" id="coluna-a"></div>
-        <div class="coluna-time" id="coluna-b"></div>
-    </div>
-
-    <div class="timeline-container">
-        <div class="timeline-titulo">⏱️ Linha do Tempo da Partida</div>
-        <div class="timeline-list" id="timeline-list">
-            <div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>
+        
+        <div class="timeline-container">
+            <div class="timeline-titulo">⏱️ Linha do Tempo da Partida</div>
+            <div class="timeline-list" id="timeline-list">
+                <div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>
+            </div>
         </div>
+        
+        <div class="coluna-time" id="coluna-b"></div>
+
     </div>
 
     <div id="modal-acoes" class="modal-overlay">
@@ -173,7 +203,8 @@
         let timerSegundos = 0;
         let isTimerRunning = false;
 
-        // 🔥 LÓGICA DE CARREGAMENTO SEGURO VIA LOTE E DTO 🔥
+        const normalizar = (txt) => (txt || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+
         window.onload = async () => {
             if (!jogoId) { alert("Partida não encontrada."); return; }
             
@@ -195,7 +226,6 @@
             } catch (err) {
                 console.error("Erro na busca segura da Súmula:", err);
                 
-                // Fallback Offline Seguro
                 let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
                 if (calOffline[lote] && calOffline[lote].jogos) {
                     jogoEncontrado = calOffline[lote].jogos.find(j => j.id === jogoId);
@@ -239,63 +269,91 @@
             return `${m}:${s}`;
         }
 
+        function extrairNomeTurma(nomeOriginal) {
+            if (!nomeOriginal || nomeOriginal === "A Definir") return { nome: "A Definir", turma: "Competidor" };
+            
+            let nomePuro = nomeOriginal;
+            let turmaPura = "Competidor";
+            
+            const ultimaAbertura = nomeOriginal.lastIndexOf('(');
+            const ultimoFechamento = nomeOriginal.lastIndexOf(')');
+            
+            if (ultimaAbertura !== -1 && ultimoFechamento !== -1 && ultimoFechamento > ultimaAbertura) {
+                nomePuro = nomeOriginal.substring(0, ultimaAbertura).trim();
+                turmaPura = nomeOriginal.substring(ultimaAbertura + 1, ultimoFechamento).trim();
+            }
+            
+            return { nome: nomePuro, turma: turmaPura };
+        }
+
         function processarDadosDoJogo(jogo) {
-            // Ajuste para DTO do Java ou Entidade Original do LocalStorage
             let nomeEsporte = jogo.esporte || (jogo.modalidade ? jogo.modalidade.nomeEsporte : "A Definir");
             let iconeEsporte = jogo.icone || (jogo.modalidade ? jogo.modalidade.icone : "🏅");
 
-            document.getElementById('lbl-esporte').innerText = `${iconeEsporte} ${nomeEsporte} | ${jogo.titulo.split(' | ')[0]}`;
+            let tituloReduzido = jogo.titulo ? jogo.titulo.split(' | ')[0] : "Partida";
+            document.getElementById('lbl-esporte').innerText = `${iconeEsporte} ${nomeEsporte} | ${tituloReduzido}`;
 
-            let confronto = jogo.titulo.split(' | ').length > 1 ? jogo.titulo.split(' | ')[1] : jogo.titulo;
-            let lados = confronto.split(' x ');
+            // 🔥 EXTRAÇÃO BLINDADA: Busca do título caso equipeANome esteja vazia ou genérica
+            let rawA = jogo.equipeANome || jogo.equipeaNome || "";
+            let rawB = jogo.equipeBNome || jogo.equipebNome || "";
 
-            // LÊ OS NOMES E IDS QUE VÊM DO DTO
-            let equipaA = jogo.equipeANome || "Equipe A";
-            let atletaA = jogo.equipeANome || "A Definir";
-            let turmaA = "Competidor";
-            let idAtletaA = jogo.equipeAId || "ID_FANTASMA_A";
-
-            if (lados[0] && lados[0].includes('(')) {
-                turmaA = lados[0].split('(')[0].trim();
-                atletaA = lados[0].split('(')[1].replace(')', '').trim();
+            if ((!rawA || rawA === "Equipe A" || rawA === "A Definir") && jogo.titulo && jogo.titulo.includes(' | ')) {
+                let partes = jogo.titulo.split(' | ')[1].split(' x ');
+                if (partes.length >= 2) {
+                    rawA = partes[0].trim().replace(' (Série de Partidas)', '');
+                    rawB = partes[1].trim().replace(' (Série de Partidas)', '');
+                }
+            } else if ((!rawA || rawA === "Equipe A" || rawA === "A Definir") && jogo.titulo && jogo.titulo.includes(' x ')) {
+                let partes = jogo.titulo.split(' x ');
+                if (partes.length >= 2) {
+                    rawA = partes[0].trim().replace(' (Série de Partidas)', '');
+                    rawB = partes[1].trim().replace(' (Série de Partidas)', '');
+                }
             }
 
-            let equipaB = jogo.equipeBNome || "Equipe B";
-            let atletaB = jogo.equipeBNome || "A Definir";
-            let turmaB = "Competidor";
-            let idAtletaB = jogo.equipeBId || "ID_FANTASMA_B";
+            let idA = jogo.equipeAId || "ID_FANTASMA_A";
+            let idB = jogo.equipeBId || "ID_FANTASMA_B";
+            
+            let dadosA = extrairNomeTurma(rawA || "Atleta A");
+            let dadosB = extrairNomeTurma(rawB || "Atleta B");
 
-            if (lados[1] && lados[1].includes('(')) {
-                turmaB = lados[1].split('(')[0].trim();
-                atletaB = lados[1].split('(')[1].replace(')', '').trim();
-            }
-
-            document.getElementById('lbl-turma-a').innerText = turmaA;
-            document.getElementById('lbl-equipa-a').innerText = equipaA;
-            document.getElementById('lbl-turma-b').innerText = turmaB;
-            document.getElementById('lbl-equipa-b').innerText = equipaB;
+            document.getElementById('lbl-turma-a').innerText = dadosA.turma;
+            document.getElementById('lbl-equipa-a').innerText = dadosA.nome;
+            document.getElementById('lbl-turma-b').innerText = dadosB.turma;
+            document.getElementById('lbl-equipa-b').innerText = dadosB.nome;
 
             let colA = document.getElementById('coluna-a');
             let colB = document.getElementById('coluna-b');
             colA.innerHTML = ''; colB.innerHTML = '';
 
-            let esportesIndividuais = ['Xadrez', 'Tênis de Mesa', 'Dama', 'E-Sports', 'Natação', 'Atletismo'];
-            let isIndividual = esportesIndividuais.includes(nomeEsporte);
+            // 🔥 FORÇA BRUTA PARA IDENTIFICAR ESPORTES INDIVIDUAIS
+            let nomeBusca = nomeEsporte.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let isIndividual = nomeBusca.includes('xadrez') || 
+                               nomeBusca.includes('dama') || 
+                               nomeBusca.includes('tenis de mesa') || 
+                               nomeBusca.includes('esport') || 
+                               nomeBusca.includes('natacao') || 
+                               nomeBusca.includes('atletismo') || 
+                               jogo.isIndividualSport === true;
 
-            if (jogo.escalacoes && jogo.escalacoes.length > 0) {
+            // 🔥 INVERSÃO DE PRIORIDADE: Se for individual, SÓ renderiza 1 JOGADOR. ACABOU!
+            if (isIndividual) {
+                colA.innerHTML = criarCardJogador('A', dadosA.nome, '1', idA);
+                colB.innerHTML = criarCardJogador('B', dadosB.nome, '1', idB);
+            } 
+            // SEGUNDA OPÇÃO: Esporte coletivo com jogadores já escalados
+            else if (jogo.escalacoes && jogo.escalacoes.length > 0) {
                 jogo.escalacoes.forEach(esc => {
                     let nome = esc.aluno ? esc.aluno.nome : "Atleta";
                     let targetCol = esc.equipe === 'A' ? colA : colB;
-                    targetCol.innerHTML += criarCardJogador(esc.equipe, nome, esc.numeroCamisa || '-', esc.aluno.id);
+                    targetCol.innerHTML += criarCardJogador(esc.equipe, nome, esc.numeroCamisa || '-', esc.aluno ? esc.aluno.id : 'esc_' + Math.random());
                 });
-            } else if (isIndividual) {
-                // A INTELIGÊNCIA: O card do atleta agora é criado com o ID dele!
-                colA.innerHTML = criarCardJogador('A', atletaA, '1', idAtletaA);
-                colB.innerHTML = criarCardJogador('B', atletaB, '1', idAtletaB);
-            } else {
+            } 
+            // TERCEIRA OPÇÃO: Esporte coletivo vazio (Mostra 5 genéricos)
+            else {
                 for(let i=1; i<=5; i++) {
-                    colA.innerHTML += criarCardJogador('A', 'A Definir', i, 'vaziaA'+i);
-                    colB.innerHTML += criarCardJogador('B', 'A Definir', i, 'vaziaB'+i);
+                    colA.innerHTML += criarCardJogador('A', `${dadosA.nome} (Jogador ${i})`, i, 'vaziaA'+i);
+                    colB.innerHTML += criarCardJogador('B', `${dadosB.nome} (Jogador ${i})`, i, 'vaziaB'+i);
                 }
             }
 
@@ -328,7 +386,7 @@
                     </div>
                     
                     <div class="jog-detalhes">
-                        <div class="jog-nome">${nome}</div>
+                        <div class="jog-nome" title="${nome}">${nome}</div>
                         <div class="jog-stats">
                             <span class="stat-badge">🟨 <span id="falta-${idAtleta}">0</span></span>
                         </div>
@@ -379,7 +437,7 @@
                     tempo: tempoStr,
                     equipe: eq,
                     icone: icone,
-                    texto: `${tipo} de ${nome} (Eq. ${eq})`
+                    texto: `${tipo} de ${nome}`
                 });
                 atualizarTimelineDOM();
             }
@@ -403,7 +461,7 @@
                     <div class="timeline-item ${classeEvt}">
                         <div class="time-stamp">${evt.tempo}</div>
                         <div style="font-size: 1.2rem;">${evt.icone}</div>
-                        <div>${evt.texto}</div>
+                        <div style="flex-grow: 1; word-break: break-word;">${evt.texto}</div>
                     </div>
                 `;
             });
@@ -419,7 +477,6 @@
             if (isTimerRunning) toggleTimer(); 
 
             try {
-                // 🔥 SEGURANÇA APLICADA AQUI PARA SALVAR A SÚMULA
                 const token = localStorage.getItem('interclassToken');
                 const resposta = await fetch(`/api/sumulas/${jogoId}/finalizar`, {
                     method: 'POST',
@@ -434,6 +491,18 @@
                     let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
                     relatorios[jogoId] = { placar: { A: placarGlobal.A, B: placarGlobal.B }, timeline: timelineEventos };
                     localStorage.setItem('relatoriosPartidas', JSON.stringify(relatorios));
+
+                    // 🔥 ATUALIZA O STATUS DO JOGO LOCALMENTE PARA AVANÇAR AUTOMATICAMENTE O TORNEIO
+                    let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                    if (calOffline[lote] && calOffline[lote].jogos) {
+                        let jg = calOffline[lote].jogos.find(j => j.id === jogoId);
+                        if (jg) {
+                            jg.status = 'FINALIZADO';
+                            jg.placarA = placarGlobal.A;
+                            jg.placarB = placarGlobal.B;
+                            localStorage.setItem('calendariosOficiais', JSON.stringify(calOffline));
+                        }
+                    }
 
                     alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
                     window.location.href = '/tabelas.html';

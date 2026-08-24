@@ -2,6 +2,7 @@ package br.com.higitech.interclasseApp.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,17 +26,32 @@ public class JogoController {
     @Autowired
     private JogoService jogoService;
 
-    // 🔥 A ROTA QUE FALTAVA (Erro 404 Resolvido): Recebe os jogos da IA e salva no banco!
     @PostMapping("/calendario")
     public ResponseEntity<Void> salvarCalendarioOficial(@RequestBody Map<String, Object> payload, @AuthenticationPrincipal Professor professorLogado) {
         jogoService.salvarCalendario(payload, professorLogado);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 🔄 ROTA QUE O DASHBOARD E O CALENDÁRIO USAM PARA CARREGAR OS JOGOS NA TELA
+    // 🔄 ROTA QUE A TABELAS.HTML USA PARA EXIBIR OS JOGOS POR GÊNERO
     @GetMapping("/lote/{genero}")
     public ResponseEntity<List<Jogo>> getJogosDoLote(@PathVariable String genero, @AuthenticationPrincipal Professor professorLogado) {
-        List<Jogo> jogos = jogoService.buscarJogosPorProfessor(professorLogado);
-        return ResponseEntity.ok(jogos);
+        List<Jogo> todos = jogoService.buscarJogosPorProfessor(professorLogado);
+        
+        // 🔥 FILTRO BLINDADO: Puxa só as chaves correspondentes para não misturar Masculino com Feminino
+        List<Jogo> filtrados = todos.stream().filter(j -> {
+            try {
+                String gen = (String) j.getClass().getMethod("getGenero").invoke(j);
+                return genero.equalsIgnoreCase(gen) || "geral".equalsIgnoreCase(gen);
+            } catch (Exception e) {
+                return true; // Se o modelo for diferente, envia tudo por precaução
+            }
+        }).collect(Collectors.toList());
+        
+        return ResponseEntity.ok(filtrados);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Jogo>> getAllJogos(@AuthenticationPrincipal Professor professorLogado) {
+        return ResponseEntity.ok(jogoService.buscarJogosPorProfessor(professorLogado));
     }
 }
