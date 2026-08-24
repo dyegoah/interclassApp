@@ -29,6 +29,14 @@ public class SetupService {
     public void processarLote(Map<String, Object> payload, Professor professorLogado) {
         String genero = payload.get("genero") != null ? payload.get("genero").toString() : "geral";
         
+        // 🔒 Limpa as configurações de inscrição antigas para não acumular
+        if ("geral".equalsIgnoreCase(genero)) {
+            try { 
+                jdbcTemplate.update("DELETE FROM modalidades WHERE lote_id IN (SELECT id FROM lotes WHERE professor_id = ? AND genero = 'geral')", professorLogado.getId()); 
+                jdbcTemplate.update("DELETE FROM lotes WHERE professor_id = ? AND genero = 'geral'", professorLogado.getId()); 
+            } catch (Exception e) {}
+        }
+
         Lote lote = new Lote();
         lote.setGenero(genero);
         lote.setProfessor(professorLogado);
@@ -75,15 +83,12 @@ public class SetupService {
         try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
-
         try { jdbcTemplate.update("DELETE FROM classificacao WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM classificacoes WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM jogos WHERE professor_id = ?", idProf); } catch (Exception e) {}
-
         try { jdbcTemplate.update("DELETE FROM alunos WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM modalidades WHERE lote_id IN (SELECT id FROM lotes WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM lotes WHERE professor_id = ?", idProf); } catch (Exception e) {}
-
         try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM lotes)"); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM tb_lote)"); } catch (Exception e) {}
     }

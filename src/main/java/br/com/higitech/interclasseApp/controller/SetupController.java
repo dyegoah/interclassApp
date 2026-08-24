@@ -22,7 +22,7 @@ public class SetupController {
     @Autowired
     private SetupService setupService;
 
-    // 🔥 ROTA PARA CRIAR O LOTE E LIBERAR O LINK DE INSCRIÇÃO
+    // 🔥 ROTA PARA SALVAR MODALIDADES E GERAR O LINK
     @PostMapping
     public ResponseEntity<Void> salvarConfiguracoesIniciais(@RequestBody Map<String, Object> payload, @AuthenticationPrincipal Professor professorLogado) {
         setupService.processarLote(payload, professorLogado);
