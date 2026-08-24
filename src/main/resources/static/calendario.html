@@ -78,15 +78,15 @@
         .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; white-space: nowrap; }
         .tab-btn.active { background: rgba(0, 242, 254, 0.1); color: var(--theme-primary); border-color: rgba(0, 242, 254, 0.3); border-bottom: 2px solid var(--theme-primary); text-shadow: 0 0 5px var(--theme-glow); }
 
-        /* 🔥 CSS DA VISÃO MINI-BRACKET SIMBÓLICO 🔥 */
-        .mini-bracket-wrapper { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 15px 5px; overflow-x: auto; background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%); border-radius: 12px;}
-        .mini-col { display: flex; flex-direction: column; justify-content: space-around; gap: 15px; position: relative; }
-        .mini-match { background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; width: 120px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-        .mini-match-header { background: rgba(255,255,255,0.08); font-size: 0.65rem; text-align: center; padding: 4px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .mini-team { padding: 6px 8px; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; color: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-team:first-of-type { border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .mini-match.final { border-color: #ffd700; transform: scale(1.1); box-shadow: 0 0 15px rgba(255,215,0,0.25); margin: 0 10px;}
-        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.15); color: #ffd700; font-weight: bold;}
+       /* 🔥 CSS DA VISÃO MINI-BRACKET SIMBÓLICO (CARROSSEL) 🔥 */
+		        .mini-bracket-wrapper { display: flex; justify-content: flex-start; align-items: center; gap: 15px; padding: 15px 5px 25px 5px; overflow-x: auto; scroll-snap-type: x mandatory; background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%); border-radius: 12px; }
+		        .mini-col { display: flex; flex-direction: column; justify-content: space-around; gap: 15px; position: relative; scroll-snap-align: start; flex-shrink: 0; min-width: 145px;}
+		        .mini-match { background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; width: 100%; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+		        .mini-match-header { background: rgba(255,255,255,0.08); font-size: 0.65rem; text-align: center; padding: 6px 4px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+		        .mini-team { padding: 6px 8px; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; color: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		        .mini-team:first-of-type { border-bottom: 1px solid rgba(255,255,255,0.05); }
+		        .mini-match.final { border-color: #ffd700; transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.25); }
+		        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.15); color: #ffd700; font-weight: bold;}
         .mini-connector-left::after { content: ''; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.2); z-index: 1; }
         .mini-connector-right::before { content: ''; position: absolute; left: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.2); z-index: 1; }
 
@@ -99,21 +99,46 @@
         .mini-group-team { flex-grow: 1; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .mini-group-row.qualified { background: rgba(0,255,0,0.05); border-left: 3px solid #00ff00; }
         .mini-group-row.qualified .mini-group-pos { color: #00ff00; }
+		.mini-bracket-wrapper { flex-wrap: wrap !important; justify-content: center !important; overflow: visible !important; gap: 10px !important; }
+		            .mini-col { min-width: 140px !important; margin-bottom: 10px !important; }
 
         #tabela-impressao { display: none; }
         
-        @media print {
-            body > * { display: none !important; }
-            body { background: white !important; color: black !important; }
-            #tabela-impressao { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-            .print-header { text-align: center; margin-bottom: 20px; color: black; font-family: Arial, sans-serif;}
-            .print-header h2 { margin: 0 0 5px 0; text-transform: uppercase; border-bottom: 2px solid black; padding-bottom: 10px;}
-            .print-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px; margin-bottom: 30px;}
-            .print-table th, .print-table td { border: 1px solid #000; padding: 10px; text-align: left; }
-            .print-table th { background-color: #e0e0e0; font-weight: bold; text-transform: uppercase; }
-            .print-table tr:nth-child(even) { background-color: #f9f9f9; }
-            .print-esporte-title { background: #d0d0d0 !important; text-align: center !important; font-size: 14px; text-transform: uppercase;}
-        }
+		#tabela-impressao { display: none; }
+		        
+		        @media print {
+		            body > * { display: none !important; }
+		            body { background: white !important; color: black !important; }
+		            #tabela-impressao { display: block !important; position: absolute; left: 0; top: 0; width: 100%; color: black !important;}
+		            
+		            .print-header { text-align: center; margin-bottom: 30px; color: black; font-family: Arial, sans-serif;}
+		            .print-header h2 { margin: 0 0 5px 0; text-transform: uppercase; border-bottom: 2px solid black; padding-bottom: 10px;}
+		            .print-header p { margin: 5px 0; font-size: 14px; }
+		            .print-content { font-family: Arial, sans-serif; }
+		            
+		            /* 🔥 REMOVENDO TEMA ESCURO E ADAPTANDO PARA PAPEL 🔥 */
+		            .dia-card { background: white !important; border: 1px solid #000 !important; color: black !important; padding: 10px !important; margin-bottom: 15px !important; page-break-inside: avoid; border-radius: 0 !important; box-shadow: none !important; }
+		            .dia-header h5 { color: black !important; text-shadow: none !important; font-size: 16px !important; }
+		            .dia-header span { color: #333 !important; }
+		            
+		            .jogo-item { background: white !important; border: 1px solid #ccc !important; color: black !important; page-break-inside: avoid; border-radius: 0 !important; margin-bottom: 4px !important;}
+		            .jogo-hora { color: black !important; }
+		            .jogo-desc { color: black !important; }
+		            .jogo-quadra { color: #555 !important; }
+		            .jogo-desc span { color: black !important; background: transparent !important; border: 1px solid #000 !important; text-shadow: none !important; }
+		            .btn-edit-jogo { display: none !important; } /* Esconde o botão Mover */
+		            
+		            /* Tabelas e Chaves de TV */
+		            .mini-group-card { background: white !important; border: 1px solid #000 !important; color: black !important; box-shadow: none !important; border-radius: 0 !important;}
+		            .mini-group-header { background: #eee !important; color: black !important; border-bottom: 1px solid #000 !important; font-weight: bold !important;}
+		            .mini-group-row { color: black !important; border-bottom: 1px solid #ccc !important; }
+		            .mini-group-pos { color: black !important; }
+		            
+		            .mini-match { background: white !important; border: 1px solid #000 !important; color: black !important; box-shadow: none !important; border-radius: 0 !important; }
+		            .mini-match-header { background: #eee !important; color: black !important; border-bottom: 1px solid #000 !important; font-weight: bold !important; }
+		            .mini-team { color: black !important; }
+		            .mini-bracket-wrapper { background: white !important; }
+		        }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -835,156 +860,146 @@
         // ==========================================
         // 🔥 RENDERIZAÇÃO: VISÃO DA TABELA (TV) MINI-BRACKET 🔥
         // ==========================================
-        function renderizarAbaTabelaTV() {
-            const container = document.getElementById('calendario-tabela-container');
-            container.innerHTML = '';
-            
-            let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
-            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => j.esporte))];
+		// ==========================================
+		        // 🔥 RENDERIZAÇÃO: VISÃO DA TABELA (TV) EM CARROSSEL 🔥
+		        // ==========================================
+		        function renderizarAbaTabelaTV() {
+		            const container = document.getElementById('calendario-tabela-container');
+		            container.innerHTML = '';
+		            
+		            let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
+		            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => j.esporte))];
 
-            esportesNomes.forEach(nomeEsp => {
-                let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
-                if (jogosDoEsporte.length === 0) return;
-                
-                let iconeEsp = jogosDoEsporte[0].icone;
-                
-                let espSetup = setupData.esportes.find(e => {
-                    let m = modalidadeDefs.find(md => md.id === e.id);
-                    return m && m.nome === nomeEsp;
-                });
-                let formato = espSetup ? espSetup.formato : 'eliminatoria';
+		            esportesNomes.forEach(nomeEsp => {
+		                let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
+		                if (jogosDoEsporte.length === 0) return;
+		                
+		                let iconeEsp = jogosDoEsporte[0].icone;
+		                
+		                let espSetup = setupData.esportes.find(e => {
+		                    let m = modalidadeDefs.find(md => md.id === e.id);
+		                    return m && m.nome === nomeEsp;
+		                });
+		                let formato = espSetup ? espSetup.formato : 'eliminatoria';
 
-                // Extrair as equipes que vão jogar
-                let todasEquipes = new Set();
-                jogosDoEsporte.forEach(j => {
-                    let s1 = j.titulo.split(' | ');
-                    if(s1.length > 1) {
-                        let s2 = s1[1].split(' x ');
-                        let eqA = s2[0] ? s2[0].trim().replace(' (Série de Partidas)', '') : "";
-                        let eqB = s2[1] ? s2[1].trim().replace(' (Série de Partidas)', '') : "";
-                        
-                        if(eqA && !eqA.includes('Vencedor') && !eqA.includes('A Definir') && !eqA.includes('Colocado') && !eqA.includes('Sorteio') && !eqA.includes('Grupo')) todasEquipes.add(eqA);
-                        if(eqB && !eqB.includes('Vencedor') && !eqB.includes('A Definir') && !eqB.includes('Colocado') && !eqB.includes('Sorteio') && !eqB.includes('Grupo')) todasEquipes.add(eqB);
-                    }
-                });
-                let listaEquipes = Array.from(todasEquipes);
-                if(listaEquipes.length === 0) {
-                    for(let i=1; i<= (espSetup ? espSetup.qtdTimes : 4); i++) listaEquipes.push(`Equipe ${i}`);
-                }
+		                // Extrair as equipes únicas para as tabelas de grupos/pontos
+		                let todasEquipes = new Set();
+		                jogosDoEsporte.forEach(j => {
+		                    let s1 = j.titulo.split(' | ');
+		                    if(s1.length > 1) {
+		                        let s2 = s1[1].split(' x ');
+		                        let eqA = s2[0] ? s2[0].trim().replace(' (Série de Partidas)', '') : "";
+		                        let eqB = s2[1] ? s2[1].trim().replace(' (Série de Partidas)', '') : "";
+		                        
+		                        if(eqA && !eqA.includes('Vencedor') && !eqA.includes('A Definir') && !eqA.includes('Colocado') && !eqA.includes('Sorteio') && !eqA.includes('Grupo')) todasEquipes.add(eqA);
+		                        if(eqB && !eqB.includes('Vencedor') && !eqB.includes('A Definir') && !eqB.includes('Colocado') && !eqB.includes('Sorteio') && !eqB.includes('Grupo')) todasEquipes.add(eqB);
+		                    }
+		                });
+		                let listaEquipes = Array.from(todasEquipes);
+		                if(listaEquipes.length === 0) {
+		                    for(let i=1; i<= (espSetup ? espSetup.qtdTimes : 4); i++) listaEquipes.push(`Equipe ${i}`);
+		                }
 
-                let extrairEqs = (jObj) => {
-                    if(!jObj) return ["A Definir", "A Definir"];
-                    let s1 = jObj.titulo.split(' | ');
-                    if(s1.length < 2) return ["?", "?"];
-                    let s2 = s1[1].split(' x ');
-                    return [
-                        s2[0] ? s2[0].trim().replace(' (Série de Partidas)', '') : "?",
-                        s2[1] ? s2[1].trim().replace(' (Série de Partidas)', '') : "?"
-                    ];
-                };
+		                // Função auxiliar para quebrar o texto do time
+		                let extrairEqs = (jObj) => {
+		                    if(!jObj) return ["A Definir", "A Definir"];
+		                    let s1 = jObj.titulo.split(' | ');
+		                    if(s1.length < 2) return ["?", "?"];
+		                    let s2 = s1[1].split(' x ');
+		                    return [
+		                        s2[0] ? s2[0].trim().replace(' (Série de Partidas)', '') : "?",
+		                        s2[1] ? s2[1].trim().replace(' (Série de Partidas)', '') : "?"
+		                    ];
+		                };
 
-                let semi1 = jogosDoEsporte.find(j => j.titulo.includes('SEMIFINAL 1'));
-                let semi2 = jogosDoEsporte.find(j => j.titulo.includes('SEMIFINAL 2'));
-                let final = jogosDoEsporte.find(j => j.titulo.includes('GRANDE FINAL'));
+		                // 🔥 GERAÇÃO DO CARROSSEL HORIZONTAL DE TODOS OS JOGOS 🔥
+		                let carouselHtml = `
+		                    <div class="mini-bracket-wrapper">
+		                        ${jogosDoEsporte.map(j => {
+		                            let eqs = extrairEqs(j);
+		                            let faseStr = j.titulo.split(' | ')[0] || 'Confronto';
+		                            let isFinal = faseStr.toUpperCase().includes('FINAL') && !faseStr.toUpperCase().includes('SEMI') && !faseStr.toUpperCase().includes('QUARTAS');
+		                            
+		                            return `
+		                            <div class="mini-col">
+		                                <div class="mini-match ${isFinal ? 'final' : ''}">
+		                                    <div class="mini-match-header" title="${HighTechSecurity.sanitizar(faseStr)}">
+		                                        ${HighTechSecurity.sanitizar(faseStr)}
+		                                    </div>
+		                                    <div class="mini-team" title="${HighTechSecurity.sanitizar(eqs[0])}">${HighTechSecurity.sanitizar(eqs[0])}</div>
+		                                    <div class="mini-team" title="${HighTechSecurity.sanitizar(eqs[1])}">${HighTechSecurity.sanitizar(eqs[1])}</div>
+		                                </div>
+		                            </div>
+		                            `;
+		                        }).join('')}
+		                    </div>
+		                `;
 
-                let eqS1 = extrairEqs(semi1);
-                let eqS2 = extrairEqs(semi2);
-                let eqF = extrairEqs(final);
+		                let htmlTabela = '';
 
-                // HTML do Mini-Bracket Simbólico
-                let bracketHtml = `
-                    <div class="mini-bracket-wrapper">
-                        ${(semi1 || semi2) ? `
-                        <div class="mini-col">
-                            <div class="mini-match mini-connector-left">
-                                <div class="mini-match-header">SEMI 1</div>
-                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS1[0])}">${HighTechSecurity.sanitizar(eqS1[0])}</div>
-                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS1[1])}">${HighTechSecurity.sanitizar(eqS1[1])}</div>
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div class="mini-col" style="align-items:center;">
-                            <div style="font-size: 2rem; filter: drop-shadow(0 0 10px #ffd700); margin-bottom: 5px;">🏆</div>
-                            <div class="mini-match final">
-                                <div class="mini-match-header">FINAL</div>
-                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqF[0])}">${HighTechSecurity.sanitizar(eqF[0])}</div>
-                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqF[1])}">${HighTechSecurity.sanitizar(eqF[1])}</div>
-                            </div>
-                        </div>
+		                if (formato === 'pontos_corridos') {
+		                    let rows = listaEquipes.map((t, idx) => `
+		                        <div class="mini-group-row ${idx === 0 ? 'qualified' : ''}">
+		                            <div class="mini-group-pos">${idx+1}</div>
+		                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
+		                        </div>`).join('');
+		                        
+		                    htmlTabela = `
+		                        <div class="mini-group-grid">
+		                            <div class="mini-group-card" style="width: 100%; max-width: 400px; border-top: 3px solid #00ff00;">
+		                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(0,255,0,0.15), transparent); color: #00ff00;">LIGA GERAL (PONTOS CORRIDOS)</div>
+		                                ${rows}
+		                            </div>
+		                        </div>
+		                        <div style="text-align: center; font-family: 'Orbitron'; color: #00f2fe; margin: 15px 0 10px 0; font-size: 0.9rem;">📺 SEQUÊNCIA DE CONFRONTOS 📺</div>
+		                        ${carouselHtml}
+		                    `;
+		                } else if (formato === 'grupos') {
+		                    let half = Math.ceil(listaEquipes.length / 2);
+		                    let grupoA = listaEquipes.slice(0, half).map((t, idx) => `
+		                        <div class="mini-group-row ${idx < 2 ? 'qualified' : ''}">
+		                            <div class="mini-group-pos">${idx+1}</div>
+		                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
+		                        </div>`).join('');
+		                        
+		                    let grupoB = listaEquipes.slice(half).map((t, idx) => `
+		                        <div class="mini-group-row ${idx < 2 ? 'qualified' : ''}">
+		                            <div class="mini-group-pos">${idx+1}</div>
+		                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
+		                        </div>`).join('');
+		                    
+		                    htmlTabela = `
+		                        <div class="mini-group-grid">
+		                            <div class="mini-group-card" style="border-top: 3px solid var(--theme-primary);">
+		                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(0,242,254,0.2), transparent);">GRUPO A</div>
+		                                ${grupoA}
+		                            </div>
+		                            <div class="mini-group-card" style="border-top: 3px solid #ff00de;">
+		                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(255,0,222,0.2), transparent);">GRUPO B</div>
+		                                ${grupoB}
+		                            </div>
+		                        </div>
+		                        <div style="text-align: center; font-family: 'Orbitron'; color: #ffd700; margin: 15px 0 10px 0; font-size: 0.9rem;">📺 TODOS OS CONFRONTOS 📺</div>
+		                        ${carouselHtml}
+		                    `;
+		                } else {
+		                    htmlTabela = `
+		                        <div style="text-align: center; font-family: 'Orbitron'; color: #ffd700; margin: 10px 0 10px 0; font-size: 0.9rem;">📺 CHAVEAMENTO COMPLETO 📺</div>
+		                        ${carouselHtml}
+		                    `;
+		                }
 
-                        ${(semi1 || semi2) ? `
-                        <div class="mini-col">
-                            <div class="mini-match mini-connector-right">
-                                <div class="mini-match-header">SEMI 2</div>
-                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS2[0])}">${HighTechSecurity.sanitizar(eqS2[0])}</div>
-                                <div class="mini-team" title="${HighTechSecurity.sanitizar(eqS2[1])}">${HighTechSecurity.sanitizar(eqS2[1])}</div>
-                            </div>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
-
-                let htmlTabela = '';
-
-                if (formato === 'pontos_corridos') {
-                    let rows = listaEquipes.map((t, idx) => `
-                        <div class="mini-group-row ${idx === 0 ? 'qualified' : ''}">
-                            <div class="mini-group-pos">${idx+1}</div>
-                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
-                        </div>`).join('');
-                        
-                    htmlTabela = `
-                        <div class="mini-group-grid">
-                            <div class="mini-group-card" style="width: 100%; max-width: 400px; border-top: 3px solid #00ff00;">
-                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(0,255,0,0.15), transparent); color: #00ff00;">LIGA GERAL (PONTOS CORRIDOS)</div>
-                                ${rows}
-                            </div>
-                        </div>
-                    `;
-                } else if (formato === 'grupos') {
-                    let half = Math.ceil(listaEquipes.length / 2);
-                    let grupoA = listaEquipes.slice(0, half).map((t, idx) => `
-                        <div class="mini-group-row ${idx < 2 ? 'qualified' : ''}">
-                            <div class="mini-group-pos">${idx+1}</div>
-                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
-                        </div>`).join('');
-                        
-                    let grupoB = listaEquipes.slice(half).map((t, idx) => `
-                        <div class="mini-group-row ${idx < 2 ? 'qualified' : ''}">
-                            <div class="mini-group-pos">${idx+1}</div>
-                            <div class="mini-group-team" title="${HighTechSecurity.sanitizar(t)}">${HighTechSecurity.sanitizar(t)}</div>
-                        </div>`).join('');
-                    
-                    htmlTabela = `
-                        <div class="mini-group-grid">
-                            <div class="mini-group-card" style="border-top: 3px solid var(--theme-primary);">
-                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(0,242,254,0.2), transparent);">GRUPO A</div>
-                                ${grupoA}
-                            </div>
-                            <div class="mini-group-card" style="border-top: 3px solid #ff00de;">
-                                <div class="mini-group-header" style="background: linear-gradient(90deg, rgba(255,0,222,0.2), transparent);">GRUPO B</div>
-                                ${grupoB}
-                            </div>
-                        </div>
-                        <div style="text-align: center; font-family: 'Orbitron'; color: #ffd700; margin: 15px 0 5px 0; font-size: 0.9rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">↓ FASE FINAL ↓</div>
-                        ${bracketHtml}
-                    `;
-                } else {
-                    htmlTabela = bracketHtml;
-                }
-
-                container.innerHTML += `
-                    <div class="dia-card" style="border-left-color: #ffd700; background: rgba(0,0,0,0.6);">
-                        <div class="dia-header" style="border-bottom-color: rgba(255,215,0,0.3);">
-                            <h5 style="color: #ffd700; font-size: 1.1rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">${iconeEsp} ${nomeEsp}</h5>
-                            <span style="font-family: 'Segoe UI'; font-size: 0.75rem; background: rgba(255,215,0,0.1); padding: 4px 8px; border-radius: 5px; color: #ffd700; text-transform: uppercase; font-weight: bold; border: 1px solid rgba(255,215,0,0.3);">${formato.replace('_', ' ')}</span>
-                        </div>
-                        ${htmlTabela}
-                    </div>
-                `;
-            });
-        }
+		                container.innerHTML += `
+		                    <div class="dia-card" style="border-left-color: #ffd700; background: rgba(0,0,0,0.6);">
+		                        <div class="dia-header" style="border-bottom-color: rgba(255,215,0,0.3);">
+		                            <h5 style="color: #ffd700; font-size: 1.1rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">${iconeEsp} ${nomeEsp}</h5>
+		                            <span style="font-family: 'Segoe UI'; font-size: 0.75rem; background: rgba(255,215,0,0.1); padding: 4px 8px; border-radius: 5px; color: #ffd700; text-transform: uppercase; font-weight: bold; border: 1px solid rgba(255,215,0,0.3);">${formato.replace('_', ' ')}</span>
+		                        </div>
+		                        ${htmlTabela}
+		                    </div>
+		                `;
+		            });
+		        }
 
         function abrirModalEdicao(jogoId) {
             const jogo = jogosGeradosGlobais.find(j => j.id === jogoId) || jogosExistentesGlobais.find(j => j.id === jogoId);
@@ -1084,6 +1099,60 @@
                 alert("🚨 Falha ao salvar. Sua sessão pode ter expirado. Faça o login novamente.");
             }
         }
+		
+		// ==========================================
+		        // 🔥 FUNÇÃO DE IMPRESSÃO PROFISSIONAL (PDF) 🔥
+		        // ==========================================
+		        function imprimirTabelaOficial() {
+		            // 1. Pega os dados do Professor e da Escola logados
+		            const escola = localStorage.getItem('profEscola') || 'Escola Não Informada';
+		            const profNome = localStorage.getItem('profNome') || 'Professor(a)';
+		            
+		            // 2. Identifica qual Aba está selecionada na tela
+		            let abaAtiva = '';
+		            let conteudoHTML = '';
+		            
+		            if (document.getElementById('tab-geral').classList.contains('active')) {
+		                abaAtiva = 'Visão Geral (Por Dia)';
+		                conteudoHTML = document.getElementById('calendario-dias-container').innerHTML;
+		            } else if (document.getElementById('tab-esporte').classList.contains('active')) {
+		                abaAtiva = 'Visão Por Modalidade';
+		                conteudoHTML = document.getElementById('calendario-esportes-container').innerHTML;
+		            } else if (document.getElementById('tab-tabela').classList.contains('active')) {
+		                abaAtiva = 'Visão da Tabela (Fases e Grupos)';
+		                conteudoHTML = document.getElementById('calendario-tabela-container').innerHTML;
+		            }
+		            
+		            const dataHoje = new Date().toLocaleDateString('pt-BR');
+		            const horaHoje = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+		            
+		            // 3. Constrói o Cabeçalho da Folha de Impressão
+		            const cabecalho = `
+		                <div class="print-header">
+		                    <h2>${HighTechSecurity.sanitizar(escola)}</h2>
+		                    <p><b>Organizador(a):</b> Prof. ${HighTechSecurity.sanitizar(profNome)}</p>
+		                    <p><b>Relatório:</b> Calendário Oficial do Torneio - ${abaAtiva}</p>
+		                    <p><b>Emitido por:</b> InterclassApp em ${dataHoje} às ${horaHoje}</p>
+		                </div>
+		                <div class="print-content">
+		                    ${conteudoHTML}
+		                </div>
+		            `;
+		            
+		            // 4. Joga para a div invisível de impressão
+		            document.getElementById('tabela-impressao').innerHTML = cabecalho;
+		            
+		            // 5. Truque Mágico: Muda o título da página temporariamente 
+		            // para que ao "Salvar como PDF", o nome do arquivo já venha pronto!
+		            const tituloOriginal = document.title;
+		            document.title = `Tabela_InterclassApp_${abaAtiva.replace(/[^a-zA-Z0-9]/g, '_')}`;
+		            
+		            // 6. Abre a janela de impressão nativa (que permite salvar em PDF)
+		            window.print();
+		            
+		            // 7. Devolve o título original ao site
+		            document.title = tituloOriginal;
+		        }
     </script>
 </body>
 </html>
