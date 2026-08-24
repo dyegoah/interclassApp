@@ -22,10 +22,9 @@ public class ModalidadeController {
 
     @GetMapping("/public/{hashPublico}")
     public ResponseEntity<List<Modalidade>> getModalidadesPublicas(@PathVariable String hashPublico) {
-        // Puxa tudo do professor
         List<Modalidade> todas = modalidadeRepository.findByLoteProfessorHashPublico(hashPublico);
         
-        // 🔥 FILTRO BLINDADO: Separa APENAS o que foi aberto para inscrição (lote "geral")
+        // 🔥 FILTRO BLINDADO: Pega APENAS as modalidades ativas no lote "geral" (Inscrições)
         List<Modalidade> ativas = todas.stream()
                 .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
                 .collect(Collectors.toList());

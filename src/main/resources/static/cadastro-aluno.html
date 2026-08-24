@@ -152,10 +152,10 @@
                 if (res.ok) {
                     const modalidadesAtivasDaAPI = await res.json();
                     
-                    // 🔥 Tratamento infalível que retira acentos para não bugar a leitura
+                    // Tratamento seguro que retira acentos para não dar falso positivo
                     const nomesAtivos = modalidadesAtivasDaAPI.map(m => m.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
                     
-                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos);
+                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivasDaAPI);
                     
                     document.getElementById('loading-esportes').style.display = 'none';
                     document.getElementById('form-cadastro').style.display = 'block';
@@ -167,8 +167,7 @@
             }
         };
 
-        // 🔥 A MÁGICA VISUAL DOS CADEADOS 🔥
-        function renderizarOpcoesDeEsportesComCadeado(nomesAtivos) {
+        function renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivasDaAPI) {
             const select = document.getElementById('esporteAluno');
             let html = '<option value="" disabled selected style="color:#fff; background:#05050f;">Selecione a Modalidade...</option>';
 
@@ -178,8 +177,11 @@
 
                 if (ativo) {
                     // LIVRE PARA INSCRIÇÃO
-                    let modData = JSON.stringify({ esporte: mod.nome, icone: mod.icone });
-                    html += `<option value='${modData}' style="color: #fff; background: #05050f;">${mod.icone} ${mod.nome}</option>`;
+                    let modObjOriginal = modalidadesAtivasDaAPI.find(m => m.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() === nomeCheck);
+                    let iconeSeguro = modObjOriginal && modObjOriginal.icone ? modObjOriginal.icone : mod.icone;
+
+                    let modData = JSON.stringify({ esporte: mod.nome, icone: iconeSeguro });
+                    html += `<option value='${modData}' style="color: #fff; background: #05050f;">${iconeSeguro} ${mod.nome}</option>`;
                 } else {
                     // TRANCADO COM CADEADO E DESABILITADO
                     html += `<option value="" disabled style="color: #666; background: #111; font-style: italic;">🔒 ${mod.nome} (Bloqueado)</option>`;

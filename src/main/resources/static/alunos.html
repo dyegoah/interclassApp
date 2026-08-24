@@ -164,9 +164,7 @@
                 </div>
             </div>
 
-            <div style="margin-bottom: 1.5rem; position: relative;">
-                <input type="text" id="input-busca" class="input-dark" placeholder="🔍 Buscar por Nome do Aluno, Turma ou Modalidade..." onkeyup="realizarBusca()">
-            </div>
+			
 
             <div class="tabs-container">
                 <button class="tab-btn active" id="tab-masculino" onclick="mudarAba('masculino')">
@@ -183,6 +181,12 @@
             <div id="resumo-container" class="resumo-esportes" style="display: none;"></div>
             <div id="sport-details-container" style="display: none;"></div>
 
+			<div style="margin-bottom: 1.5rem; position: relative; display: flex; align-items: center;">
+			                <input type="text" id="input-busca" class="input-dark" placeholder="🔍 Buscar por Nome do Aluno, Turma ou Modalidade..." onkeyup="realizarBusca()" style="padding-right: 45px;">
+			                <!-- 🔥 BOTÃO MÁGICO DE LIMPAR BUSCA 🔥 -->
+			                <button id="btn-limpar-busca" onclick="limparBusca()" style="display: none; position: absolute; right: 15px; background: transparent; border: none; color: var(--theme-primary); font-size: 1.5rem; cursor: pointer; transition: 0.3s; font-weight: bold;" title="Limpar Seleção">&times;</button>
+			            </div>
+			
             <div id="loading-alunos" style="text-align: center; padding: 2rem; color: var(--theme-primary);">
                 ⏳ Conectando ao Banco de Dados Seguro...
             </div>
@@ -205,7 +209,10 @@
             { id: 11, nome: 'Dama', icone: '🏁' }, { id: 12, nome: 'E-Sports', icone: '🎮' }
         ];
 
-        const minJogadoresPorEsporte = { 'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2 };
+		const minJogadoresPorEsporte = { 
+		            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2,
+		            'Tênis de Mesa': 1, 'Xadrez': 1, 'Dama': 1, 'E-Sports': 1, 'Natação': 1, 'Atletismo': 1 
+		        };
 
         let listaAlunosBase = []; 
         let generoAtual = 'masculino';
@@ -273,7 +280,22 @@
 		            aplicarFiltrosEPaginacao();
 		        }
 
-        function realizarBusca() { paginaAtual = 1; aplicarFiltrosEPaginacao(); }
+				function realizarBusca() { 
+				            paginaAtual = 1; 
+				            
+				            // Mostra o botão "X" se houver texto, e esconde se estiver vazio
+				            const inputBusca = document.getElementById('input-busca');
+				            const btnLimpar = document.getElementById('btn-limpar-busca');
+				            btnLimpar.style.display = inputBusca.value.trim() !== "" ? 'block' : 'none';
+				            
+				            aplicarFiltrosEPaginacao(); 
+				        }
+
+				        function limparBusca() {
+				            // Zera o campo, atualiza a lista e esconde o "X"
+				            document.getElementById('input-busca').value = "";
+				            realizarBusca();
+				        }
 
         function aplicarFiltrosEPaginacao() {
             let filtrados = listaAlunosBase.filter(a => a.genero === generoAtual);
@@ -316,13 +338,29 @@
             let minExigido = minJogadoresPorEsporte[nomeEsporte] || 2; 
 
             let htmlEq = '';
-            arrEq.forEach(eq => {
-                let corStatus = eq.count >= minExigido ? '#00ff00' : (eq.count >= (minExigido / 2) ? '#ffd700' : '#ff0055');
-                htmlEq += `<div class="equipe-summary-card" style="border-top-color: ${corStatus};"><div class="eq-turma">${eq.turma}</div><div class="eq-count-badge" style="color: ${corStatus}; border-color: ${corStatus}; box-shadow: 0 0 10px rgba(${corStatus === '#00ff00' ? '0,255,0' : (corStatus === '#ffd700' ? '255,215,0' : '255,0,85')}, 0.2);">${eq.count} <span style="font-size:0.65rem; color:#ccc; font-weight:normal;">/ ${minExigido}</span></div></div>`;
-            });
+			arrEq.forEach(eq => {
+			                let corStatus = eq.count >= minExigido ? '#00ff00' : (eq.count >= (minExigido / 2) ? '#ffd700' : '#ff0055');
+			                // 🔥 ADICIONADO O ONCLICK E O CURSOR POINTER
+			                htmlEq += `<div class="equipe-summary-card" style="border-top-color: ${corStatus}; cursor: pointer;" onclick="filtrarAlunosPorTurma('${eq.turma}')" title="Ver alunos desta turma">
+			                    <div class="eq-turma">${eq.turma}</div>
+			                    <div class="eq-count-badge" style="color: ${corStatus}; border-color: ${corStatus}; box-shadow: 0 0 10px rgba(${corStatus === '#00ff00' ? '0,255,0' : (corStatus === '#ffd700' ? '255,215,0' : '255,0,85')}, 0.2);">${eq.count} <span style="font-size:0.65rem; color:#ccc; font-weight:normal;">/ ${minExigido}</span></div>
+			                </div>`;
+			            });
             let ic = modalidadeDefs.find(m => m.nome === nomeEsporte)?.icone || '🏅';
             detailsContainer.innerHTML = `<div class="sport-details-box"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 15px;"><h4 class="sub-section-title" style="margin: 0; border: none;">${ic} Status das Turmas (${nomeEsporte})</h4><button class="btn-acao" onclick="iniciarSetupDoEsporte('${nomeEsporte}')" style="box-shadow: 0 0 15px var(--theme-glow);">⚙️ Criar Torneio ➔</button></div><div class="equipes-scroll-container">${htmlEq}</div></div>`;
         }
+		
+		function filtrarAlunosPorTurma(turma) {
+		            // Preenche o campo de busca automaticamente com a turma clicada
+		            const inputBusca = document.getElementById('input-busca');
+		            inputBusca.value = turma;
+		            
+		            // Chama a sua função de busca já existente
+		            realizarBusca();
+		            
+		            // Rola a tela suavemente para a lista de alunos
+		            document.getElementById('titulo-lista-alunos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+		        }
 
         function iniciarSetupDoEsporte(nomeEsporte) {
             const defEsporte = modalidadeDefs.find(m => m.nome === nomeEsporte);

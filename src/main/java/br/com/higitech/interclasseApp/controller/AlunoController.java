@@ -61,14 +61,14 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
-        // 🔥 TRAVA DE SEGURANÇA: Verifica se a modalidade realmente foi ativada na Inscrição
+        // 🔥 TRAVA DE SEGURANÇA NO JAVA
         List<Modalidade> todasModalidades = modalidadeRepository.findByLoteProfessorHashPublico(professorHash);
         boolean esportePermitido = todasModalidades.stream()
                 .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
                 .anyMatch(m -> m.getNomeEsporte().equalsIgnoreCase(dto.esporte));
 
         if (!esportePermitido) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta modalidade não está aberta para inscrições nesta escola.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta modalidade não está aberta para inscrições.");
         }
 
         long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()

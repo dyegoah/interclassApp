@@ -2,6 +2,7 @@ package br.com.higitech.interclasseApp.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,11 +30,17 @@ public class SetupService {
     public void processarLote(Map<String, Object> payload, Professor professorLogado) {
         String genero = payload.get("genero") != null ? payload.get("genero").toString() : "geral";
         
+        // 🔥 A MÁGICA: Limpa os esportes anteriores do Link de Inscrição usando o Hibernate (100% Seguro)
         if ("geral".equalsIgnoreCase(genero)) {
-            try { 
-                jdbcTemplate.update("DELETE FROM modalidades WHERE lote_id IN (SELECT id FROM lotes WHERE professor_id = ? AND genero = 'geral')", professorLogado.getId()); 
-                jdbcTemplate.update("DELETE FROM lotes WHERE professor_id = ? AND genero = 'geral'", professorLogado.getId()); 
-            } catch (Exception e) {}
+            try {
+                List<Modalidade> antigas = modalidadeRepository.findByLoteProfessorHashPublico(professorLogado.getHashPublico())
+                        .stream()
+                        .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
+                        .collect(Collectors.toList());
+                modalidadeRepository.deleteAll(antigas);
+            } catch (Exception e) {
+                System.out.println("Aviso ao limpar modalidades: " + e.getMessage());
+            }
         }
 
         Lote lote = new Lote();
@@ -78,6 +85,7 @@ public class SetupService {
 
     public void resetarTudo(Professor profLogado) {
         Long idProf = profLogado.getId();
+
         try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
