@@ -35,7 +35,7 @@
         .btn-timer { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 20px; border-radius: 20px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; font-size: 0.85rem; margin-top: 5px; }
         .btn-timer.running { background: #ff0000; color: #fff; border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.4);}
 
-        /* 🔥 LAYOUT DE ARENA: JOGADOR A - LINHA DO TEMPO (CENTRO) - JOGADOR B 🔥 */
+        /* 🔥 LAYOUT DE ARENA CENTRALIZADO E EXCLUSIVO (1v1) 🔥 */
         .arena-prancheta { 
             display: flex; 
             width: 95%; 
@@ -52,24 +52,23 @@
 
         .coluna-time { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 280px; width: 100%; }
         
-        .jogador-card { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px 15px 15px 50px; padding: 8px 15px 8px 8px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
+        .jogador-card { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px 15px 15px 50px; padding: 15px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
         .jogador-card:active { background: rgba(255,255,255,0.1); transform: scale(0.96); }
         .jogador-card.eq-a { border-left: 4px solid var(--team-a); }
         .jogador-card.eq-b { border-left: 4px solid var(--team-b); }
         
-        .jog-img-wrapper { position: relative; width: 60px; height: 60px; flex-shrink: 0; }
-        .jog-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #555; background: #222;}
+        .jog-img-wrapper { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+        .jog-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #555; background: #222;}
         .eq-a .jog-img { border-color: var(--team-a); }
         .eq-b .jog-img { border-color: var(--team-b); }
         
-        .jog-detalhes { flex-grow: 1; padding: 0 12px; overflow: hidden; }
-        .jog-nome { font-family: 'Segoe UI'; font-size: 1.05rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .jog-stats { font-size: 0.75rem; color: #aaa; display: flex; gap: 8px; margin-top: 4px; font-family: 'Segoe UI';}
-        .stat-badge { background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);}
+        .jog-detalhes { flex-grow: 1; padding: 0 15px; overflow: hidden; }
+        .jog-nome { font-family: 'Segoe UI'; font-size: 1.2rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .jog-stats { font-size: 0.85rem; color: #aaa; display: flex; gap: 8px; margin-top: 6px; font-family: 'Segoe UI';}
+        .stat-badge { background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);}
         
-        .gols-destaque { font-size: 2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
+        .gols-destaque { font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
 
-        /* 🔥 LINHA DO TEMPO CENTRALIZADA NO MEIO 🔥 */
         .timeline-container { 
             flex: 1.2; 
             min-width: 300px; 
@@ -139,7 +138,7 @@
         </div>
     </div>
 
-    <!-- 🔥 PRANCHETA CENTRALIZADA E EXCLUSIVA (1v1) 🔥 -->
+    <!-- 🔥 PRANCHETA CENTRALIZADA (TIME A - TIMELINE NO MEIO - TIME B) 🔥 -->
     <div class="arena-prancheta">
         
         <div class="coluna-time" id="coluna-a"></div>
@@ -292,11 +291,10 @@
             let tituloReduzido = jogo.titulo ? jogo.titulo.split(' | ')[0] : "Partida";
             document.getElementById('lbl-esporte').innerText = `${iconeEsporte} ${nomeEsporte} | ${tituloReduzido}`;
 
-            // Pega o que o banco tem
+            // Pega o que o banco tem ou o Título
             let rawA = jogo.equipeANome || jogo.equipeaNome || "";
             let rawB = jogo.equipeBNome || jogo.equipebNome || "";
 
-            // Se for genérico, extrai o nome real de dentro do Título (Ex: Bernardo (8ºA) x Igor (7ºB))
             if ((!rawA || rawA === "Equipe A" || rawA === "A Definir") && jogo.titulo && jogo.titulo.includes(' | ')) {
                 let partes = jogo.titulo.split(' | ')[1].split(' x ');
                 if (partes.length >= 2) {
@@ -328,8 +326,9 @@
             colA.innerHTML = ''; colB.innerHTML = '';
 
             // 🔥 A MÁGICA DESTA TELA: ELA É EXCLUSIVA PARA 1x1. APENAS 1 CARD DESENHADO!
-            colA.innerHTML = criarCardJogador('A', dadosA.nome, '1', idA);
-            colB.innerHTML = criarCardJogador('B', dadosB.nome, '1', idB);
+            // Não faz laços FOR. Desenha apenas o Competidor A na esquerda, e o B na direita.
+            colA.innerHTML = criarCardJogador('A', dadosA.nome, idA);
+            colB.innerHTML = criarCardJogador('B', dadosB.nome, idB);
 
             if (modoLeitura || jogo.status === 'FINALIZADO') {
                 placarGlobal.A = jogo.placarA || 0;
@@ -342,13 +341,13 @@
             }
         }
 
-        function criarCardJogador(equipe, nome, camisa, idAtleta) {
+        function criarCardJogador(equipe, nome, idAtleta) {
             pontosAtletas[idAtleta] = 0;
             faltasAtletas[idAtleta] = 0;
             let classeCard = equipe === 'A' ? 'eq-a' : 'eq-b';
             
             let corEq = equipe === 'A' ? '00f2fe' : 'ff00de';
-            let imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=222&color=${corEq}&bold=true`;
+            let imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=222&color=${corEq}&bold=true&size=128`;
             
             let clickAction = modoLeitura ? '' : `onclick="abrirModalAcoes('${idAtleta}', '${equipe}', '${nome.replace(/'/g, "\\'")}', '${imgUrl}')"`;
 
@@ -465,6 +464,7 @@
                     relatorios[jogoId] = { placar: { A: placarGlobal.A, B: placarGlobal.B }, timeline: timelineEventos };
                     localStorage.setItem('relatoriosPartidas', JSON.stringify(relatorios));
 
+                    // 🔥 ATUALIZA O STATUS DO JOGO LOCALMENTE PARA AVANÇAR AUTOMATICAMENTE O TORNEIO
                     let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
                     if (calOffline[lote] && calOffline[lote].jogos) {
                         let jg = calOffline[lote].jogos.find(j => j.id === jogoId);
