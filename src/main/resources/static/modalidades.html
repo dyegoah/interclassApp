@@ -303,7 +303,7 @@
             // Limpa o temporário da Etapa 1
             localStorage.removeItem('arenaSetupTemp');
             
-            window.location.href = '/setup/torneios.html'; // Corrigido para a rota oficial da pasta setup!
+            window.location.href = '/torneios.html';
         }
 
         window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };

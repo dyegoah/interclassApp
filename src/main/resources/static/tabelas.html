@@ -8,7 +8,7 @@
     <!-- 🛡️ ANTI-FLICKER E PROTEÇÃO DE ROTA -->
     <script>
         if (!localStorage.getItem('interclassToken')) {
-            window.location.replace('/index.html'); // Expulsa pro Login
+            window.location.replace('/index.html'); 
         }
     </script>
   
@@ -42,7 +42,7 @@
         .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
         .section-title { text-transform: uppercase; font-size: 1.2rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;}
         
-        .torneio-grupo { margin-bottom: 20px; background: rgba(0,0,0,0.4); border-radius: 15px; border-left: 5px solid var(--theme-primary); overflow: hidden; }
+        .torneio-grupo { margin-bottom: 20px; background: rgba(0,0,0,0.4); border-radius: 15px; border-left: 5px solid var(--theme-primary); overflow: hidden; transition: 0.5s ease; }
         .torneio-header { padding: 15px 20px; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
         .torneio-header:hover { background: rgba(255,255,255,0.1); }
         .torneio-header h3 { font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 10px; }
@@ -65,12 +65,20 @@
         
         .secao-agenda-titulo { font-family: 'Orbitron'; font-size: 1rem; color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;}
         
-        .playhub-card { min-height: 110px; display: grid; grid-template-columns: 110px 1fr auto; gap: 15px; align-items: center; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .playhub-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
-        .play-hora { border-right: 2px solid var(--theme-primary); height: 100%; display: flex; flex-direction: column; justify-content: center; text-align: center; padding-right: 15px;}
+        .playhub-card { min-height: 110px; display: grid; grid-template-columns: 110px 1fr auto; gap: 15px; align-items: center; padding: 15px; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; }
+        .playhub-card:hover { transform: translateY(-2px); }
+        
+        .card-aguardando { border-left: 4px solid #555 !important; opacity: 0.8; }
+        .card-aguardando .btn-play { background: #555; color: #aaa; box-shadow: none; }
+        .card-aguardando .btn-play:hover { background: #666; transform: none; box-shadow: none; }
+        
+        .card-pronto { border-left: 4px solid #ffd700 !important; background: rgba(255, 215, 0, 0.05) !important; border: 1px solid rgba(255,215,0,0.2); }
+        .card-pronto .btn-play { background: #ffd700; color: #000; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
+        .card-pronto .btn-play:hover { background: #ffea00; box-shadow: 0 0 20px rgba(255,215,0,0.6); }
+
+        .play-hora { height: 100%; display: flex; flex-direction: column; justify-content: center; text-align: center; padding-right: 15px;}
         .play-info { display: flex; flex-direction: column; justify-content: center; }
-        .btn-play { background: #00ff00; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,0,0.2); transition: 0.3s;}
-        .btn-play:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,0,0.5); }
+        .btn-play { border-radius: 8px; padding: 10px 20px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; border: none;}
 
         .campeao-banner { background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); padding: 30px 20px; border-radius: 15px; text-align: center; margin-top: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4); border: 2px solid #fff; position: relative; overflow: hidden; }
         .campeao-banner h2 { font-family: 'Orbitron'; color: #000; margin: 0; text-transform: uppercase; font-size: 1.4rem; font-weight: bold; }
@@ -81,7 +89,7 @@
 
         @media (max-width: 768px) {
             .playhub-card { grid-template-columns: 1fr; text-align: center; gap: 10px; }
-            .play-hora { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 10px; }
+            .play-hora { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 10px; }
             .play-info > div { flex-direction: column; gap: 10px; }
         }
 
@@ -100,7 +108,6 @@
                 </div>
             </div>
 
-            <!-- 🔥 A MÁGICA ESTÁ AQUI: OS BOTÕES APARECERÃO SEMPRE 🔥 -->
             <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;" id="filtros-lote"></div>
             
             <div id="lista-jogos"></div>
@@ -129,502 +136,607 @@
 
     <div id="footbar-placeholder"></div>
 
-	<script>
-	        let relatoriosSalvos = {}; 
-	        let loteAtualSelecionado = null;
-	        let configuracoesLotesGlobais = {}; 
-	        let listaAlunosGlobais = []; 
-	        let torneioParaExcluir = null; 
+    <script>
+        let relatoriosSalvos = {}; 
+        let loteAtualSelecionado = null;
+        let configuracoesLotesGlobais = {}; 
+        let listaAlunosGlobais = []; 
+        let torneioParaExcluir = null; 
 
-	        // 🔥 O MAPEAMENTO CORRETO QUE VAI DIRECIONAR O XADREZ PARA A NOVA "individual.html"
-	        const rotasSaaS = {
-	            'Futsal': 'futsal', 'Handebol': 'handebol', 'Vôlei': 'volei', 'Vôlei de Areia': 'volei-areia',
-	            'Basquete': 'basquete', 'Queimada': 'geral', 
-	            'Tênis de Mesa': 'individual', 'Xadrez': 'individual', 'Dama': 'individual', 
-	            'E-Sports': 'individual', 'Natação': 'individual', 'Atletismo': 'individual'
-	        };
+        function obterPlacarSeguro(rel, jogo) {
+            let pA = 0, pB = 0;
+            if (rel) {
+                if (rel.placar && typeof rel.placar.A !== 'undefined') { pA = rel.placar.A; pB = rel.placar.B; }
+                else if (typeof rel.setsA !== 'undefined') { pA = rel.setsA; pB = rel.setsB; }
+                else if (rel.placarFinal && typeof rel.placarFinal.A !== 'undefined') { pA = rel.placarFinal.A; pB = rel.placarFinal.B; }
+                else if (rel.equipeA && typeof rel.equipeA.sets !== 'undefined') { pA = rel.equipeA.sets; pB = rel.equipeB.sets; }
+                else { pA = jogo.placarA || 0; pB = jogo.placarB || 0; }
+            } else {
+                pA = jogo.placarA || 0;
+                pB = jogo.placarB || 0;
+            }
+            return { A: parseInt(pA) || 0, B: parseInt(pB) || 0 };
+        }
 
-	        function obterPlacarSeguro(rel, jogo) {
-	            let pA = 0, pB = 0;
-	            if (rel) {
-	                if (rel.placar && typeof rel.placar.A !== 'undefined') { pA = rel.placar.A; pB = rel.placar.B; }
-	                else if (typeof rel.setsA !== 'undefined') { pA = rel.setsA; pB = rel.setsB; }
-	                else if (rel.placarFinal && typeof rel.placarFinal.A !== 'undefined') { pA = rel.placarFinal.A; pB = rel.placarFinal.B; }
-	                else if (rel.equipeA && typeof rel.equipeA.sets !== 'undefined') { pA = rel.equipeA.sets; pB = rel.equipeB.sets; }
-	                else { pA = jogo.placarA || 0; pB = jogo.placarB || 0; }
-	            } else {
-	                pA = jogo.placarA || 0;
-	                pB = jogo.placarB || 0;
-	            }
-	            return { A: parseInt(pA) || 0, B: parseInt(pB) || 0 };
-	        }
+        function extrairEsporteNomeSeguro(j) {
+            if(j.esporte && typeof j.esporte === 'string') return j.esporte;
+            if(j.modalidade && j.modalidade.nomeEsporte) return j.modalidade.nomeEsporte;
+            return "A Definir";
+        }
+        function extrairEsporteIconeSeguro(j) {
+            if(j.icone && typeof j.icone === 'string') return j.icone;
+            if(j.modalidade && j.modalidade.icone) return j.modalidade.icone;
+            return "🏅";
+        }
 
-	        function extrairEsporteNomeSeguro(j) {
-	            if(j.esporte && typeof j.esporte === 'string') return j.esporte;
-	            if(j.modalidade && j.modalidade.nomeEsporte) return j.modalidade.nomeEsporte;
-	            return "A Definir";
-	        }
-	        function extrairEsporteIconeSeguro(j) {
-	            if(j.icone && typeof j.icone === 'string') return j.icone;
-	            if(j.modalidade && j.modalidade.icone) return j.modalidade.icone;
-	            return "🏅";
-	        }
+        window.onload = async () => {
+            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+            
+            relatoriosSalvos = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+            configuracoesLotesGlobais = JSON.parse(localStorage.getItem('arenaLotes')) || {};
+            
+            try {
+                const token = localStorage.getItem('interclassToken');
+                const resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (resAlunos.ok) listaAlunosGlobais = await resAlunos.json();
+            } catch (error) { console.warn("Modo offline ativo para alunos."); }
 
-	        window.onload = async () => {
-	            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-	            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
-	            
-	            relatoriosSalvos = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-	            configuracoesLotesGlobais = JSON.parse(localStorage.getItem('arenaLotes')) || {};
-	            
-	            try {
-	                const token = localStorage.getItem('interclassToken');
-	                const resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
-	                if (resAlunos.ok) listaAlunosGlobais = await resAlunos.json();
-	            } catch (error) { console.warn("Modo offline ativo para alunos."); }
+            carregarLotesFixos();
+        };
 
-	            carregarLotesFixos();
-	        };
+        function carregarLotesFixos() {
+            const container = document.getElementById('filtros-lote');
+            container.innerHTML = '';
+            
+            let generosDisponiveis = ['masculino', 'feminino', 'misto'];
+            
+            let ultimoLote = localStorage.getItem('ultimoLoteVisita') || 'masculino';
+            if (!generosDisponiveis.includes(ultimoLote)) ultimoLote = 'masculino';
 
-	        // 🔥 FUNÇÃO REFORMULADA: Sempre exibe os 3 botões e carrega o Masculino por Padrão
-	        function carregarLotesFixos() {
-	            const container = document.getElementById('filtros-lote');
-	            container.innerHTML = '';
-	            
-	            let generosDisponiveis = ['masculino', 'feminino', 'misto'];
+            generosDisponiveis.forEach((genero, idx) => {
+                let cor = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+                
+                container.innerHTML += `
+                    <button id="btn-lote-${genero}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: ${cor}; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s;" 
+                            onclick="mudarLotePlayHub('${genero}', this)">
+                        LOTE: ${genero}
+                    </button>
+                `;
+            });
+            
+            const botaoAlvo = document.getElementById(`btn-lote-${ultimoLote}`);
+            if(botaoAlvo) mudarLotePlayHub(ultimoLote, botaoAlvo);
+        }
 
-	            generosDisponiveis.forEach((genero, idx) => {
-	                let cor = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
-	                let active = idx === 0 ? `border-bottom: 3px solid ${cor}; font-weight: bold; background: rgba(255,255,255,0.1);` : '';
-	                
-	                container.innerHTML += `
-	                    <button style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: ${cor}; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s; ${active}" 
-	                            onclick="mudarLotePlayHub('${genero}', this)">
-	                        LOTE: ${genero}
-	                    </button>
-	                `;
-	            });
-	            
-	            // Força a carga inicial do primeiro botão (Masculino)
-	            const primeiroBotao = container.children[0];
-	            mudarLotePlayHub('masculino', primeiroBotao);
-	        }
+        function mudarLotePlayHub(genero, btnElement) {
+            loteAtualSelecionado = genero;
+            localStorage.setItem('ultimoLoteVisita', genero);
+            
+            Array.from(document.getElementById('filtros-lote').children).forEach(b => {
+                b.style.borderBottom = 'none'; 
+                b.style.fontWeight = 'normal'; 
+                b.style.background = 'rgba(0,0,0,0.5)';
+            });
+            
+            if(btnElement) {
+                btnElement.style.borderBottom = `3px solid ${btnElement.style.color}`;
+                btnElement.style.fontWeight = 'bold';
+                btnElement.style.background = 'rgba(255,255,255,0.1)';
+            }
+            
+            document.body.classList.remove('theme-fem', 'theme-misto');
+            if (genero === 'feminino') document.body.classList.add('theme-fem');
+            if (genero === 'misto') document.body.classList.add('theme-misto');
+            
+            buscarJogosDoBanco(genero);
+        }
 
-	        // 🔥 FUNÇÃO REFORMULADA: Limpa os botões antigos, muda o tema visual e puxa a API certa
-	        function mudarLotePlayHub(genero, btnElement) {
-	            loteAtualSelecionado = genero;
-	            
-	            // Tira o "Active" de todos os botões
-	            Array.from(document.getElementById('filtros-lote').children).forEach(b => {
-	                b.style.borderBottom = 'none'; 
-	                b.style.fontWeight = 'normal'; 
-	                b.style.background = 'rgba(0,0,0,0.5)';
-	            });
-	            
-	            // Coloca o "Active" no botão clicado
-	            if(btnElement) {
-	                btnElement.style.borderBottom = `3px solid ${btnElement.style.color}`;
-	                btnElement.style.fontWeight = 'bold';
-	                btnElement.style.background = 'rgba(255,255,255,0.1)';
-	            }
-	            
-	            // Muda o fundo do site inteiro 
-	            document.body.classList.remove('theme-fem', 'theme-misto');
-	            if (genero === 'feminino') document.body.classList.add('theme-fem');
-	            if (genero === 'misto') document.body.classList.add('theme-misto');
-	            
-	            // Inicia o carregamento seguro do banco
-	            buscarJogosDoBanco(genero);
-	        }
+        function resolverNomesDinamicos(jogos, generoCorrente) {
+            let mapVencedores = {};
 
-			async function buscarJogosDoBanco(genero) {
-	            const container = document.getElementById('lista-jogos');
-	            container.innerHTML = `<p style="text-align: center; font-family: 'Orbitron'; color: #00f2fe; margin-top: 50px;">⏳ Buscando chaves do Lote ${genero.toUpperCase()}...</p>`;
+            jogos.forEach(j => {
+                let numMatch = j.titulo.match(/\(Jogo (\d+)\)/i);
+                if (numMatch) {
+                    let idJogoStr = numMatch[1];
+                    let rel = relatoriosSalvos[String(j.id)];
+                    
+                    if (rel || j.status === 'FINALIZADO') {
+                        let placares = obterPlacarSeguro(rel, j);
+                        let eqA = j.equipeANome || j.equipeaNome || j.titulo.split(' | ')[1]?.split(' x ')[0]?.trim() || "Equipe A";
+                        let eqB = j.equipeBNome || j.equipebNome || j.titulo.split(' | ')[1]?.split(' x ')[1]?.trim() || "Equipe B";
+                        
+                        eqA = eqA.replace(' (Série de Partidas)', '');
+                        eqB = eqB.replace(' (Série de Partidas)', '');
 
-	            try {
-	                const token = localStorage.getItem('interclassToken');
-	                const response = await fetch(`/api/jogos/lote/${genero}`, {
-	                    headers: { 'Authorization': `Bearer ${token}` }
-	                });
-	                
-	                if (response.status === 403 || response.status === 401) {
-	                    alert("A sua sessão expirou. Por favor, faça o login novamente.");
-	                    window.location.href = '/index.html'; return;
-	                }
-	                if (!response.ok) throw new Error(`Falha API - Status: ${response.status}`);
-	                
-	                const jogos = await response.json(); 
-	                if (jogos.length === 0) throw new Error('Nenhum torneio agendado.');
-	                
-	                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-	                calOffline[genero] = { jogos: jogos };
-	                localStorage.setItem('calendariosOficiais', JSON.stringify(calOffline));
+                        if (placares.A > placares.B) {
+                            mapVencedores[idJogoStr] = { nome: eqA, id: j.equipeAId };
+                        } else if (placares.B > placares.A) {
+                            mapVencedores[idJogoStr] = { nome: eqB, id: j.equipeBId };
+                        }
+                    }
+                }
+            });
 
-	                renderizarJogosEmAcordeao(jogos, genero, false);
-	            } catch (error) {
-	                console.error("Erro ao buscar jogos do banco:", error);
-	                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-	                
-	                // 🔥 Fallback Offline Inteligente: Se não tem no banco, avisa direto sem crachar!
-	                if(calOffline[genero] && calOffline[genero].jogos && calOffline[genero].jogos.length > 0) {
-	                    renderizarJogosEmAcordeao(calOffline[genero].jogos, genero, true);
-	                } else {
-	                    let corAviso = genero === 'feminino' ? '#ff00de' : (genero === 'misto' ? '#b200ff' : '#00f2fe');
-	                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); border: 1px dashed ${corAviso}; padding: 20px; border-radius: 10px; margin-top: 50px; background: rgba(0,0,0,0.5);">Ainda não há torneios criados ou agendados para a categoria <b style="color:${corAviso}; text-transform:uppercase;">${genero}</b>.</p>`;
-	                }
-	            }
-	        }
+            jogos.forEach(j => {
+                let partesTitulo = j.titulo.split(' | ');
+                if (partesTitulo.length < 2) return;
+                
+                let confrontoPartes = partesTitulo[1].split(' x ');
+                let nomeA = j.equipeANome || j.equipeaNome || confrontoPartes[0]?.trim();
+                let nomeB = j.equipeBNome || j.equipebNome || confrontoPartes[1]?.trim();
 
-	        function renderizarJogosEmAcordeao(todosJogos, genero, isOffline) {
-	            const container = document.getElementById('lista-jogos');
-	            container.innerHTML = '';
-	            
-	            if (isOffline) {
-	                container.innerHTML += `
-	                    <div style="background: rgba(255,0,0,0.1); border: 1px dashed #ff0055; color: #ffccdd; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 0.85rem; font-family: 'Segoe UI';">
-	                        ⚠️ <b>SISTEMA EM MODO OFFLINE:</b> Falha na comunicação com o servidor. Exibindo dados do cache local.
-	                    </div>
-	                `;
-	            }
+                const regexVencedor = /(?:Vencedor do Jogo|Venc\.? Jogo) (\d+)/i;
 
-	            const ordemFases = { "FINAL": 4, "SEMIFINAL": 3, "QUARTAS": 2, "CLASSIFICATÓRIA": 1, "GRUPO": 1 };
+                let mudouA = false;
+                let matchA = nomeA.match(regexVencedor);
+                if (matchA && mapVencedores[matchA[1]]) {
+                    j.equipeANome = mapVencedores[matchA[1]].nome;
+                    j.equipeAId = mapVencedores[matchA[1]].id;
+                    nomeA = j.equipeANome; 
+                    mudouA = true;
+                }
 
-	            todosJogos.sort((a, b) => {
-	                let diaA = a.diaId || a.dataJogo || "0";
-	                let diaB = b.diaId || b.dataJogo || "0";
-	                if (diaA !== diaB) return diaA.localeCompare(diaB);
+                let mudouB = false;
+                let matchB = nomeB.match(regexVencedor);
+                if (matchB && mapVencedores[matchB[1]]) {
+                    j.equipeBNome = mapVencedores[matchB[1]].nome;
+                    j.equipeBId = mapVencedores[matchB[1]].id;
+                    nomeB = j.equipeBNome; 
+                    mudouB = true;
+                }
 
-	                let horaA = a.hora || a.horario || "00:00";
-	                let horaB = b.hora || b.horario || "00:00";
-	                if (horaA !== horaB) return horaA.localeCompare(horaB);
+                if (mudouA || mudouB) {
+                    let sufixo = partesTitulo[1].includes('(Série de Partidas)') ? ' (Série de Partidas)' : '';
+                    j.titulo = `${partesTitulo[0]} | ${nomeA} x ${nomeB}${sufixo}`;
+                    j._mudou = true; 
+                }
+            });
+            
+            return jogos;
+        }
 
-	                let tituloA = (a.titulo || "").toUpperCase();
-	                let tituloB = (b.titulo || "").toUpperCase();
-	                const faseA = ordemFases[Object.keys(ordemFases).find(f => tituloA.includes(f))] || 0;
-	                const faseB = ordemFases[Object.keys(ordemFases).find(f => tituloB.includes(f))] || 0;
-	                return faseA - faseB;
-	            });
+		async function buscarJogosDoBanco(genero) {
+            const container = document.getElementById('lista-jogos');
+            container.innerHTML = `<p style="text-align: center; font-family: 'Orbitron'; color: #00f2fe; margin-top: 50px;">⏳ Buscando chaves do Lote ${genero.toUpperCase()}...</p>`;
 
-	            let torneios = {};
-	            todosJogos.forEach(jogo => {
-	                let eNome = extrairEsporteNomeSeguro(jogo);
-	                let eIcon = extrairEsporteIconeSeguro(jogo);
-	                if(!torneios[eNome]) torneios[eNome] = { icone: eIcon, jogos: [] };
-	                torneios[eNome].jogos.push(jogo);
-	            });
+            try {
+                const token = localStorage.getItem('interclassToken');
+                const response = await fetch(`/api/jogos/lote/${genero}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.status === 403 || response.status === 401) {
+                    alert("A sua sessão expirou. Por favor, faça o login novamente.");
+                    window.location.href = '/index.html'; return;
+                }
+                if (!response.ok) throw new Error(`Falha API - Status: ${response.status}`);
+                
+                let jogos = await response.json(); 
+                if (jogos.length === 0) throw new Error('Nenhum torneio agendado.');
 
-	            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+                jogos = resolverNomesDinamicos(jogos, genero);
+                
+                let jogosParaSalvar = jogos.filter(j => j._mudou);
+                if (jogosParaSalvar.length > 0) {
+                    jogosParaSalvar.forEach(j => delete j._mudou);
+                    try {
+                        fetch('/api/jogos/calendario', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({ genero: genero, jogos: jogosParaSalvar })
+                        });
+                    } catch(e) {}
+                }
+                
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                calOffline[genero] = { jogos: jogos };
+                localStorage.setItem('calendariosOficiais', JSON.stringify(calOffline));
 
-	            for (let esporteNome in torneios) {
-	                let dados = torneios[esporteNome];
-	                let domId = esporteNome.replace(/\s+/g, '-').toLowerCase();
-	                
-	                let formato = 'eliminatoria'; 
-	                if(configuracoesLotesGlobais[genero] && configuracoesLotesGlobais[genero].esportes) {
-	                    let espConfig = configuracoesLotesGlobais[genero].esportes.find(e => e.nome === esporteNome);
-	                    if(espConfig && espConfig.formato) formato = espConfig.formato;
-	                }
-	                formato = String(formato).toLowerCase();
+                renderizarJogosEmAcordeao(jogos, genero, false);
+            } catch (error) {
+                console.error("Erro ao buscar jogos do banco:", error);
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                
+                if(calOffline[genero] && calOffline[genero].jogos && calOffline[genero].jogos.length > 0) {
+                    renderizarJogosEmAcordeao(calOffline[genero].jogos, genero, true);
+                } else {
+                    let corAviso = genero === 'feminino' ? '#ff00de' : (genero === 'misto' ? '#b200ff' : '#00f2fe');
+                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); border: 1px dashed ${corAviso}; padding: 20px; border-radius: 10px; margin-top: 50px; background: rgba(0,0,0,0.5);">Ainda não há torneios criados ou agendados para a categoria <b style="color:${corAviso}; text-transform:uppercase;">${genero}</b>.</p>`;
+                }
+            }
+        }
 
-	                let painelObj = processarChaveECampeao(formato, dados.jogos);
-	                let htmlTabelaLiga = painelObj.htmlTabela;
-	                let campeaoNome = painelObj.campeaoNome;
-	                let campeaoId = painelObj.campeaoId;
+        function renderizarJogosEmAcordeao(todosJogos, genero, isOffline) {
+            const container = document.getElementById('lista-jogos');
+            container.innerHTML = '';
+            
+            if (isOffline) {
+                container.innerHTML += `
+                    <div style="background: rgba(255,0,0,0.1); border: 1px dashed #ff0055; color: #ffccdd; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 0.85rem; font-family: 'Segoe UI';">
+                        ⚠️ <b>SISTEMA EM MODO OFFLINE:</b> Falha na comunicação com o servidor. Exibindo dados do cache local.
+                    </div>
+                `;
+            }
 
-	                let htmlJogosAgenda = '';
-	                let jogosConcluidos = 0;
-	                
-	                dados.jogos.forEach(jogo => {
-	                    let relatorio = relatoriosSalvos[String(jogo.id)]; 
-	                    
-	                    let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
-	                    let dataCurta = dataDoJogo;
-	                    if(dataCurta.includes('-')) {
-	                        let p = dataCurta.split('-');
-	                        if(p.length === 3) dataCurta = p[2] + '/' + p[1];
-	                    }
+            // 🔥 ORDENAÇÃO DE FORÇA BRUTA: Trava absoluta na posição dos jogos usando apenas o ID
+            todosJogos.sort((a, b) => {
+                return a.id - b.id;
+            });
 
-	                    let partesTitulo = jogo.titulo.split(' | ');
-	                    let faseTag = partesTitulo[0].replace('🏆', '').trim();
-	                    let confrontoStr = partesTitulo.length > 1 ? partesTitulo[1].trim() : "Aguardando Vencedores";
+            let torneios = {};
+            todosJogos.forEach(jogo => {
+                let eNome = extrairEsporteNomeSeguro(jogo);
+                let eIcon = extrairEsporteIconeSeguro(jogo);
+                if(!torneios[eNome]) torneios[eNome] = { icone: eIcon, jogos: [] };
+                torneios[eNome].jogos.push(jogo);
+            });
 
-	                    let placares = obterPlacarSeguro(relatorio, jogo);
-	                    let placarAExibicao = placares.A;
-	                    let placarBExibicao = placares.B;
-	                    let hor = jogo.hora || jogo.horario || '--:--';
+            let corTemaDefault = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
 
-	                    if (relatorio || jogo.status === 'FINALIZADO') {
-	                        jogosConcluidos++;
-	                        htmlJogosAgenda += `
-	                            <div class="playhub-card" style="border-left: 4px solid #555; background: rgba(0,0,0,0.6);">
-	                                <div class="play-hora">
-	                                    <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
-	                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
-	                                    <span style="font-size:0.75rem; color: var(--theme-primary);">${dataCurta}</span>
-	                                </div>
-	                                <div class="play-info">
-	                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-	                                        <div>
-	                                            <h3 style="color: #888; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${faseTag}</h3>
-	                                            <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #ccc;">${confrontoStr}</p>
-	                                        </div>
-	                                        <div style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.3rem; color: #00ff00; background: rgba(0,255,0,0.1); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0,255,0,0.2); min-width: 80px; text-align: center;">
-	                                            ${placarAExibicao} <span style="color:#555; font-size:0.9rem;">x</span> ${placarBExibicao}
-	                                        </div>
-	                                    </div>
-	                                </div>
-	                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
-	                            </div>
-	                        `;
-	                    } else {
-	                        htmlJogosAgenda += `
-	                            <div class="playhub-card" style="border-left: 4px solid ${corTema};">
-	                                <div class="play-hora">
-	                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
-	                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corTema};">${dataCurta}</span>
-	                                </div>
-	                                <div class="play-info">
-	                                    <h3 style="color: ${corTema}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${faseTag}</h3>
-	                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${confrontoStr}</p>
-	                                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra || 'A Definir'}</p>
-	                                </div>
-	                                <button class="btn-play" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">▶️ SÚMULA</button>
-	                            </div>
-	                        `;
-	                    }
-	                });
+            for (let esporteNome in torneios) {
+                let dados = torneios[esporteNome];
+                let domId = esporteNome.replace(/\s+/g, '-').toLowerCase();
+                
+                let formato = 'eliminatoria'; 
+                if(configuracoesLotesGlobais[genero] && configuracoesLotesGlobais[genero].esportes) {
+                    let espConfig = configuracoesLotesGlobais[genero].esportes.find(e => e.nome === esporteNome);
+                    if(espConfig && espConfig.formato) formato = espConfig.formato;
+                }
+                formato = String(formato).toLowerCase();
 
-	                let campeaoHtml = '';
-	                if (campeaoNome) {
-	                    let fotoHtml = '';
-	                    let esportesIndividuais = ['Xadrez', 'Tênis de Mesa', 'Dama', 'E-Sports', 'Natação', 'Atletismo'];
-	                    
-	                    if (esportesIndividuais.includes(esporteNome)) {
-	                        let aluno = listaAlunosGlobais.find(a => a.id == campeaoId);
-	                        let fotoUrl = (aluno && aluno.fotoUrl) ? aluno.fotoUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(campeaoNome)}&background=222&color=fff&size=128`;
-	                        fotoHtml = `<img src="${fotoUrl}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; margin: 10px auto 5px auto; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5);">`;
-	                    }
+                let painelObj = processarChaveECampeao(formato, dados.jogos);
+                let htmlTabelaLiga = painelObj.htmlTabela;
+                let campeaoNome = painelObj.campeaoNome;
+                let campeaoId = painelObj.campeaoId;
 
-	                    campeaoHtml = `
-	                        <div class="campeao-banner">
-	                            <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(255,255,255,0.8); line-height: 1;">🏆</div>
-	                            ${fotoHtml}
-	                            <h2 style="margin-top: 10px;">Grande Campeão</h2>
-	                            <p>${campeaoNome}</p>
-	                        </div>
-	                    `;
-	                }
+                let htmlJogosAgenda = '';
+                let jogosConcluidos = 0;
+                let entrouNaFaseFinal = false;
+                
+                let temFaseDeGrupos = dados.jogos.some(j => j.titulo.toUpperCase().includes('GRUPO') || j.titulo.toUpperCase().includes('CLASSIFICAÇÃO') || j.titulo.toUpperCase().includes('LIGA') || j.titulo.toUpperCase().includes('SORTEIO'));
 
-	                let pctConcluido = dados.jogos.length > 0 ? Math.round((jogosConcluidos / dados.jogos.length) * 100) : 0;
-	                let corBarra = pctConcluido === 100 ? '#00ff00' : '#ffd700';
-	                let displayStyle = 'none'; 
-	                let setaText = '▼';
+                dados.jogos.forEach(jogo => {
+                    let relatorio = relatoriosSalvos[String(jogo.id)]; 
+                    
+                    let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
+                    let dataCurta = dataDoJogo;
+                    if(dataCurta.includes('-')) {
+                        let p = dataCurta.split('-');
+                        if(p.length === 3) dataCurta = p[2] + '/' + p[1];
+                    }
 
-	                container.innerHTML += `
-	                    <div class="torneio-grupo" style="border-color: ${corTema};">
-	                        <div class="torneio-header" onclick="toggleTorneio('${domId}', this)">
-	                            <h3>${dados.icone} Torneio de ${esporteNome} <span style="font-family:'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: normal; margin-left: 10px;">(${formato.toUpperCase()})</span></h3>
-	                            <div style="display: flex; align-items: center; gap: 15px;">
-	                                <button class="btn-delete-torneio" onclick="confirmarExclusaoTorneio(event, '${genero}', '${esporteNome}')" title="Excluir este Torneio">🗑️</button>
-	                                <div class="torneio-toggle">Painel <span class="seta-toggle">${setaText}</span></div>
-	                            </div>
-	                        </div>
-	                        <div class="torneio-body" id="body-${domId}" style="display: ${displayStyle};">
-	                            <div class="torneio-status-bar">
-	                                <span style="font-family: 'Orbitron'; font-size: 0.8rem; color: ${corBarra};">STATUS DO TORNEIO</span>
-	                                <div class="progresso-bg"><div class="progresso-fill" style="width: ${pctConcluido}%; background: ${corBarra}; box-shadow: 0 0 10px ${corBarra};"></div></div>
-	                                <span style="font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold;">${jogosConcluidos} / ${dados.jogos.length} Partidas</span>
-	                            </div>
-	                            ${htmlTabelaLiga}
-	                            <div class="secao-agenda-titulo" style="margin-top: 20px;">📋 Agenda de Confrontos e Súmulas</div>
-	                            ${htmlJogosAgenda}
-	                            ${campeaoHtml}
-	                        </div>
-	                    </div>
-	                `;
-	            }
-	        }
+                    let partesTitulo = jogo.titulo.split(' | ');
+                    let faseTag = partesTitulo[0].replace('🏆', '').trim();
+                    let fUpper = faseTag.toUpperCase();
+                    let confrontoStr = partesTitulo.length > 1 ? partesTitulo[1].trim() : "Aguardando Vencedores";
 
-	        // ==========================================
-	        // EXCLUSÃO
-	        // ==========================================
-	        function confirmarExclusaoTorneio(event, genero, esporteNome) {
-	            event.stopPropagation(); 
-	            torneioParaExcluir = { genero: genero, esporte: esporteNome };
-	            document.getElementById('nome-torneio-exclusao').innerText = esporteNome;
-	            document.getElementById('modal-exclusao-torneio').style.display = 'flex';
-	        }
+                    if (temFaseDeGrupos && !entrouNaFaseFinal && (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('QUARTAS') || fUpper.includes('SEMI') || fUpper.includes('FINAL'))) {
+                        htmlJogosAgenda += `<div class="secao-agenda-titulo" style="margin-top: 30px; margin-bottom: 20px; color: #ff0055; justify-content: center; font-size: 1.1rem; border-top: 1px dashed rgba(255,0,85,0.3); padding-top: 20px; text-shadow: 0 0 10px rgba(255,0,85,0.5);">🔥 FASE FINAL (Mata-Mata) 🔥</div>`;
+                        entrouNaFaseFinal = true;
+                    }
 
-	        function fecharModalExclusaoTorneio() {
-	            document.getElementById('modal-exclusao-torneio').style.display = 'none';
-	            torneioParaExcluir = null;
-	            document.getElementById('btn-excluir-1').style.display = 'block';
-	            document.getElementById('btn-excluir-2').style.display = 'none';
-	            document.getElementById('aviso-duplo-texto').style.display = 'none';
-	        }
+                    let corBorda = corTemaDefault;
+                    let corBg = 'rgba(255,255,255,0.02)';
+                    let corTextoFase = corTemaDefault;
 
-	        function avancarExclusaoTorneio() {
-	            document.getElementById('btn-excluir-1').style.display = 'none';
-	            document.getElementById('btn-excluir-2').style.display = 'block';
-	            document.getElementById('aviso-duplo-texto').style.display = 'block';
-	        }
+                    if (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('OITAVAS')) {
+                        corBorda = '#ffd700'; 
+                        corBg = 'rgba(255, 215, 0, 0.08)';
+                        corTextoFase = '#ffd700';
+                    } else if (fUpper.includes('QUARTAS')) {
+                        corBorda = '#aaaaaa'; 
+                        corBg = 'rgba(170, 170, 170, 0.08)';
+                        corTextoFase = '#aaaaaa';
+                    } else if (fUpper.includes('SEMI')) {
+                        corBorda = '#00f2fe'; 
+                        corBg = 'rgba(0, 242, 254, 0.08)';
+                        corTextoFase = '#00f2fe';
+                    } else if (fUpper.includes('FINAL')) {
+                        corBorda = '#ff00de'; 
+                        corBg = 'rgba(255, 0, 222, 0.08)';
+                        corTextoFase = '#ff00de';
+                    }
 
-	        async function executarExclusaoTorneio() {
-	            if(!torneioParaExcluir) return;
-	            const token = localStorage.getItem('interclassToken');
-	            
-	            try {
-	                const response = await fetch(`/api/jogos/torneio/${torneioParaExcluir.genero}/${torneioParaExcluir.esporte}`, {
-	                    method: 'DELETE',
-	                    headers: { 'Authorization': `Bearer ${token}` }
-	                });
-	                
-	                if(response.ok) {
-	                    fecharModalExclusaoTorneio();
-	                    buscarJogosDoBanco(loteAtualSelecionado); 
-	                } else {
-	                    alert("⚠️ O Servidor recusou a exclusão.");
-	                }
-	            } catch(e) {
-	                console.error(e);
-	                alert("🚨 Erro de comunicação com o banco de dados.");
-	            }
-	        }
+                    let placares = obterPlacarSeguro(relatorio, jogo);
+                    let placarAExibicao = placares.A;
+                    let placarBExibicao = placares.B;
+                    let hor = jogo.hora || jogo.horario || '--:--';
 
-	        // ==========================================
-	        // PROCESSAMENTO DE PONTOS
-	        // ==========================================
-	        function processarChaveECampeao(formato, jogos) {
-	            let campeaoFinal = null;
-	            let campeaoIdFinal = null;
-	            let htmlTabela = '';
+                    if (relatorio || jogo.status === 'FINALIZADO') {
+                        jogosConcluidos++;
+                        htmlJogosAgenda += `
+                            <div class="playhub-card" style="border-left: 4px solid #555; background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.05);">
+                                <div class="play-hora" style="border-right-color: #555;">
+                                    <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
+                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
+                                    <span style="font-size:0.75rem; color: #888;">${dataCurta}</span>
+                                </div>
+                                <div class="play-info">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                        <div>
+                                            <h3 style="color: #888; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${faseTag}</h3>
+                                            <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #ccc;">${confrontoStr}</p>
+                                        </div>
+                                        <div style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.3rem; color: #00ff00; background: rgba(0,255,0,0.05); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0,255,0,0.1); min-width: 80px; text-align: center;">
+                                            ${placarAExibicao} <span style="color:#555; font-size:0.9rem;">x</span> ${placarBExibicao}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
+                            </div>
+                        `;
+                    } else {
+                        let isAguardando = confrontoStr.includes('Vencedor') || confrontoStr.includes('A Definir') || confrontoStr.includes('Venc.');
+                        
+                        let opacity = isAguardando ? '0.7' : '1';
+                        let brilhoBox = isAguardando ? '' : `box-shadow: inset 0 0 15px ${corBg.replace('0.08', '0.2')}; border-color: ${corBg.replace('0.08', '0.4')};`;
+                        
+                        let textoBotao = isAguardando ? 'AGUARDANDO' : '▶️ SÚMULA';
+                        let estiloBotao = isAguardando 
+                            ? `background: rgba(255,255,255,0.1); color: #aaa; box-shadow: none;` 
+                            : `background: ${corBorda}; color: #000; box-shadow: 0 0 15px ${corBg.replace('0.08', '0.5')};`;
 
-	            if (formato === 'liga' || formato === 'grupos' || formato.includes('pontos') || formato.includes('liga')) {
-	                let tabela = {};
+                        htmlJogosAgenda += `
+                            <div class="playhub-card" style="border-left: 4px solid ${corBorda}; background: ${corBg}; opacity: ${opacity}; ${brilhoBox}">
+                                <div class="play-hora" style="border-right-color: ${corBorda};">
+                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
+                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda};">${dataCurta}</span>
+                                </div>
+                                <div class="play-info">
+                                    <h3 style="color: ${corTextoFase}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 8px ${corBg.replace('0.08', '0.6')};">${faseTag}</h3>
+                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${confrontoStr}</p>
+                                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra || 'A Definir'}</p>
+                                </div>
+                                <button class="btn-play" style="${estiloBotao}" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">${textoBotao}</button>
+                            </div>
+                        `;
+                    }
+                });
 
-	                jogos.forEach(j => {
-	                    let partes = j.titulo.split(' | ');
-	                    if(partes.length < 2) return;
-	                    let confronto = partes[1].split(' x ');
-	                    if(confronto.length < 2) return;
-	                    
-	                    let tA = confronto[0].trim();
-	                    let tB = confronto[1].trim();
+                let campeaoHtml = '';
+                if (campeaoNome) {
+                    let fotoHtml = '';
+                    let esportesIndividuais = ['Xadrez', 'Tênis de Mesa', 'Dama', 'E-Sports', 'Natação', 'Atletismo'];
+                    
+                    if (esportesIndividuais.includes(esporteNome)) {
+                        let aluno = listaAlunosGlobais.find(a => a.id == campeaoId);
+                        let fotoUrl = (aluno && aluno.fotoUrl) ? aluno.fotoUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(campeaoNome)}&background=222&color=fff&size=128`;
+                        fotoHtml = `<img src="${fotoUrl}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; margin: 10px auto 5px auto; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5);">`;
+                    }
 
-	                    if(!tA.includes('Vencedor') && !tA.includes('A Definir') && !tA.includes('Colocado') && !tA.includes('Sorteio')) {
-	                        if(!tabela[tA]) tabela[tA] = { nome: tA, id: j.equipeAId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
-	                    }
-	                    if(!tB.includes('Vencedor') && !tB.includes('A Definir') && !tB.includes('Colocado') && !tB.includes('Sorteio')) {
-	                        if(!tabela[tB]) tabela[tB] = { nome: tB, id: j.equipeBId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
-	                    }
+                    campeaoHtml = `
+                        <div class="campeao-banner">
+                            <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(255,255,255,0.8); line-height: 1;">🏆</div>
+                            ${fotoHtml}
+                            <h2 style="margin-top: 10px;">Grande Campeão</h2>
+                            <p>${campeaoNome}</p>
+                        </div>
+                    `;
+                }
 
-	                    let rel = relatoriosSalvos[String(j.id)];
-	                    
-	                    let placares = obterPlacarSeguro(rel, j);
-	                    let placarA = placares.A;
-	                    let placarB = placares.B;
+                let pctConcluido = dados.jogos.length > 0 ? Math.round((jogosConcluidos / dados.jogos.length) * 100) : 0;
+                let corBarra = pctConcluido === 100 ? '#00ff00' : '#ffd700';
+                let displayStyle = 'none'; 
+                let setaText = '▼';
 
-	                    if((rel || j.status === 'FINALIZADO') && tabela[tA] && tabela[tB]) {
-	                        tabela[tA].j++; tabela[tB].j++;
-	                        tabela[tA].gp += placarA; tabela[tA].gc += placarB;
-	                        tabela[tB].gp += placarB; tabela[tB].gc += placarA;
+                container.innerHTML += `
+                    <div class="torneio-grupo" style="border-color: ${corTemaDefault};">
+                        <div class="torneio-header" onclick="toggleTorneio('${domId}', this)">
+                            <h3>${dados.icone} Torneio de ${esporteNome} <span style="font-family:'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: normal; margin-left: 10px;">(${formato.toUpperCase()})</span></h3>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <button class="btn-delete-torneio" onclick="confirmarExclusaoTorneio(event, '${genero}', '${esporteNome}')" title="Excluir este Torneio">🗑️</button>
+                                <div class="torneio-toggle">Painel <span class="seta-toggle">${setaText}</span></div>
+                            </div>
+                        </div>
+                        <div class="torneio-body" id="body-${domId}" style="display: ${displayStyle};">
+                            <div class="torneio-status-bar">
+                                <span style="font-family: 'Orbitron'; font-size: 0.8rem; color: ${corBarra};">STATUS DO TORNEIO</span>
+                                <div class="progresso-bg"><div class="progresso-fill" style="width: ${pctConcluido}%; background: ${corBarra}; box-shadow: 0 0 10px ${corBarra};"></div></div>
+                                <span style="font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold;">${jogosConcluidos} / ${dados.jogos.length} Partidas</span>
+                            </div>
+                            ${htmlTabelaLiga}
+                            <div class="secao-agenda-titulo" style="margin-top: 20px;">📋 Agenda de Confrontos e Súmulas</div>
+                            ${htmlJogosAgenda}
+                            ${campeaoHtml}
+                        </div>
+                    </div>
+                `;
+            }
+        }
 
-	                        if(placarA > placarB) { tabela[tA].v++; tabela[tB].d++; tabela[tA].pts += 3; }
-	                        else if(placarB > placarA) { tabela[tB].v++; tabela[tA].d++; tabela[tB].pts += 3; }
-	                        else { tabela[tA].e++; tabela[tB].e++; tabela[tA].pts += 1; tabela[tB].pts += 1; }
-	                    }
-	                });
+        // ==========================================
+        // EXCLUSÃO
+        // ==========================================
+        function confirmarExclusaoTorneio(event, genero, esporteNome) {
+            event.stopPropagation(); 
+            torneioParaExcluir = { genero: genero, esporte: esporteNome };
+            document.getElementById('nome-torneio-exclusao').innerText = esporteNome;
+            document.getElementById('modal-exclusao-torneio').style.display = 'flex';
+        }
 
-	                let timesOrdenados = Object.values(tabela).sort((a,b) => {
-	                    if(b.pts !== a.pts) return b.pts - a.pts;
-	                    if(b.v !== a.v) return b.v - a.v;
-	                    return (b.gp - b.gc) - (a.gp - a.gc);
-	                });
+        function fecharModalExclusaoTorneio() {
+            document.getElementById('modal-exclusao-torneio').style.display = 'none';
+            torneioParaExcluir = null;
+            document.getElementById('btn-excluir-1').style.display = 'block';
+            document.getElementById('btn-excluir-2').style.display = 'none';
+            document.getElementById('aviso-duplo-texto').style.display = 'none';
+        }
 
-	                if(timesOrdenados.length > 0) {
-	                    let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
-	                    
-	                    if (jogosEncerrados === jogos.length && jogos.length > 0) {
-	                        campeaoFinal = timesOrdenados[0].nome;
-	                        campeaoIdFinal = timesOrdenados[0].id;
-	                    }
+        function avancarExclusaoTorneio() {
+            document.getElementById('btn-excluir-1').style.display = 'none';
+            document.getElementById('btn-excluir-2').style.display = 'block';
+            document.getElementById('aviso-duplo-texto').style.display = 'block';
+        }
 
-	                    let trs = '';
-	                    timesOrdenados.forEach((t, i) => {
-	                        let classe = i === 0 ? 'linha-campeao' : '';
-	                        let saldo = t.gp - t.gc;
-	                        let corSaldo = saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff');
-	                        trs += `
-	                            <tr class="${classe}">
-	                                <td>${i+1}º</td>
-	                                <td style="text-align:left; font-weight:bold;">${t.nome}</td>
-	                                <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
-	                                <td>${t.j}</td>
-	                                <td>${t.v}</td>
-	                                <td>${t.e}</td>
-	                                <td>${t.d}</td>
-	                                <td>${t.gp}</td>
-	                                <td>${t.gc}</td>
-	                                <td style="color: ${corSaldo};">${saldo > 0 ? '+'+saldo : saldo}</td>
-	                            </tr>
-	                        `;
-	                    });
+        async function executarExclusaoTorneio() {
+            if(!torneioParaExcluir) return;
+            const token = localStorage.getItem('interclassToken');
+            
+            try {
+                const response = await fetch(`/api/jogos/torneio/${torneioParaExcluir.genero}/${torneioParaExcluir.esporte}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if(response.ok) {
+                    fecharModalExclusaoTorneio();
+                    buscarJogosDoBanco(loteAtualSelecionado); 
+                } else {
+                    alert("⚠️ O Servidor recusou a exclusão.");
+                }
+            } catch(e) {
+                console.error(e);
+                alert("🚨 Erro de comunicação com o banco de dados.");
+            }
+        }
 
-	                    htmlTabela = `
-	                        <div class="secao-agenda-titulo">📊 Tabela de Classificação Atualizada</div>
-	                        <div class="table-wrapper">
-	                            <table class="tabela-brasileirao">
-	                                <thead><tr><th style="width:40px;">Pos</th><th style="text-align:left;">Turma / Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>Pró</th><th>Con</th><th>SG</th></tr></thead>
-	                                <tbody>${trs}</tbody>
-	                            </table>
-	                        </div>
-	                    `;
-	                }
-	                return { htmlTabela: htmlTabela, campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+        function processarChaveECampeao(formato, jogos) {
+            let campeaoFinal = null;
+            let campeaoIdFinal = null;
+            let htmlTabela = '';
 
-	            } else {
-	                let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
-	                if (jogosEncerrados === jogos.length && jogos.length > 0) {
-	                    let jogoFinal = jogos.find(j => j.titulo.includes('FINAL') && !j.titulo.includes('Ida')) || jogos[jogos.length - 1];
-	                    let rel = relatoriosSalvos[String(jogoFinal.id)];
-	                    
-	                    let placares = obterPlacarSeguro(rel, jogoFinal);
-	                    let pA = placares.A;
-	                    let pB = placares.B;
-	                    
-	                    if (rel || jogoFinal.status === 'FINALIZADO') {
-	                        let eqA = jogoFinal.equipeANome || jogoFinal.titulo.split(' | ')[1].split(' x ')[0].trim();
-	                        let eqB = jogoFinal.equipeBNome || jogoFinal.titulo.split(' | ')[1].split(' x ')[1].trim();
-	                        
-	                        if (pA > pB) { campeaoFinal = eqA; campeaoIdFinal = jogoFinal.equipeAId; } 
-	                        else if (pB > pA) { campeaoFinal = eqB; campeaoIdFinal = jogoFinal.equipeBId; }
-	                    }
-	                }
-	                return { htmlTabela: '', campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
-	            }
-	        }
+            if (formato === 'liga' || formato === 'grupos' || formato.includes('pontos') || formato.includes('liga')) {
+                let tabela = {};
 
-	        window.toggleTorneio = function(id, headerEl) {
-	            const body = document.getElementById(`body-${id}`);
-	            const seta = headerEl.querySelector('.seta-toggle');
-	            if (body.style.display === 'block') {
-	                body.style.display = 'none';
-	                if(seta) seta.textContent = '▼';
-	            } else {
-	                body.style.display = 'block';
-	                if(seta) seta.textContent = '▲';
-	            }
-	        };
+                jogos.forEach(j => {
+                    let partes = j.titulo.split(' | ');
+                    if(partes.length < 2) return;
+                    let confronto = partes[1].split(' x ');
+                    if(confronto.length < 2) return;
+                    
+                    let tA = confronto[0].trim();
+                    let tB = confronto[1].trim();
 
-	        function abrirSaaS(esporteNome, idJogo, lote, readonly) {
-	            let arquivo = rotasSaaS[esporteNome] || 'individual'; 
-	            window.location.href = `/matchsheet/${arquivo}.html?jogo=${idJogo}&lote=${lote}&read=${readonly}`;
-	        }
-	        
-	        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
-	        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
-	    </script>
-	</body>
-	</html>
+                    if(!tA.includes('Vencedor') && !tA.includes('A Definir') && !tA.includes('Colocado') && !tA.includes('Sorteio')) {
+                        if(!tabela[tA]) tabela[tA] = { nome: tA, id: j.equipeAId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
+                    }
+                    if(!tB.includes('Vencedor') && !tB.includes('A Definir') && !tB.includes('Colocado') && !tB.includes('Sorteio')) {
+                        if(!tabela[tB]) tabela[tB] = { nome: tB, id: j.equipeBId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
+                    }
+
+                    let rel = relatoriosSalvos[String(j.id)];
+                    
+                    let placares = obterPlacarSeguro(rel, j);
+                    let placarA = placares.A;
+                    let placarB = placares.B;
+
+                    if((rel || j.status === 'FINALIZADO') && tabela[tA] && tabela[tB]) {
+                        tabela[tA].j++; tabela[tB].j++;
+                        tabela[tA].gp += placarA; tabela[tA].gc += placarB;
+                        tabela[tB].gp += placarB; tabela[tB].gc += placarA;
+
+                        if(placarA > placarB) { tabela[tA].v++; tabela[tB].d++; tabela[tA].pts += 3; }
+                        else if(placarB > placarA) { tabela[tB].v++; tabela[tA].d++; tabela[tB].pts += 3; }
+                        else { tabela[tA].e++; tabela[tB].e++; tabela[tA].pts += 1; tabela[tB].pts += 1; }
+                    }
+                });
+
+                let timesOrdenados = Object.values(tabela).sort((a,b) => {
+                    if(b.pts !== a.pts) return b.pts - a.pts;
+                    if(b.v !== a.v) return b.v - a.v;
+                    return (b.gp - b.gc) - (a.gp - a.gc);
+                });
+
+                if(timesOrdenados.length > 0) {
+                    let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
+                    
+                    if (jogosEncerrados === jogos.length && jogos.length > 0) {
+                        campeaoFinal = timesOrdenados[0].nome;
+                        campeaoIdFinal = timesOrdenados[0].id;
+                    }
+
+                    let trs = '';
+                    timesOrdenados.forEach((t, i) => {
+                        let classe = i === 0 ? 'linha-campeao' : '';
+                        let saldo = t.gp - t.gc;
+                        let corSaldo = saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff');
+                        trs += `
+                            <tr class="${classe}">
+                                <td>${i+1}º</td>
+                                <td style="text-align:left; font-weight:bold;">${t.nome}</td>
+                                <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
+                                <td>${t.j}</td>
+                                <td>${t.v}</td>
+                                <td>${t.e}</td>
+                                <td>${t.d}</td>
+                                <td>${t.gp}</td>
+                                <td>${t.gc}</td>
+                                <td style="color: ${corSaldo};">${saldo > 0 ? '+'+saldo : saldo}</td>
+                            </tr>
+                        `;
+                    });
+
+                    htmlTabela = `
+                        <div class="secao-agenda-titulo">📊 Tabela de Classificação Atualizada</div>
+                        <div class="table-wrapper">
+                            <table class="tabela-brasileirao">
+                                <thead><tr><th style="width:40px;">Pos</th><th style="text-align:left;">Turma / Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>Pró</th><th>Con</th><th>SG</th></tr></thead>
+                                <tbody>${trs}</tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                return { htmlTabela: htmlTabela, campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+
+            } else {
+                let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
+                if (jogosEncerrados === jogos.length && jogos.length > 0) {
+                    let jogoFinal = jogos.find(j => j.titulo.includes('FINAL') && !j.titulo.includes('Ida')) || jogos[jogos.length - 1];
+                    let rel = relatoriosSalvos[String(jogoFinal.id)];
+                    
+                    let placares = obterPlacarSeguro(rel, jogoFinal);
+                    let pA = placares.A;
+                    let pB = placares.B;
+                    
+                    if (rel || jogoFinal.status === 'FINALIZADO') {
+                        let eqA = jogoFinal.equipeANome || jogoFinal.titulo.split(' | ')[1].split(' x ')[0].trim();
+                        let eqB = jogoFinal.equipeBNome || jogoFinal.titulo.split(' | ')[1].split(' x ')[1].trim();
+                        
+                        if (pA > pB) { campeaoFinal = eqA; campeaoIdFinal = jogoFinal.equipeAId; } 
+                        else if (pB > pA) { campeaoFinal = eqB; campeaoIdFinal = jogoFinal.equipeBId; }
+                    }
+                }
+                return { htmlTabela: '', campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+            }
+        }
+
+        window.toggleTorneio = function(id, headerEl) {
+            const body = document.getElementById(`body-${id}`);
+            const seta = headerEl.querySelector('.seta-toggle');
+            if (body.style.display === 'block') {
+                body.style.display = 'none';
+                if(seta) seta.textContent = '▼';
+            } else {
+                body.style.display = 'block';
+                if(seta) seta.textContent = '▲';
+            }
+        };
+
+        function abrirSaaS(esporteNome, idJogo, lote, readonly) {
+            let nomeNormalizado = (esporteNome || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+            let arquivo = 'geral'; 
+            
+            if (nomeNormalizado.includes('futsal')) arquivo = 'futsal';
+            else if (nomeNormalizado.includes('handebol')) arquivo = 'handebol';
+            else if (nomeNormalizado.includes('volei de areia')) arquivo = 'volei-areia';
+            else if (nomeNormalizado.includes('volei')) arquivo = 'volei';
+            else if (nomeNormalizado.includes('basquete')) arquivo = 'basquete';
+            
+            else if (nomeNormalizado.includes('xadrez') || 
+                     nomeNormalizado.includes('dama') || 
+                     nomeNormalizado.includes('tenis de mesa') || 
+                     nomeNormalizado.includes('esport') || 
+                     nomeNormalizado.includes('natacao') || 
+                     nomeNormalizado.includes('atletismo')) {
+                arquivo = 'individual';
+            }
+
+            window.location.href = `/matchsheet/${arquivo}.html?jogo=${idJogo}&lote=${lote}&read=${readonly}`;
+        }
+        
+        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+    </script>
 </body>
 </html>

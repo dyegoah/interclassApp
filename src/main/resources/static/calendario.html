@@ -78,15 +78,15 @@
         .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; white-space: nowrap; }
         .tab-btn.active { background: rgba(0, 242, 254, 0.1); color: var(--theme-primary); border-color: rgba(0, 242, 254, 0.3); border-bottom: 2px solid var(--theme-primary); text-shadow: 0 0 5px var(--theme-glow); }
 
-       /* 🔥 CSS DA VISÃO MINI-BRACKET SIMBÓLICO (CARROSSEL) 🔥 */
-		        .mini-bracket-wrapper { display: flex; justify-content: flex-start; align-items: center; gap: 15px; padding: 15px 5px 25px 5px; overflow-x: auto; scroll-snap-type: x mandatory; background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%); border-radius: 12px; }
-		        .mini-col { display: flex; flex-direction: column; justify-content: space-around; gap: 15px; position: relative; scroll-snap-align: start; flex-shrink: 0; min-width: 145px;}
-		        .mini-match { background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; width: 100%; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-		        .mini-match-header { background: rgba(255,255,255,0.08); font-size: 0.65rem; text-align: center; padding: 6px 4px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-		        .mini-team { padding: 6px 8px; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; color: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-		        .mini-team:first-of-type { border-bottom: 1px solid rgba(255,255,255,0.05); }
-		        .mini-match.final { border-color: #ffd700; transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.25); }
-		        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.15); color: #ffd700; font-weight: bold;}
+        /* 🔥 CSS DA VISÃO MINI-BRACKET SIMBÓLICO (CARROSSEL) 🔥 */
+        .mini-bracket-wrapper { display: flex; justify-content: flex-start; align-items: center; gap: 15px; padding: 15px 5px 25px 5px; overflow-x: auto; scroll-snap-type: x mandatory; background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%); border-radius: 12px; }
+        .mini-col { display: flex; flex-direction: column; justify-content: space-around; gap: 15px; position: relative; scroll-snap-align: start; flex-shrink: 0; min-width: 145px;}
+        .mini-match { background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; width: 100%; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .mini-match-header { background: rgba(255,255,255,0.08); font-size: 0.65rem; text-align: center; padding: 6px 4px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .mini-team { padding: 6px 8px; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; color: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-team:first-of-type { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mini-match.final { border-color: #ffd700; transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.25); }
+        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.15); color: #ffd700; font-weight: bold;}
         .mini-connector-left::after { content: ''; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.2); z-index: 1; }
         .mini-connector-right::before { content: ''; position: absolute; left: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.2); z-index: 1; }
 
@@ -100,55 +100,50 @@
         .mini-group-row.qualified { background: rgba(0,255,0,0.05); border-left: 3px solid #00ff00; }
         .mini-group-row.qualified .mini-group-pos { color: #00ff00; }
 		.mini-bracket-wrapper { flex-wrap: wrap !important; justify-content: center !important; overflow: visible !important; gap: 10px !important; }
-		            .mini-col { min-width: 140px !important; margin-bottom: 10px !important; }
+		.mini-col { min-width: 140px !important; margin-bottom: 10px !important; }
 
         #tabela-impressao { display: none; }
         
-		#tabela-impressao { display: none; }
-		        
-		        @media print {
-		            body > * { display: none !important; }
-		            body { background: white !important; color: black !important; }
-		            #tabela-impressao { display: block !important; position: absolute; left: 0; top: 0; width: 100%; color: black !important;}
-		            
-		            .print-header { text-align: center; margin-bottom: 30px; color: black; font-family: Arial, sans-serif;}
-		            .print-header h2 { margin: 0 0 5px 0; text-transform: uppercase; border-bottom: 2px solid black; padding-bottom: 10px;}
-		            .print-header p { margin: 5px 0; font-size: 14px; }
-		            .print-content { font-family: Arial, sans-serif; }
-		            
-		            /* 🔥 REMOVENDO TEMA ESCURO E ADAPTANDO PARA PAPEL 🔥 */
-		            .dia-card { background: white !important; border: 1px solid #000 !important; color: black !important; padding: 10px !important; margin-bottom: 15px !important; page-break-inside: avoid; border-radius: 0 !important; box-shadow: none !important; }
-		            .dia-header h5 { color: black !important; text-shadow: none !important; font-size: 16px !important; }
-		            .dia-header span { color: #333 !important; }
-		            
-		            .jogo-item { background: white !important; border: 1px solid #ccc !important; color: black !important; page-break-inside: avoid; border-radius: 0 !important; margin-bottom: 4px !important;}
-		            .jogo-hora { color: black !important; }
-		            .jogo-desc { color: black !important; }
-		            .jogo-quadra { color: #555 !important; }
-		            .jogo-desc span { color: black !important; background: transparent !important; border: 1px solid #000 !important; text-shadow: none !important; }
-		            .btn-edit-jogo { display: none !important; } /* Esconde o botão Mover */
-		            
-		            /* Tabelas e Chaves de TV */
-		            .mini-group-card { background: white !important; border: 1px solid #000 !important; color: black !important; box-shadow: none !important; border-radius: 0 !important;}
-		            .mini-group-header { background: #eee !important; color: black !important; border-bottom: 1px solid #000 !important; font-weight: bold !important;}
-		            .mini-group-row { color: black !important; border-bottom: 1px solid #ccc !important; }
-		            .mini-group-pos { color: black !important; }
-		            
-		            .mini-match { background: white !important; border: 1px solid #000 !important; color: black !important; box-shadow: none !important; border-radius: 0 !important; }
-		            .mini-match-header { background: #eee !important; color: black !important; border-bottom: 1px solid #000 !important; font-weight: bold !important; }
-		            .mini-team { color: black !important; }
-		            .mini-bracket-wrapper { background: white !important; }
-		        }
+        @media print {
+            body > * { display: none !important; }
+            body { background: white !important; color: black !important; }
+            #tabela-impressao { display: block !important; position: absolute; left: 0; top: 0; width: 100%; color: black !important;}
+            
+            .print-header { text-align: center; margin-bottom: 30px; color: black; font-family: Arial, sans-serif;}
+            .print-header h2 { margin: 0 0 5px 0; text-transform: uppercase; border-bottom: 2px solid black; padding-bottom: 10px;}
+            .print-header p { margin: 5px 0; font-size: 14px; }
+            .print-content { font-family: Arial, sans-serif; }
+            
+            .dia-card { background: white !important; border: 1px solid #000 !important; color: black !important; padding: 10px !important; margin-bottom: 15px !important; page-break-inside: avoid; border-radius: 0 !important; box-shadow: none !important; }
+            .dia-header h5 { color: black !important; text-shadow: none !important; font-size: 16px !important; }
+            .dia-header span { color: #333 !important; }
+            
+            .jogo-item { background: white !important; border: 1px solid #ccc !important; color: black !important; page-break-inside: avoid; border-radius: 0 !important; margin-bottom: 4px !important;}
+            .jogo-hora { color: black !important; }
+            .jogo-desc { color: black !important; }
+            .jogo-quadra { color: #555 !important; }
+            .jogo-desc span { color: black !important; background: transparent !important; border: 1px solid #000 !important; text-shadow: none !important; }
+            .btn-edit-jogo { display: none !important; }
+            
+            .mini-group-card { background: white !important; border: 1px solid #000 !important; color: black !important; box-shadow: none !important; border-radius: 0 !important;}
+            .mini-group-header { background: #eee !important; color: black !important; border-bottom: 1px solid #000 !important; font-weight: bold !important;}
+            .mini-group-row { color: black !important; border-bottom: 1px solid #ccc !important; }
+            .mini-group-pos { color: black !important; }
+            
+            .mini-match { background: white !important; border: 1px solid #000 !important; color: black !important; box-shadow: none !important; border-radius: 0 !important; }
+            .mini-match-header { background: #eee !important; color: black !important; border-bottom: 1px solid #000 !important; font-weight: bold !important; }
+            .mini-team { color: black !important; }
+            .mini-bracket-wrapper { background: white !important; }
+        }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 	
-	<!-- 🛡️ ANTI-FLICKER: Expulsa curiosos do criador de torneios instantaneamente -->
-	    <script>
-	        if (!localStorage.getItem('interclassToken')) {
-	            window.location.replace('/index.html');
-	        }
-	    </script>
+	<script>
+	    if (!localStorage.getItem('interclassToken')) {
+	        window.location.replace('/index.html');
+	    }
+	</script>
 </head>
 <body>
     <div class="arena-container">
@@ -448,7 +443,6 @@
                 alert("Período de datas inválido."); return;
             }
 
-            // 🔥 TRAVA INTELIGENTE ANTES DE PROCESSAR (VALIDAÇÃO DE GRUPOS) 🔥
             let erroGrupos = false;
             let msgErro = "";
 
@@ -472,7 +466,6 @@
                     if (inscritosRaw.length > 0) nTimes = inscritosRaw.length;
                 }
 
-                // A trava de Fase de Grupos
                 if (esp.formato === 'grupos' && nTimes < 4) {
                     erroGrupos = true;
                     msgErro += `- ${def.icone} ${def.nome}: Formato "Fase de Grupos" exige mínimo de 4 equipes inscritas. O sistema detetou apenas ${nTimes} válidas.\n`;
@@ -757,7 +750,7 @@
         function renderizarVisualizacoes() {
             renderizarAbaGeral();
             renderizarAbaPorEsporte();
-            renderizarAbaTabelaTV(); // 🔥 MÁGICA DA TV MINI-BRACKET
+            renderizarAbaTabelaTV(); 
         }
 
         function renderizarAbaGeral() {
@@ -779,7 +772,15 @@
 
             diasOrdenados.forEach(diaId => {
                 let jogosDoDia = todosOsJogosParaRender.filter(j => (j.diaId || j.dataJogo) === diaId);
-                jogosDoDia.sort((a, b) => a.hora.localeCompare(b.hora));
+                
+                // 🔥 PROTEÇÃO ABSOLUTA DA ORDENAÇÃO NA ABA GERAL 🔥
+                jogosDoDia.sort((a, b) => {
+                    let horaA = a.hora || "";
+                    let horaB = b.hora || "";
+                    if(horaA !== horaB) return horaA.localeCompare(horaB);
+                    return (a.id || 0) - (b.id || 0);
+                });
+                
                 if(jogosDoDia.length === 0) return; 
 
                 let jogosHtml = '';
@@ -787,26 +788,26 @@
                     let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
                     let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
                     
-                    let corTexto = jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
+                    let corTexto = jogo.titulo && (jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA")) ? "#ffee00" : "rgba(255,255,255,0.7)";
                     
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-${jogo.id}">
-                            <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora)}</div>
-                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo)}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora || "--:--")}</div>
+                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo || "")}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
                 });
 
                 let tituloDia = mapaDias[diaId];
-                if(!tituloDia.includes('-')) {
+                if(tituloDia && !tituloDia.includes('-')) {
                     let partes = tituloDia.split('-');
                     if(partes.length === 3) tituloDia = `${partes[2]}/${partes[1]}/${partes[0]}`;
                 }
 
                 container.innerHTML += `
                     <div class="dia-card">
-                        <div class="dia-header"><h5>${HighTechSecurity.sanitizar(tituloDia)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
+                        <div class="dia-header"><h5>${HighTechSecurity.sanitizar(tituloDia || diaId)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoDia.length} Partidas</span></div>
                         ${jogosHtml}
                     </div>
                 `;
@@ -822,9 +823,17 @@
 
             esportesNomes.forEach(nomeEsp => {
                 let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
+                
+                // 🔥 PROTEÇÃO ABSOLUTA DA ORDENAÇÃO NA ABA POR ESPORTE 🔥
                 jogosDoEsporte.sort((a, b) => {
-                    let diaA = a.diaId || a.dataJogo; let diaB = b.diaId || b.dataJogo;
-                    if (diaA === diaB) return a.hora.localeCompare(b.hora);
+                    let diaA = a.diaId || a.dataJogo || ""; 
+                    let diaB = b.diaId || b.dataJogo || "";
+                    if (diaA === diaB) {
+                        let horaA = a.hora || "";
+                        let horaB = b.hora || "";
+                        if(horaA !== horaB) return horaA.localeCompare(horaB);
+                        return (a.id || 0) - (b.id || 0);
+                    }
                     return diaA.localeCompare(diaB);
                 });
                 if(jogosDoEsporte.length === 0) return;
@@ -832,17 +841,17 @@
                 let jogosHtml = '';
                 jogosDoEsporte.forEach(jogo => {
                     let dataObj = diasGeradosGlobais.find(d => d.idStr === (jogo.diaId || jogo.dataJogo));
-                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : (jogo.diaId || jogo.dataJogo).split('-').reverse().slice(0,2).join('/');
+                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : ((jogo.diaId || jogo.dataJogo) || "").split('-').reverse().slice(0,2).join('/');
                     
                     let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
                     let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
                     
-                    let corTexto = jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
+                    let corTexto = jogo.titulo && (jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA")) ? "#ffee00" : "rgba(255,255,255,0.7)";
 
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-esp-${jogo.id}">
-                            <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora)}</span></div>
-                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.titulo)}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora || "--:--")}</span></div>
+                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.titulo || "")}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
@@ -857,12 +866,6 @@
             });
         }
 
-        // ==========================================
-        // 🔥 RENDERIZAÇÃO: VISÃO DA TABELA (TV) MINI-BRACKET 🔥
-        // ==========================================
-		// ==========================================
-		        // 🔥 RENDERIZAÇÃO: VISÃO DA TABELA (TV) EM CARROSSEL 🔥
-		        // ==========================================
 		        function renderizarAbaTabelaTV() {
 		            const container = document.getElementById('calendario-tabela-container');
 		            container.innerHTML = '';
@@ -882,9 +885,9 @@
 		                });
 		                let formato = espSetup ? espSetup.formato : 'eliminatoria';
 
-		                // Extrair as equipes únicas para as tabelas de grupos/pontos
 		                let todasEquipes = new Set();
 		                jogosDoEsporte.forEach(j => {
+                            if(!j.titulo) return;
 		                    let s1 = j.titulo.split(' | ');
 		                    if(s1.length > 1) {
 		                        let s2 = s1[1].split(' x ');
@@ -900,9 +903,8 @@
 		                    for(let i=1; i<= (espSetup ? espSetup.qtdTimes : 4); i++) listaEquipes.push(`Equipe ${i}`);
 		                }
 
-		                // Função auxiliar para quebrar o texto do time
 		                let extrairEqs = (jObj) => {
-		                    if(!jObj) return ["A Definir", "A Definir"];
+		                    if(!jObj || !jObj.titulo) return ["A Definir", "A Definir"];
 		                    let s1 = jObj.titulo.split(' | ');
 		                    if(s1.length < 2) return ["?", "?"];
 		                    let s2 = s1[1].split(' x ');
@@ -912,12 +914,11 @@
 		                    ];
 		                };
 
-		                // 🔥 GERAÇÃO DO CARROSSEL HORIZONTAL DE TODOS OS JOGOS 🔥
 		                let carouselHtml = `
 		                    <div class="mini-bracket-wrapper">
 		                        ${jogosDoEsporte.map(j => {
 		                            let eqs = extrairEqs(j);
-		                            let faseStr = j.titulo.split(' | ')[0] || 'Confronto';
+		                            let faseStr = j.titulo ? j.titulo.split(' | ')[0] : 'Confronto';
 		                            let isFinal = faseStr.toUpperCase().includes('FINAL') && !faseStr.toUpperCase().includes('SEMI') && !faseStr.toUpperCase().includes('QUARTAS');
 		                            
 		                            return `
@@ -1100,59 +1101,45 @@
             }
         }
 		
-		// ==========================================
-		        // 🔥 FUNÇÃO DE IMPRESSÃO PROFISSIONAL (PDF) 🔥
-		        // ==========================================
-		        function imprimirTabelaOficial() {
-		            // 1. Pega os dados do Professor e da Escola logados
-		            const escola = localStorage.getItem('profEscola') || 'Escola Não Informada';
-		            const profNome = localStorage.getItem('profNome') || 'Professor(a)';
-		            
-		            // 2. Identifica qual Aba está selecionada na tela
-		            let abaAtiva = '';
-		            let conteudoHTML = '';
-		            
-		            if (document.getElementById('tab-geral').classList.contains('active')) {
-		                abaAtiva = 'Visão Geral (Por Dia)';
-		                conteudoHTML = document.getElementById('calendario-dias-container').innerHTML;
-		            } else if (document.getElementById('tab-esporte').classList.contains('active')) {
-		                abaAtiva = 'Visão Por Modalidade';
-		                conteudoHTML = document.getElementById('calendario-esportes-container').innerHTML;
-		            } else if (document.getElementById('tab-tabela').classList.contains('active')) {
-		                abaAtiva = 'Visão da Tabela (Fases e Grupos)';
-		                conteudoHTML = document.getElementById('calendario-tabela-container').innerHTML;
-		            }
-		            
-		            const dataHoje = new Date().toLocaleDateString('pt-BR');
-		            const horaHoje = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-		            
-		            // 3. Constrói o Cabeçalho da Folha de Impressão
-		            const cabecalho = `
-		                <div class="print-header">
-		                    <h2>${HighTechSecurity.sanitizar(escola)}</h2>
-		                    <p><b>Organizador(a):</b> Prof. ${HighTechSecurity.sanitizar(profNome)}</p>
-		                    <p><b>Relatório:</b> Calendário Oficial do Torneio - ${abaAtiva}</p>
-		                    <p><b>Emitido por:</b> InterclassApp em ${dataHoje} às ${horaHoje}</p>
-		                </div>
-		                <div class="print-content">
-		                    ${conteudoHTML}
-		                </div>
-		            `;
-		            
-		            // 4. Joga para a div invisível de impressão
-		            document.getElementById('tabela-impressao').innerHTML = cabecalho;
-		            
-		            // 5. Truque Mágico: Muda o título da página temporariamente 
-		            // para que ao "Salvar como PDF", o nome do arquivo já venha pronto!
-		            const tituloOriginal = document.title;
-		            document.title = `Tabela_InterclassApp_${abaAtiva.replace(/[^a-zA-Z0-9]/g, '_')}`;
-		            
-		            // 6. Abre a janela de impressão nativa (que permite salvar em PDF)
-		            window.print();
-		            
-		            // 7. Devolve o título original ao site
-		            document.title = tituloOriginal;
-		        }
+		function imprimirTabelaOficial() {
+		    const escola = localStorage.getItem('profEscola') || 'Escola Não Informada';
+		    const profNome = localStorage.getItem('profNome') || 'Professor(a)';
+		    
+		    let abaAtiva = '';
+		    let conteudoHTML = '';
+		    
+		    if (document.getElementById('tab-geral').classList.contains('active')) {
+		        abaAtiva = 'Visão Geral (Por Dia)';
+		        conteudoHTML = document.getElementById('calendario-dias-container').innerHTML;
+		    } else if (document.getElementById('tab-esporte').classList.contains('active')) {
+		        abaAtiva = 'Visão Por Modalidade';
+		        conteudoHTML = document.getElementById('calendario-esportes-container').innerHTML;
+		    } else if (document.getElementById('tab-tabela').classList.contains('active')) {
+		        abaAtiva = 'Visão da Tabela (Fases e Grupos)';
+		        conteudoHTML = document.getElementById('calendario-tabela-container').innerHTML;
+		    }
+		    
+		    const dataHoje = new Date().toLocaleDateString('pt-BR');
+		    const horaHoje = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+		    
+		    const cabecalho = `
+		        <div class="print-header">
+		            <h2>${HighTechSecurity.sanitizar(escola)}</h2>
+		            <p><b>Organizador(a):</b> Prof. ${HighTechSecurity.sanitizar(profNome)}</p>
+		            <p><b>Relatório:</b> Calendário Oficial do Torneio - ${abaAtiva}</p>
+		            <p><b>Emitido por:</b> InterclassApp em ${dataHoje} às ${horaHoje}</p>
+		        </div>
+		        <div class="print-content">
+		            ${conteudoHTML}
+		        </div>
+		    `;
+		    
+		    document.getElementById('tabela-impressao').innerHTML = cabecalho;
+		    const tituloOriginal = document.title;
+		    document.title = `Tabela_InterclassApp_${abaAtiva.replace(/[^a-zA-Z0-9]/g, '_')}`;
+		    window.print();
+		    document.title = original;
+		}
     </script>
 </body>
 </html>
