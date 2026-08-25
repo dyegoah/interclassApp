@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.higitech.interclasseApp.model.Aluno;
-import br.com.higitech.interclasseApp.model.Modalidade;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.AlunoRepository;
 import br.com.higitech.interclasseApp.repositories.ModalidadeRepository;
@@ -61,7 +60,9 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
-        // 🔥 TRAVA DE SEGURANÇA NO JAVA
+        // 🔥 TRAVA DE SEGURANÇA DESATIVADA:
+        // Como o sistema agora usa Link Inteligente, o Front-End é quem controla os esportes permitidos!
+        /*
         List<Modalidade> todasModalidades = modalidadeRepository.findByLoteProfessorHashPublico(professorHash);
         boolean esportePermitido = todasModalidades.stream()
                 .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
@@ -70,6 +71,7 @@ public class AlunoController {
         if (!esportePermitido) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta modalidade não está aberta para inscrições.");
         }
+        */
 
         long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()
                 .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte) &&

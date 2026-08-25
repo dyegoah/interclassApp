@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Inscrição de Atleta - InterclassApp</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#05050f">
@@ -10,11 +10,7 @@
     <style>
         :root { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body {
-            background-color: #05050f;
-            background-image: radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%);
-            color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
-        }
+        body { background-color: #05050f; background-image: radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%); color: #ffffff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
         h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 10px; font-size: 1.5rem; text-shadow: 0 0 10px var(--theme-glow); }
         p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 25px; font-size: 0.9rem; text-align: center; }
@@ -29,11 +25,8 @@
         .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
         .form-group input, .form-group select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 0.95rem; outline: none; transition: 0.3s; }
         .form-group input:focus, .form-group select:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
-        
-        /* 🔥 CADEADO VISUAL 🔥 */
         .form-group select option { background: #05050f; color: white; padding: 5px; }
         .form-group select option:disabled { color: #666; background: #111; font-style: italic; }
-        
         .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; text-transform: uppercase; margin-top: 10px; }
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
         .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 8px; font-size: 0.9rem; display: none; }
@@ -48,11 +41,9 @@
         <h1>Inscrição de Atleta</h1>
         <p class="subtitle">Selecione a modalidade e preencha os seus dados.</p>
         <div id="mensagem-alerta" class="alert"></div>
-
         <div id="loading-esportes" style="text-align: center; color: #00f2fe; margin-bottom: 20px; font-family: 'Orbitron'; font-size: 0.9rem;">
             ⏳ Verificando status da Arena...
         </div>
-
         <form id="form-cadastro" onsubmit="inscreverAluno(event)" style="display: none;">
             <div class="profile-pic-container">
                 <div class="profile-pic-wrapper" id="profile-border" onclick="document.getElementById('file-upload').click()">
@@ -62,7 +53,6 @@
                 <input type="file" id="file-upload" accept="image/*" style="display: none;" onchange="processarImagem(event)">
                 <p style="font-size: 0.75rem; color: #aaa; margin-top: 8px;">Toque para adicionar foto (Opcional)</p>
             </div>
-
             <div class="form-group">
                 <label>1. Qual a sua Categoria (Gênero)?</label>
                 <select id="generoAluno" required onchange="mudarCorDaBorda(this.value)">
@@ -72,19 +62,16 @@
                     <option value="misto" style="color:#fff; background:#05050f;">🚻 Misto</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label>2. Escolha sua Modalidade Esportiva</label>
                 <select id="esporteAluno" required>
                     <!-- Preenchido pelo JavaScript com os cadeados -->
                 </select>
             </div>
-
             <div class="form-group">
                 <label>3. Seu Nome Completo</label>
                 <input type="text" id="nomeAluno" required minlength="2" maxlength="50" placeholder="Ex: João da Silva">
             </div>
-
             <div class="form-group">
                 <label>4. Sua Turma / Equipe</label>
                 <select id="turmaAluno" required>
@@ -109,13 +96,13 @@
                     </optgroup>
                 </select>
             </div>
-
             <button type="submit" class="btn-submit" id="btn-submit">Confirmar Inscrição</button>
         </form>
     </div>
-
     <script>
-        const professorHashPublico = new URLSearchParams(window.location.search).get('ref');
+        const urlParams = new URLSearchParams(window.location.search);
+        const professorHashPublico = urlParams.get('ref');
+        const modalidadesDoLink = urlParams.get('mods'); // 🔥 NOVO: Lê os esportes ativos direto da URL
         let fotoBase64 = "";
 
         const listaTodasModalidades = [
@@ -134,6 +121,7 @@
             }
 
             try {
+                // Checa se o professor fechou a arena
                 const resStatus = await fetch(`/api/alunos/public/status/${professorHashPublico}`);
                 if (resStatus.ok) {
                     const isOpen = await resStatus.json();
@@ -148,19 +136,25 @@
                     }
                 }
 
-                const res = await fetch(`/api/modalidades/public/${professorHashPublico}`);
-                if (res.ok) {
-                    const modalidadesAtivasDaAPI = await res.json();
-                    
-                    // Tratamento seguro que retira acentos para não dar falso positivo
-                    const nomesAtivos = modalidadesAtivasDaAPI.map(m => m.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
-                    
-                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivasDaAPI);
-                    
+                // 🔥 LÓGICA DO LINK INTELIGENTE 🔥
+                if (modalidadesDoLink) {
+                    // Se o Link tiver esportes, ignora a API quebrada e usa os dados do Link!
+                    const nomesAtivos = modalidadesDoLink.split(',').map(m => m.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
+                    renderizarOpcoesDeEsportesComCadeado(nomesAtivos, []);
                     document.getElementById('loading-esportes').style.display = 'none';
                     document.getElementById('form-cadastro').style.display = 'block';
                 } else {
-                    document.getElementById('loading-esportes').innerText = "❌ Erro ao buscar modalidades ativas.";
+                    // Fallback para tentar ler a API caso seja um link antigo
+                    const res = await fetch(`/api/modalidades/public/${professorHashPublico}`);
+                    if (res.ok) {
+                        const modalidadesAtivasDaAPI = await res.json();
+                        const nomesAtivos = modalidadesAtivasDaAPI.map(m => m.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
+                        renderizarOpcoesDeEsportesComCadeado(nomesAtivos, modalidadesAtivasDaAPI);
+                        document.getElementById('loading-esportes').style.display = 'none';
+                        document.getElementById('form-cadastro').style.display = 'block';
+                    } else {
+                        document.getElementById('loading-esportes').innerText = "❌ Erro ao buscar modalidades ativas. O Professor não configurou as opções.";
+                    }
                 }
             } catch (error) {
                 document.getElementById('loading-esportes').innerText = "⚠️ O Servidor está fora do ar no momento.";
@@ -176,18 +170,14 @@
                 let ativo = nomesAtivos.includes(nomeCheck);
 
                 if (ativo) {
-                    // LIVRE PARA INSCRIÇÃO
                     let modObjOriginal = modalidadesAtivasDaAPI.find(m => m.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() === nomeCheck);
                     let iconeSeguro = modObjOriginal && modObjOriginal.icone ? modObjOriginal.icone : mod.icone;
-
                     let modData = JSON.stringify({ esporte: mod.nome, icone: iconeSeguro });
                     html += `<option value='${modData}' style="color: #fff; background: #05050f;">${iconeSeguro} ${mod.nome}</option>`;
                 } else {
-                    // TRANCADO COM CADEADO E DESABILITADO
                     html += `<option value="" disabled style="color: #666; background: #111; font-style: italic;">🔒 ${mod.nome} (Bloqueado)</option>`;
                 }
             });
-
             select.innerHTML = html;
         }
 
@@ -238,19 +228,13 @@
             btnSubmit.disabled = true;
 
             const payload = {
-                nome: nome,
-                turma: turmaEscolhida,
-                fotoUrl: fotoBase64,
-                esporte: modalidadeObj.esporte,
-                iconeEsporte: modalidadeObj.icone,
-                genero: generoEscolhido
+                nome: nome, turma: turmaEscolhida, fotoUrl: fotoBase64,
+                esporte: modalidadeObj.esporte, iconeEsporte: modalidadeObj.icone, genero: generoEscolhido
             };
 
             try {
                 const response = await fetch(`/api/alunos/public/${professorHashPublico}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
