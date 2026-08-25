@@ -161,8 +161,14 @@
         function extrairEsporteNomeSeguro(j) {
             if(j.esporte && typeof j.esporte === 'string') return j.esporte;
             if(j.modalidade && j.modalidade.nomeEsporte) return j.modalidade.nomeEsporte;
-            return "A Definir";
+            
+            // Fallback Extra caso o esporte esteja mascarado no ícone
+            const mapIcon = { '⚽': 'Futsal', '🏐': 'Vôlei', '🏀': 'Basquete', '🤾': 'Handebol', '☄️': 'Queimada', '🏖️': 'Vôlei de Areia', '🏊': 'Natação', '🏃': 'Atletismo', '🏓': 'Tênis de Mesa', '♟️': 'Xadrez', '🏁': 'Dama', '🎮': 'E-Sports' };
+            if(j.icone && mapIcon[j.icone]) return mapIcon[j.icone];
+            
+            return "Modalidade Desconhecida";
         }
+        
         function extrairEsporteIconeSeguro(j) {
             if(j.icone && typeof j.icone === 'string') return j.icone;
             if(j.modalidade && j.modalidade.icone) return j.modalidade.icone;
@@ -302,7 +308,9 @@
 
             try {
                 const token = localStorage.getItem('interclassToken');
-                const response = await fetch(`/api/jogos/lote/${genero}`, {
+                
+                // 🔥 SOLUÇÃO: Busca GLOBAL de jogos para contornar falhas antigas de gênero vazio no Banco
+                const response = await fetch(`/api/jogos`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
@@ -312,7 +320,30 @@
                 }
                 if (!response.ok) throw new Error(`Falha API - Status: ${response.status}`);
                 
-                let jogos = await response.json(); 
+                let todosJogos = await response.json(); 
+                
+                // 🔥 FILTRO DE RESGATE LOCAL (Garante que a Dama e outros apareçam mesmo se o DB perdeu a tag 'Feminino')
+                let configLotes = JSON.parse(localStorage.getItem('arenaLotes')) || {};
+                let esportesDoLote = [];
+                if(configLotes[genero] && configLotes[genero].esportes) {
+                    esportesDoLote = configLotes[genero].esportes.map(e => e.nome.toLowerCase().trim());
+                }
+
+                let jogos = todosJogos.filter(j => {
+                    let genDb = (j.genero || "").toLowerCase().trim();
+                    let nomeEsp = extrairEsporteNomeSeguro(j).toLowerCase().trim();
+                    
+                    // Condição 1: Gênero bate perfeitamente
+                    if (genDb === genero.toLowerCase()) return true;
+                    // Condição 2: Gênero nulo/perdido no banco, mas sabemos que pertence a este lote pela memória
+                    if ((genDb === "" || genDb === "null") && esportesDoLote.includes(nomeEsp)) return true;
+                    // Condição 3: Resgate absoluto - se há alunos deste gênero cadastrados neste esporte
+                    let temAlunoNesteGenero = listaAlunosGlobais.some(a => a.esporte.toLowerCase().trim() === nomeEsp && a.genero === genero.toLowerCase());
+                    if ((genDb === "" || genDb === "null") && temAlunoNesteGenero) return true;
+
+                    return false;
+                });
+
                 if (jogos.length === 0) throw new Error('Nenhum torneio agendado.');
 
                 jogos = resolverNomesDinamicos(jogos, genero);
@@ -359,7 +390,7 @@
                 `;
             }
 
-            // 🔥 ORDENAÇÃO DE FORÇA BRUTA: Trava absoluta na posição dos jogos usando apenas o ID
+            // 🔥 ORDENAÇÃO DE FORÇA BRUTA: Trava absoluta na posição dos jogos
             todosJogos.sort((a, b) => {
                 return a.id - b.id;
             });
@@ -394,7 +425,7 @@
                 let jogosConcluidos = 0;
                 let entrouNaFaseFinal = false;
                 
-                let temFaseDeGrupos = dados.jogos.some(j => j.titulo.toUpperCase().includes('GRUPO') || j.titulo.toUpperCase().includes('CLASSIFICAÇÃO') || j.titulo.toUpperCase().includes('LIGA') || j.titulo.toUpperCase().includes('SORTEIO'));
+                let temFaseDeGrupos = dados.jogos.some(j => (j.titulo||"").toUpperCase().includes('GRUPO') || (j.titulo||"").toUpperCase().includes('CLASSIFICAÇÃO') || (j.titulo||"").toUpperCase().includes('LIGA') || (j.titulo||"").toUpperCase().includes('SORTEIO'));
 
                 dados.jogos.forEach(jogo => {
                     let relatorio = relatoriosSalvos[String(jogo.id)]; 
@@ -406,7 +437,8 @@
                         if(p.length === 3) dataCurta = p[2] + '/' + p[1];
                     }
 
-                    let partesTitulo = jogo.titulo.split(' | ');
+                    let tituloOriginalSeguro = jogo.titulo || "Aguardando";
+                    let partesTitulo = tituloOriginalSeguro.split(' | ');
                     let faseTag = partesTitulo[0].replace('🏆', '').trim();
                     let fUpper = faseTag.toUpperCase();
                     let confrontoStr = partesTitulo.length > 1 ? partesTitulo[1].trim() : "Aguardando Vencedores";
@@ -546,7 +578,7 @@
         }
 
         // ==========================================
-        // EXCLUSÃO
+        // EXCLUSÃO E CAMPEÃO
         // ==========================================
         function confirmarExclusaoTorneio(event, genero, esporteNome) {
             event.stopPropagation(); 
@@ -600,7 +632,7 @@
                 let tabela = {};
 
                 jogos.forEach(j => {
-                    let partes = j.titulo.split(' | ');
+                    let partes = (j.titulo||"").split(' | ');
                     if(partes.length < 2) return;
                     let confronto = partes[1].split(' x ');
                     if(confronto.length < 2) return;
@@ -682,7 +714,7 @@
             } else {
                 let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
                 if (jogosEncerrados === jogos.length && jogos.length > 0) {
-                    let jogoFinal = jogos.find(j => j.titulo.includes('FINAL') && !j.titulo.includes('Ida')) || jogos[jogos.length - 1];
+                    let jogoFinal = jogos.find(j => (j.titulo||"").includes('FINAL') && !(j.titulo||"").includes('Ida')) || jogos[jogos.length - 1];
                     let rel = relatoriosSalvos[String(jogoFinal.id)];
                     
                     let placares = obterPlacarSeguro(rel, jogoFinal);
@@ -690,8 +722,8 @@
                     let pB = placares.B;
                     
                     if (rel || jogoFinal.status === 'FINALIZADO') {
-                        let eqA = jogoFinal.equipeANome || jogoFinal.titulo.split(' | ')[1].split(' x ')[0].trim();
-                        let eqB = jogoFinal.equipeBNome || jogoFinal.titulo.split(' | ')[1].split(' x ')[1].trim();
+                        let eqA = jogoFinal.equipeANome || (jogoFinal.titulo||"").split(' | ')[1]?.split(' x ')[0]?.trim();
+                        let eqB = jogoFinal.equipeBNome || (jogoFinal.titulo||"").split(' | ')[1]?.split(' x ')[1]?.trim();
                         
                         if (pA > pB) { campeaoFinal = eqA; campeaoIdFinal = jogoFinal.equipeAId; } 
                         else if (pB > pA) { campeaoFinal = eqB; campeaoIdFinal = jogoFinal.equipeBId; }
