@@ -37,45 +37,20 @@
 
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem; }
         .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); background: #fff; color: #000; }
-        .btn-excluir { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; }
-        .btn-excluir:hover { background: #ff0055; color: #fff; box-shadow: 0 0 10px rgba(255,0,85,0.5); }
+        
+        /* 🔥 BOTÕES DE EXCLUSÃO 🔥 */
+        .btn-excluir { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .btn-excluir:hover { background: rgba(255,0,85,0.2); box-shadow: 0 0 10px rgba(255,0,85,0.5); transform: scale(1.05); }
 
         .total-geral-badge { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--theme-primary); color: #fff; padding: 10px 20px; border-radius: 30px; font-family: 'Orbitron'; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px var(--theme-glow); transition: all 0.3s ease; }
         .input-dark { width: 100%; padding: 15px 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; color: white; font-family: 'Segoe UI'; font-size: 1rem; outline: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .input-dark:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); background: rgba(0,0,0,0.8); }
 
-        /* 🔥 BOTÕES PADRONIZADOS COM TABELAS.HTML 🔥 */
-        .tabs-container { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            overflow-x: auto; 
-            padding-bottom: 5px; 
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .tab-btn { 
-            background: rgba(0,0,0,0.5); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            padding: 0 20px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-family: 'Orbitron'; 
-            font-size: 0.85rem; 
-            transition: 0.3s;
-            white-space: nowrap; 
-            flex-shrink: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 40px; 
-        }
-
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+        .tab-btn { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 0 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; height: 40px; }
         #tab-masculino { color: #00f2fe; }
         #tab-feminino { color: #ff00de; }
         #tab-misto { color: #b200ff; }
-
         .tab-count { font-size: 0.75rem; opacity: 0.8; font-family: 'Segoe UI'; font-weight: normal; margin-left: 5px; }
 
         .resumo-esportes { margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
@@ -91,20 +66,18 @@
         .equipes-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
         .equipes-scroll-container::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 4px; }
 
-        .equipe-summary-card { 
-            min-width: 140px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; padding: 15px 10px; text-align: center; display: flex; 
-            flex-direction: column; align-items: center; border-top: 4px solid #555; transition: 0.3s;
-        }
+        .equipe-summary-card { min-width: 140px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; border-top: 4px solid #555; transition: 0.3s; }
         .equipe-summary-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.05); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
         .eq-turma { font-family: 'Segoe UI'; font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 10px; white-space: nowrap;}
         .eq-count-badge { font-family: 'Orbitron'; font-weight: bold; font-size: 1.1rem; border: 1px solid; border-radius: 20px; padding: 4px 15px; background: rgba(0,0,0,0.4); display: inline-block; }
 
+        /* 🔥 AJUSTES DO CARD DE ATLETAS PARA CABER O CHECKBOX 🔥 */
         .grid-alunos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 2rem;}
-        .aluno-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: 0.3s; position: relative;}
+        .aluno-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; padding-left: 45px; display: flex; align-items: center; gap: 15px; transition: 0.3s; position: relative; overflow: hidden; }
         .aluno-card:hover { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.05); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        /* 🔥 ESTILO FOTO INSTAGRAM 🔥 */
+        .aluno-checkbox { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; cursor: pointer; accent-color: #ff0055; z-index: 10; }
+
         .insta-foto { width: 60px; height: 60px; border-radius: 50%; padding: 3px; object-fit: cover; background-color: #222; }
         .insta-masculino { background: linear-gradient(45deg, #00f2fe, #4facfe); }
         .insta-feminino { background: linear-gradient(45deg, #ff00de, #ff73ea); }
@@ -121,15 +94,19 @@
         .btn-page.active { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
         .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
 
+        /* 🔥 BARRA DE AÇÃO EM MASSA 🔥 */
+        .barra-acao-massa { display: none; justify-content: space-between; align-items: center; background: rgba(255, 0, 85, 0.15); border: 1px solid #ff0055; border-radius: 10px; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(255,0,85,0.3); animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
         @media (max-width: 900px) {
             .grid-alunos { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .aluno-card { flex-direction: column; text-align: center; padding: 12px 10px; }
+            .aluno-card { flex-direction: column; text-align: center; padding: 15px 10px 10px 10px; }
+            .aluno-checkbox { top: 10px; left: 10px; transform: none; }
+            .btn-excluir { position: absolute; top: 5px; right: 5px; padding: 5px; }
             .insta-foto { width: 50px; height: 50px; margin: 0 auto; }
             .aluno-info { width: 100%; }
-            .btn-excluir { width: 100%; margin-top: 8px; }
         }
 
-        /* 🔥 AJUSTE RESPONSIVO CONTRA ESMAGAMENTO NO CELULAR 🔥 */
         @media (max-width: 600px) {
             .arena-container { padding: 10px; }
             .glass { padding: 15px; } 
@@ -137,10 +114,8 @@
             .subtitle { font-size: 0.8rem; }
             .btn-acao { width: 100%; text-align: center; margin-top: 10px; }
             .grid-alunos { grid-template-columns: repeat(2, 1fr); }
+            .barra-acao-massa { flex-direction: column; gap: 15px; text-align: center; }
         }
-
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #05050f; border: 1px solid #ff0055; border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 0 30px rgba(255,0,85,0.4); }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -164,8 +139,6 @@
                 </div>
             </div>
 
-			
-
             <div class="tabs-container">
                 <button class="tab-btn active" id="tab-masculino" onclick="mudarAba('masculino')">
                     LOTE: MASCULINO <span class="tab-count" id="count-masc">(0)</span>
@@ -182,22 +155,33 @@
             <div id="sport-details-container" style="display: none;"></div>
 
 			<div style="margin-bottom: 1.5rem; position: relative; display: flex; align-items: center;">
-			                <input type="text" id="input-busca" class="input-dark" placeholder="🔍 Buscar por Nome do Aluno, Turma ou Modalidade..." onkeyup="realizarBusca()" style="padding-right: 45px;">
-			                <!-- 🔥 BOTÃO MÁGICO DE LIMPAR BUSCA 🔥 -->
-			                <button id="btn-limpar-busca" onclick="limparBusca()" style="display: none; position: absolute; right: 15px; background: transparent; border: none; color: var(--theme-primary); font-size: 1.5rem; cursor: pointer; transition: 0.3s; font-weight: bold;" title="Limpar Seleção">&times;</button>
-			            </div>
+                <input type="text" id="input-busca" class="input-dark" placeholder="🔍 Buscar por Nome do Aluno, Turma ou Modalidade..." onkeyup="realizarBusca()" style="padding-right: 45px;">
+                <button id="btn-limpar-busca" onclick="limparBusca()" style="display: none; position: absolute; right: 15px; background: transparent; border: none; color: var(--theme-primary); font-size: 1.5rem; cursor: pointer; transition: 0.3s; font-weight: bold;" title="Limpar Seleção">&times;</button>
+            </div>
 			
             <div id="loading-alunos" style="text-align: center; padding: 2rem; color: var(--theme-primary);">
                 ⏳ Conectando ao Banco de Dados Seguro...
             </div>
 
-            <h4 class="sub-section-title" id="titulo-lista-alunos" style="display: none; margin-top: 2rem; border: none; font-family: 'Segoe UI'; font-size: 1rem; color: rgba(255,255,255,0.7);">📋 Lista de Inscrições Individuais</h4>
+            <!-- 🔥 BARRA FLUTUANTE DE EXCLUSÃO EM MASSA 🔥 -->
+            <div id="barra-acao-massa" class="barra-acao-massa">
+                <div style="font-family: 'Orbitron'; font-weight: bold; color: #ffccdd;">
+                    🗑️ <span id="texto-qtd-selecionados">0</span> Atleta(s) Selecionado(s)
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-page" onclick="limparSelecoesGlobais()">Cancelar</button>
+                    <button class="btn-acao" style="background: #ff0055; color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.5);" onclick="excluirAlunosEmMassa()">Excluir Selecionados</button>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; margin-bottom: 15px;">
+                <h4 class="sub-section-title" id="titulo-lista-alunos" style="display: none; margin: 0; border: none; font-family: 'Segoe UI'; font-size: 1rem; color: rgba(255,255,255,0.7);">📋 Lista de Inscrições Individuais</h4>
+            </div>
+
             <div class="grid-alunos" id="grid-alunos" style="display: none;"></div>
             <div id="paginacao-container" class="paginacao-container"></div>
         </div>
     </div>
-
-    <!-- Modais omitidos para manter tamanho (O código Java anterior os controla perfeitamente) -->
     
     <script>
         const modalidadeDefs = [
@@ -210,9 +194,9 @@
         ];
 
 		const minJogadoresPorEsporte = { 
-		            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2,
-		            'Tênis de Mesa': 1, 'Xadrez': 1, 'Dama': 1, 'E-Sports': 1, 'Natação': 1, 'Atletismo': 1 
-		        };
+            'Futsal': 5, 'Vôlei': 6, 'Basquete': 5, 'Handebol': 7, 'Queimada': 6, 'Vôlei de Areia': 2,
+            'Tênis de Mesa': 1, 'Xadrez': 1, 'Dama': 1, 'E-Sports': 1, 'Natação': 1, 'Atletismo': 1 
+        };
 
         let listaAlunosBase = []; 
         let generoAtual = 'masculino';
@@ -220,6 +204,9 @@
         let paginaAtual = 1;
         const itensPorPagina = 9;
         let esporteAbaSelecionada = null;
+        
+        // 🔥 CONTROLE DE ALUNOS SELECIONADOS PARA EXCLUSÃO 🔥
+        let alunosSelecionadosParaExclusao = new Set();
 
         window.onload = async () => {
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
@@ -247,55 +234,48 @@
         }
 
 		function mudarAba(genero) {
-		            generoAtual = genero; 
-		            paginaAtual = 1; 
-		            esporteAbaSelecionada = null; 
-		            
-		            // 1. Resetar todos os botões para o estado inicial
-		            document.querySelectorAll('.tab-btn').forEach(btn => {
-		                btn.classList.remove('active');
-		                btn.style.borderBottom = 'none';
-		                btn.style.fontWeight = 'normal';
-		                btn.style.background = 'rgba(0,0,0,0.5)';
-		            });
+            generoAtual = genero; 
+            paginaAtual = 1; 
+            esporteAbaSelecionada = null; 
+            limparSelecoesGlobais(); // 🔥 Limpa a seleção ao trocar de lote
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderBottom = 'none';
+                btn.style.fontWeight = 'normal';
+                btn.style.background = 'rgba(0,0,0,0.5)';
+            });
 
-		            // 2. Definir a cor do tema baseado na seleção
-		            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
-		            
-		            // 3. Aplicar o visual "Ativo" no botão clicado (Idêntico ao tabelas.html)
-		            const btnAtivo = document.getElementById(`tab-${genero}`);
-		            if(btnAtivo) {
-		                btnAtivo.classList.add('active');
-		                btnAtivo.style.borderBottom = `3px solid ${corTema}`;
-		                btnAtivo.style.fontWeight = 'bold';
-		                btnAtivo.style.background = 'rgba(255,255,255,0.1)';
-		            }
+            let corTema = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+            
+            const btnAtivo = document.getElementById(`tab-${genero}`);
+            if(btnAtivo) {
+                btnAtivo.classList.add('active');
+                btnAtivo.style.borderBottom = `3px solid ${corTema}`;
+                btnAtivo.style.fontWeight = 'bold';
+                btnAtivo.style.background = 'rgba(255,255,255,0.1)';
+            }
 
-		            // 4. Mudar as variáveis de cor global da tela
-		            const body = document.body;
-		            body.classList.remove('theme-fem', 'theme-misto');
-		            if (genero === 'feminino') body.classList.add('theme-fem');
-		            if (genero === 'misto') body.classList.add('theme-misto');
-		            
-		            aplicarFiltrosEPaginacao();
-		        }
+            const body = document.body;
+            body.classList.remove('theme-fem', 'theme-misto');
+            if (genero === 'feminino') body.classList.add('theme-fem');
+            if (genero === 'misto') body.classList.add('theme-misto');
+            
+            aplicarFiltrosEPaginacao();
+        }
 
-				function realizarBusca() { 
-				            paginaAtual = 1; 
-				            
-				            // Mostra o botão "X" se houver texto, e esconde se estiver vazio
-				            const inputBusca = document.getElementById('input-busca');
-				            const btnLimpar = document.getElementById('btn-limpar-busca');
-				            btnLimpar.style.display = inputBusca.value.trim() !== "" ? 'block' : 'none';
-				            
-				            aplicarFiltrosEPaginacao(); 
-				        }
+        function realizarBusca() { 
+            paginaAtual = 1; 
+            const inputBusca = document.getElementById('input-busca');
+            const btnLimpar = document.getElementById('btn-limpar-busca');
+            btnLimpar.style.display = inputBusca.value.trim() !== "" ? 'block' : 'none';
+            aplicarFiltrosEPaginacao(); 
+        }
 
-				        function limparBusca() {
-				            // Zera o campo, atualiza a lista e esconde o "X"
-				            document.getElementById('input-busca').value = "";
-				            realizarBusca();
-				        }
+        function limparBusca() {
+            document.getElementById('input-busca').value = "";
+            realizarBusca();
+        }
 
         function aplicarFiltrosEPaginacao() {
             let filtrados = listaAlunosBase.filter(a => a.genero === generoAtual);
@@ -339,28 +319,22 @@
 
             let htmlEq = '';
 			arrEq.forEach(eq => {
-			                let corStatus = eq.count >= minExigido ? '#00ff00' : (eq.count >= (minExigido / 2) ? '#ffd700' : '#ff0055');
-			                // 🔥 ADICIONADO O ONCLICK E O CURSOR POINTER
-			                htmlEq += `<div class="equipe-summary-card" style="border-top-color: ${corStatus}; cursor: pointer;" onclick="filtrarAlunosPorTurma('${eq.turma}')" title="Ver alunos desta turma">
-			                    <div class="eq-turma">${eq.turma}</div>
-			                    <div class="eq-count-badge" style="color: ${corStatus}; border-color: ${corStatus}; box-shadow: 0 0 10px rgba(${corStatus === '#00ff00' ? '0,255,0' : (corStatus === '#ffd700' ? '255,215,0' : '255,0,85')}, 0.2);">${eq.count} <span style="font-size:0.65rem; color:#ccc; font-weight:normal;">/ ${minExigido}</span></div>
-			                </div>`;
-			            });
+                let corStatus = eq.count >= minExigido ? '#00ff00' : (eq.count >= (minExigido / 2) ? '#ffd700' : '#ff0055');
+                htmlEq += `<div class="equipe-summary-card" style="border-top-color: ${corStatus}; cursor: pointer;" onclick="filtrarAlunosPorTurma('${eq.turma}')" title="Ver alunos desta turma">
+                    <div class="eq-turma">${eq.turma}</div>
+                    <div class="eq-count-badge" style="color: ${corStatus}; border-color: ${corStatus}; box-shadow: 0 0 10px rgba(${corStatus === '#00ff00' ? '0,255,0' : (corStatus === '#ffd700' ? '255,215,0' : '255,0,85')}, 0.2);">${eq.count} <span style="font-size:0.65rem; color:#ccc; font-weight:normal;">/ ${minExigido}</span></div>
+                </div>`;
+            });
             let ic = modalidadeDefs.find(m => m.nome === nomeEsporte)?.icone || '🏅';
             detailsContainer.innerHTML = `<div class="sport-details-box"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 15px;"><h4 class="sub-section-title" style="margin: 0; border: none;">${ic} Status das Turmas (${nomeEsporte})</h4><button class="btn-acao" onclick="iniciarSetupDoEsporte('${nomeEsporte}')" style="box-shadow: 0 0 15px var(--theme-glow);">⚙️ Criar Torneio ➔</button></div><div class="equipes-scroll-container">${htmlEq}</div></div>`;
         }
 		
 		function filtrarAlunosPorTurma(turma) {
-		            // Preenche o campo de busca automaticamente com a turma clicada
-		            const inputBusca = document.getElementById('input-busca');
-		            inputBusca.value = turma;
-		            
-		            // Chama a sua função de busca já existente
-		            realizarBusca();
-		            
-		            // Rola a tela suavemente para a lista de alunos
-		            document.getElementById('titulo-lista-alunos').scrollIntoView({ behavior: 'smooth', block: 'start' });
-		        }
+            const inputBusca = document.getElementById('input-busca');
+            inputBusca.value = turma;
+            realizarBusca();
+            document.getElementById('titulo-lista-alunos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         function iniciarSetupDoEsporte(nomeEsporte) {
             const defEsporte = modalidadeDefs.find(m => m.nome === nomeEsporte);
@@ -379,28 +353,112 @@
                 document.getElementById('paginacao-container').innerHTML = ''; return;
             }
 
-            container.style.display = 'grid'; tituloLista.style.display = 'flex';
+            container.style.display = 'grid'; tituloLista.style.display = 'block';
             const totalPaginas = Math.ceil(alunosFiltradosGlobais.length / itensPorPagina);
             const alunosPaginaAtual = alunosFiltradosGlobais.slice((paginaAtual - 1) * itensPorPagina, ((paginaAtual - 1) * itensPorPagina) + itensPorPagina);
 
-            // 🔥 AS FOTOS ESTILO INSTAGRAM SÃO APLICADAS AQUI 🔥
             alunosPaginaAtual.forEach(aluno => {
                 let fotoSegura = aluno.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome)}&background=222&color=fff`;
                 let instaColorClass = `insta-${aluno.genero}`;
+                // Mantém a seleção (checkbox) marcada mesmo mudando de página
+                let isChecked = alunosSelecionadosParaExclusao.has(aluno.hashPublico) ? 'checked' : '';
 
                 container.innerHTML += `
                     <div class="aluno-card" id="card-aluno-${aluno.hashPublico}">
+                        <input type="checkbox" class="aluno-checkbox" onchange="toggleSelecaoExclusao('${aluno.hashPublico}')" ${isChecked} title="Selecionar para exclusão">
                         <img src="${fotoSegura}" class="aluno-foto insta-foto ${instaColorClass}" alt="Foto Atleta">
                         <div class="aluno-info">
                             <div class="aluno-nome" title="${aluno.nome}">${aluno.nome}</div>
                             <div class="aluno-detalhes">Turma: ${aluno.turma}</div>
                             <div class="badge-esporte">${aluno.iconeEsporte || '🏅'} ${aluno.esporte}</div>
                         </div>
+                        <button class="btn-excluir" onclick="excluirAlunoIndividual('${aluno.hashPublico}', '${aluno.nome}')" title="Excluir Atleta">🗑️</button>
                     </div>
                 `;
             });
 
             renderizarControlesPaginacao(totalPaginas);
+        }
+
+        // 🔥 FUNÇÕES DE EXCLUSÃO 🔥
+
+        // Adiciona ou remove da lista de selecionados
+        function toggleSelecaoExclusao(hashPublico) {
+            if (alunosSelecionadosParaExclusao.has(hashPublico)) {
+                alunosSelecionadosParaExclusao.delete(hashPublico);
+            } else {
+                alunosSelecionadosParaExclusao.add(hashPublico);
+            }
+            atualizarBarraAcaoMassa();
+        }
+
+        function limparSelecoesGlobais() {
+            alunosSelecionadosParaExclusao.clear();
+            atualizarBarraAcaoMassa();
+            renderizarGridPaginado(); // Desmarca todos visualmente
+        }
+
+        // Mostra a barra flutuante se houver atletas selecionados
+        function atualizarBarraAcaoMassa() {
+            const barra = document.getElementById('barra-acao-massa');
+            const txtQtd = document.getElementById('texto-qtd-selecionados');
+            if (alunosSelecionadosParaExclusao.size > 0) {
+                barra.style.display = 'flex';
+                txtQtd.innerText = alunosSelecionadosParaExclusao.size;
+            } else {
+                barra.style.display = 'none';
+            }
+        }
+
+        // Exclusão Individual (Botão da Lixeira no Card)
+        async function excluirAlunoIndividual(hashPublico, nome) {
+            if (!confirm(`⚠️ Tem certeza que deseja EXCLUIR permanentemente o atleta: ${nome}?`)) return;
+            
+            const token = localStorage.getItem('interclassToken');
+            try {
+                const res = await fetch(`/api/alunos/${hashPublico}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (res.ok) {
+                    alunosSelecionadosParaExclusao.delete(hashPublico); // Limpa da lista se estivesse marcado
+                    await buscarAlunosDoServidor(); // Atualiza tudo do banco
+                } else {
+                    alert("❌ Falha ao tentar excluir o atleta. Acesso negado.");
+                }
+            } catch(e) {
+                alert("🚨 Erro de comunicação com o servidor.");
+            }
+        }
+
+        // Exclusão em Massa (Botão Vermelho da Barra Flutuante)
+        async function excluirAlunosEmMassa() {
+            const qtd = alunosSelecionadosParaExclusao.size;
+            if (!confirm(`⚠️ ATENÇÃO: Você está prestes a EXCLUIR PERMANENTEMENTE ${qtd} atleta(s) do seu banco de dados.\n\nDeseja continuar?`)) return;
+            
+            const token = localStorage.getItem('interclassToken');
+            let sucessoCount = 0;
+            
+            document.body.style.cursor = 'wait';
+            
+            // Usamos Promise.all para excluir vários ao mesmo tempo, mantendo a velocidade
+            const promessasExclusao = Array.from(alunosSelecionadosParaExclusao).map(hashPublico => 
+                fetch(`/api/alunos/${hashPublico}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(res => {
+                    if(res.ok) sucessoCount++;
+                }).catch(e => console.error("Erro na exclusão de um atleta:", e))
+            );
+            
+            await Promise.all(promessasExclusao);
+            
+            document.body.style.cursor = 'default';
+            alert(`✅ Exclusão concluída! ${sucessoCount} atleta(s) removido(s) com sucesso.`);
+            
+            limparSelecoesGlobais(); // Limpa e esconde a barra
+            await buscarAlunosDoServidor(); // Refaz a contagem e filtros na tela
         }
 
         function renderizarControlesPaginacao(totalPaginas) {
@@ -413,16 +471,13 @@
         }
     </script>
 	
-	<!-- Espaço onde a barra inferior será injetada -->
 	<div id="footbar-placeholder"></div>
 
 	<script>
-	    // Carregar a barra de navegação inferior dinamicamente
 	    fetch('/footbar.html')
 	        .then(r => r.text())
 	        .then(h => {
 	            document.getElementById('footbar-placeholder').innerHTML = h;
-	            // Adiciona um espaço extra no fim da página para a lista de alunos não ficar escondida atrás da barra
 	            document.body.style.paddingBottom = '80px'; 
 	        });
 	</script>

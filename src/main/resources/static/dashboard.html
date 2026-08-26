@@ -178,209 +178,223 @@
 
     <div id="footbar-placeholder"></div>
 
-    <script>
-		let profName = localStorage.getItem('profNome') || 'Professor';
-		        document.getElementById('dash-prof-nome').innerText = profName;
-		        
-		        // 🔥 CORREÇÃO: Pega apenas o Hash Real salvo no Login. Se não tiver, não inventa!
-		        let profHash = localStorage.getItem('profHash');
-		        
-		        let base = window.location.origin;
-		        if (base === "null" || base.includes("file://")) {
-		            base = "http://localhost:8080"; 
-		        }
+	<script>
+	        let profName = localStorage.getItem('profNome') || 'Professor';
+	        if (profName !== 'Professor') {
+	            document.getElementById('dash-prof-nome').innerText = profName.replace(/"/g, '');
+	        }
+	        
+	        // 🔥 A MÁGICA ACONTECE AQUI: Adicionamos o "profId" (que o login usa) na busca!
+	        let rawHash = localStorage.getItem('profId') || localStorage.getItem('profHash') || localStorage.getItem('hashPublico') || localStorage.getItem('professorHash');
+	        let profHash = "";
 
-		        if (profHash) {
-		            document.getElementById('link-publico').value = `${base}/cadastro-aluno.html?ref=${profHash}`;
-		        } else {
-		            document.getElementById('link-publico').value = "⚠️ Erro: Faça login novamente para carregar seu link.";
-		        }
+	        // Validação rigorosa: Não permite "null", "undefined" ou o hash antigo "PROF_MXW"
+	        if (rawHash && rawHash !== 'null' && rawHash !== 'undefined' && !rawHash.includes('PROF_MXW')) {
+	            profHash = rawHash.replace(/"/g, '').trim();
+	            // Padroniza a chave correta no navegador
+	            localStorage.setItem('profHash', profHash); 
+	        } else {
+	            localStorage.removeItem('profHash');
+	        }
+	        
+	        let base = window.location.origin;
+	        if (base === "null" || base.includes("file://")) {
+	            base = "http://localhost:8080"; 
+	        }
 
-        // A lista universal de modalidades
-        const listaTodasModalidades = [
-            { id: 1, nomeEsporte: 'Futsal', icone: '⚽' }, { id: 2, nomeEsporte: 'Vôlei', icone: '🏐' },
-            { id: 3, nomeEsporte: 'Basquete', icone: '🏀' }, { id: 4, nomeEsporte: 'Handebol', icone: '🤾' },
-            { id: 5, nomeEsporte: 'Queimada', icone: '☄️' }, { id: 6, nomeEsporte: 'Vôlei de Areia', icone: '🏖️' },
-            { id: 7, nomeEsporte: 'Natação', icone: '🏊' }, { id: 8, nomeEsporte: 'Atletismo', icone: '🏃' },
-            { id: 9, nomeEsporte: 'Tênis de Mesa', icone: '🏓' }, { id: 10, nomeEsporte: 'Xadrez', icone: '♟️' },
-            { id: 11, nomeEsporte: 'Dama', icone: '🏁' }, { id: 12, nomeEsporte: 'E-Sports', icone: '🎮' }
-        ];
+	        if (profHash) {
+	            document.getElementById('link-publico').value = `${base}/cadastro-aluno.html?ref=${profHash}`;
+	        } else {
+	            document.getElementById('link-publico').value = "⚠️ ALERTA: Faça SAIR (Logout) e Login novamente!";
+	        }
 
-        window.onload = async () => {
-            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
-            
-            atualizarLinkDinamico();
-            carregarMetricasDaAPI();
-        };
+	        // A lista universal de modalidades
+	        const listaTodasModalidades = [
+	            { id: 1, nomeEsporte: 'Futsal', icone: '⚽' }, { id: 2, nomeEsporte: 'Vôlei', icone: '🏐' },
+	            { id: 3, nomeEsporte: 'Basquete', icone: '🏀' }, { id: 4, nomeEsporte: 'Handebol', icone: '🤾' },
+	            { id: 5, nomeEsporte: 'Queimada', icone: '☄️' }, { id: 6, nomeEsporte: 'Vôlei de Areia', icone: '🏖️' },
+	            { id: 7, nomeEsporte: 'Natação', icone: '🏊' }, { id: 8, nomeEsporte: 'Atletismo', icone: '🏃' },
+	            { id: 9, nomeEsporte: 'Tênis de Mesa', icone: '🏓' }, { id: 10, nomeEsporte: 'Xadrez', icone: '♟️' },
+	            { id: 11, nomeEsporte: 'Dama', icone: '🏁' }, { id: 12, nomeEsporte: 'E-Sports', icone: '🎮' }
+	        ];
 
-        // 🔥 ATUALIZA O LINK INJETANDO OS ESPORTES DENTRO DELE 🔥
-        function atualizarLinkDinamico() {
-            let cacheLocal = JSON.parse(localStorage.getItem('modalidadesAtivas'));
-            let linkStr = `${base}/cadastro-aluno.html?ref=${profHash}`;
-            
-            // Se tiver esportes no cache, joga na URL para o cadastro-aluno ler
-            if(cacheLocal && cacheLocal.length > 0) {
-                let esportesFormatados = cacheLocal.join(',');
-                linkStr += `&mods=${encodeURIComponent(esportesFormatados)}`;
-            }
-            
-            document.getElementById('link-publico').value = linkStr;
-        }
+	        window.onload = async () => {
+	            fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+	            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+	            
+	            atualizarLinkDinamico();
+	            carregarMetricasDaAPI();
+	        };
 
-        async function carregarMetricasDaAPI() {
-            const token = localStorage.getItem('interclassToken');
-            
-            try {
-                const resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
-                if(resAlunos.ok) {
-                    let alunos = await resAlunos.json();
-                    document.getElementById('val-inscritos').innerText = alunos.length;
-                }
+	        // 🔥 ATUALIZA O LINK INJETANDO OS ESPORTES DENTRO DELE 🔥
+	        function atualizarLinkDinamico() {
+	            if (!profHash) return; // Impede a geração de link com erro
 
-                const resJogos = await fetch('/api/jogos', { headers: { 'Authorization': `Bearer ${token}` } });
-                if(resJogos.ok) {
-                    let jogos = await resJogos.json();
-                    
-                    let countEsportes = new Set(jogos.map(j => j.esporte || (j.modalidade ? j.modalidade.nomeEsporte : ''))).size;
-                    document.getElementById('val-torneios').innerText = countEsportes;
-                    
-                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                    let encerrados = jogos.filter(j => j.status === 'FINALIZADO' || rels[String(j.id)]).length;
-                    document.getElementById('val-partidas').innerText = encerrados;
+	            let cacheLocal = JSON.parse(localStorage.getItem('modalidadesAtivas'));
+	            let linkStr = `${base}/cadastro-aluno.html?ref=${profHash}`;
+	            
+	            // Se tiver esportes no cache, joga na URL para o cadastro-aluno ler
+	            if(cacheLocal && cacheLocal.length > 0) {
+	                let esportesFormatados = cacheLocal.join(',');
+	                linkStr += `&mods=${encodeURIComponent(esportesFormatados)}`;
+	            }
+	            
+	            document.getElementById('link-publico').value = linkStr;
+	        }
 
-                    renderizarLotesDashboard(jogos);
-                }
+	        async function carregarMetricasDaAPI() {
+	            const token = localStorage.getItem('interclassToken');
+	            
+	            try {
+	                const resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+	                if(resAlunos.ok) {
+	                    let alunos = await resAlunos.json();
+	                    document.getElementById('val-inscritos').innerText = alunos.length;
+	                }
 
-            } catch (error) {
-                console.warn("Modo offline: ", error);
-                document.getElementById('lista-lotes-ativos').innerHTML = `<p style="color: #ff0055; text-align: center;">Modo Offline. Impossível carregar lotes do banco de dados.</p>`;
-            }
-        }
+	                const resJogos = await fetch('/api/jogos', { headers: { 'Authorization': `Bearer ${token}` } });
+	                if(resJogos.ok) {
+	                    let jogos = await resJogos.json();
+	                    
+	                    let countEsportes = new Set(jogos.map(j => j.esporte || (j.modalidade ? j.modalidade.nomeEsporte : ''))).size;
+	                    document.getElementById('val-torneios').innerText = countEsportes;
+	                    
+	                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+	                    let encerrados = jogos.filter(j => j.status === 'FINALIZADO' || rels[String(j.id)]).length;
+	                    document.getElementById('val-partidas').innerText = encerrados;
 
-        function renderizarLotesDashboard(todosJogos) {
-            const container = document.getElementById('lista-lotes-ativos');
-            
-            let lotesDict = {};
-            todosJogos.forEach(j => {
-                let gen = (j.genero || 'geral').toLowerCase();
-                if(!lotesDict[gen]) lotesDict[gen] = { count: 0, encerrados: 0, esportes: new Set() };
-                
-                lotesDict[gen].count++;
-                if (j.status === 'FINALIZADO') lotesDict[gen].encerrados++;
-                let eNome = j.esporte || (j.modalidade ? j.modalidade.nomeEsporte : 'Esporte');
-                lotesDict[gen].esportes.add(eNome);
-            });
+	                    renderizarLotesDashboard(jogos);
+	                }
 
-            if (Object.keys(lotesDict).length === 0) {
-                container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5);">Você ainda não criou nenhum torneio.</p>`;
-                return;
-            }
+	            } catch (error) {
+	                console.warn("Modo offline: ", error);
+	                document.getElementById('lista-lotes-ativos').innerHTML = `<p style="color: #ff0055; text-align: center;">Modo Offline. Impossível carregar lotes do banco de dados.</p>`;
+	            }
+	        }
 
-            container.innerHTML = '';
-            for (let gen in lotesDict) {
-                let infos = lotesDict[gen];
-                let cssClass = gen === 'masculino' ? 'lote-masc' : (gen === 'feminino' ? 'lote-fem' : 'lote-misto');
-                let espTexto = Array.from(infos.esportes).slice(0, 3).join(', ') + (infos.esportes.size > 3 ? '...' : '');
+	        function renderizarLotesDashboard(todosJogos) {
+	            const container = document.getElementById('lista-lotes-ativos');
+	            
+	            let lotesDict = {};
+	            todosJogos.forEach(j => {
+	                let gen = (j.genero || 'geral').toLowerCase();
+	                if(!lotesDict[gen]) lotesDict[gen] = { count: 0, encerrados: 0, esportes: new Set() };
+	                
+	                lotesDict[gen].count++;
+	                if (j.status === 'FINALIZADO') lotesDict[gen].encerrados++;
+	                let eNome = j.esporte || (j.modalidade ? j.modalidade.nomeEsporte : 'Esporte');
+	                lotesDict[gen].esportes.add(eNome);
+	            });
 
-                container.innerHTML += `
-                    <div class="lote-item ${cssClass}">
-                        <div class="lote-info">
-                            <h4 style="color: ${gen === 'masculino' ? '#00f2fe' : (gen === 'feminino' ? '#ff00de' : '#b200ff')}">${gen}</h4>
-                            <p><b>${infos.count}</b> Partidas | ${espTexto}</p>
-                        </div>
-                        <button class="btn-acao" style="background: rgba(255,255,255,0.1); color: #fff;" onclick="window.location.href='/tabelas.html'">Acessar Tabela ➔</button>
-                    </div>
-                `;
-            }
-        }
+	            if (Object.keys(lotesDict).length === 0) {
+	                container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5);">Você ainda não criou nenhum torneio.</p>`;
+	                return;
+	            }
 
-        // 🔥 RENDERIZAÇÃO DOS BLOCOS (TUDO DESMARCADO POR PADRÃO) 🔥
-        function abrirPainelInscricoes() {
-            document.getElementById('modal-link').style.display = 'flex';
-            const container = document.getElementById('painel-controle-modalidades');
-            
-            let cacheAntigo = JSON.parse(localStorage.getItem('modalidadesAtivas'));
-            let nomesAtivos = [];
+	            container.innerHTML = '';
+	            for (let gen in lotesDict) {
+	                let infos = lotesDict[gen];
+	                let cssClass = gen === 'masculino' ? 'lote-masc' : (gen === 'feminino' ? 'lote-fem' : 'lote-misto');
+	                let espTexto = Array.from(infos.esportes).slice(0, 3).join(', ') + (infos.esportes.size > 3 ? '...' : '');
 
-            if (cacheAntigo !== null && Array.isArray(cacheAntigo)) {
-                nomesAtivos = cacheAntigo.map(n => n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
-            } else {
-                nomesAtivos = []; // 100% vazio por padrão
-                localStorage.setItem('modalidadesAtivas', JSON.stringify(nomesAtivos));
-            }
+	                container.innerHTML += `
+	                    <div class="lote-item ${cssClass}">
+	                        <div class="lote-info">
+	                            <h4 style="color: ${gen === 'masculino' ? '#00f2fe' : (gen === 'feminino' ? '#ff00de' : '#b200ff')}">${gen}</h4>
+	                            <p><b>${infos.count}</b> Partidas | ${espTexto}</p>
+	                        </div>
+	                        <button class="btn-acao" style="background: rgba(255,255,255,0.1); color: #fff;" onclick="window.location.href='/tabelas.html'">Acessar Tabela ➔</button>
+	                    </div>
+	                `;
+	            }
+	        }
 
-            container.innerHTML = '';
+	        // 🔥 RENDERIZAÇÃO DOS BLOCOS (TUDO DESMARCADO POR PADRÃO) 🔥
+	        function abrirPainelInscricoes() {
+	            document.getElementById('modal-link').style.display = 'flex';
+	            const container = document.getElementById('painel-controle-modalidades');
+	            
+	            let cacheAntigo = JSON.parse(localStorage.getItem('modalidadesAtivas'));
+	            let nomesAtivos = [];
 
-            listaTodasModalidades.forEach(mod => {
-                let nomeCheck = mod.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-                let isAtiva = nomesAtivos.includes(nomeCheck);
-                
-                let selectedClass = isAtiva ? 'selected' : '';
+	            if (cacheAntigo !== null && Array.isArray(cacheAntigo)) {
+	                nomesAtivos = cacheAntigo.map(n => n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
+	            } else {
+	                nomesAtivos = []; // 100% vazio por padrão
+	                localStorage.setItem('modalidadesAtivas', JSON.stringify(nomesAtivos));
+	            }
 
-                container.innerHTML += `
-                    <div class="mod-block ${selectedClass}" onclick="toggleModBlock(this)">
-                        <div class="mod-icon">${mod.icone}</div>
-                        <div class="mod-name">${mod.nomeEsporte}</div>
-                    </div>
-                `;
-            });
-            
-            atualizarLinkDinamico();
-        }
+	            container.innerHTML = '';
 
-        // 🔥 FUNÇÃO DE CLIQUE NO BLOCO QUE ATUALIZA O LINK EM TEMPO REAL 🔥
-        function toggleModBlock(elemento) {
-            elemento.classList.toggle('selected');
-            
-            let cacheLocal = [];
-            document.querySelectorAll('.mod-block.selected .mod-name').forEach(el => {
-                cacheLocal.push(el.innerText.trim());
-            });
-            
-            // Grava na memória
-            localStorage.setItem('modalidadesAtivas', JSON.stringify(cacheLocal));
-            
-            // Atualiza o link público instantaneamente com os novos esportes!
-            atualizarLinkDinamico();
-        }
+	            listaTodasModalidades.forEach(mod => {
+	                let nomeCheck = mod.nomeEsporte.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+	                let isAtiva = nomesAtivos.includes(nomeCheck);
+	                
+	                let selectedClass = isAtiva ? 'selected' : '';
 
-        function fecharModalControle() {
-            document.getElementById('modal-link').style.display = 'none';
-        }
+	                container.innerHTML += `
+	                    <div class="mod-block ${selectedClass}" onclick="toggleModBlock(this)">
+	                        <div class="mod-icon">${mod.icone}</div>
+	                        <div class="mod-name">${mod.nomeEsporte}</div>
+	                    </div>
+	                `;
+	            });
+	            
+	            atualizarLinkDinamico();
+	        }
 
-        function copiarLink() {
-            const linkInput = document.getElementById('link-publico');
-            const linkText = linkInput.value;
+	        // 🔥 FUNÇÃO DE CLIQUE NO BLOCO QUE ATUALIZA O LINK EM TEMPO REAL 🔥
+	        function toggleModBlock(elemento) {
+	            elemento.classList.toggle('selected');
+	            
+	            let cacheLocal = [];
+	            document.querySelectorAll('.mod-block.selected .mod-name').forEach(el => {
+	                cacheLocal.push(el.innerText.trim());
+	            });
+	            
+	            // Grava na memória
+	            localStorage.setItem('modalidadesAtivas', JSON.stringify(cacheLocal));
+	            
+	            // Atualiza o link público instantaneamente com os novos esportes!
+	            atualizarLinkDinamico();
+	        }
 
-            if (!linkText) {
-                alert("⚠️ Nenhum link disponível para copiar.");
-                return;
-            }
+	        function fecharModalControle() {
+	            document.getElementById('modal-link').style.display = 'none';
+	        }
 
-            const ghostInput = document.createElement('textarea');
-            ghostInput.value = linkText;
-            ghostInput.style.position = 'absolute';
-            ghostInput.style.left = '-9999px'; 
-            ghostInput.setAttribute('readonly', ''); 
+	        function copiarLink() {
+	            const linkInput = document.getElementById('link-publico');
+	            const linkText = linkInput.value;
 
-            document.body.appendChild(ghostInput);
-            
-            ghostInput.select();
-            ghostInput.setSelectionRange(0, 99999); 
+	            if (!linkText || linkText.includes("ALERTA")) {
+	                alert("⚠️ Nenhum link disponível para copiar. Por favor, faça login novamente.");
+	                return;
+	            }
 
-            try {
-                document.execCommand('copy');
-                alert("✅ Link copiado com sucesso! Envie para os seus alunos.");
-            } catch (err) {
-                alert("⚠️ Seu navegador bloqueou a cópia. Selecione o texto e copie manualmente.");
-            }
+	            const ghostInput = document.createElement('textarea');
+	            ghostInput.value = linkText;
+	            ghostInput.style.position = 'absolute';
+	            ghostInput.style.left = '-9999px'; 
+	            ghostInput.setAttribute('readonly', ''); 
 
-            document.body.removeChild(ghostInput); 
-        }
+	            document.body.appendChild(ghostInput);
+	            
+	            ghostInput.select();
+	            ghostInput.setSelectionRange(0, 99999); 
 
-        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
-        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
-    </script>
+	            try {
+	                document.execCommand('copy');
+	                alert("✅ Link copiado com sucesso! Envie para os seus alunos.");
+	            } catch (err) {
+	                alert("⚠️ Seu navegador bloqueou a cópia. Selecione o texto e copie manualmente.");
+	            }
+
+	            document.body.removeChild(ghostInput); 
+	        }
+
+	        window.toggleUserMenu = function(e) { e.stopPropagation(); const d = document.getElementById('user-dropdown'); if(d) d.style.display = d.style.display === 'none' ? 'block' : 'none'; };
+	        document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
+	    </script>
 </body>
 </html>

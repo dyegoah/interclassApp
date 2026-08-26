@@ -122,11 +122,14 @@
                     const dados = await response.json();
                     localStorage.setItem('interclassToken', dados.token);
                     localStorage.setItem('profId', dados.hash);
+                    
+                    // 🔥 CORREÇÃO: Salvando a variável exata que o Dashboard procura!
+                    localStorage.setItem('profHash', dados.hash); 
+                    
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
                     
-                    // Professor normal vai para o Dashboard (index.html)
-                    window.location.replace('/index.html'); 
+                    window.location.replace('/dashboard.html'); 
                 } else {
                     const erroServidor = await response.text();
                     
@@ -174,10 +177,13 @@
                     const dados = await response.json();
                     localStorage.setItem('interclassToken', dados.token);
                     localStorage.setItem('profId', dados.hash);
+                    
+                    // 🔥 CORREÇÃO: Salvando a variável exata que o Dashboard procura!
+                    localStorage.setItem('profHash', dados.hash);
+                    
                     localStorage.setItem('profNome', dados.nome);
                     localStorage.setItem('profEscola', dados.escola);
                     
-                    // Admin Master vai para o cofre (admin.html)
                     window.location.replace('/admin.html'); 
                 } else {
                     const erroServidor = await response.text();

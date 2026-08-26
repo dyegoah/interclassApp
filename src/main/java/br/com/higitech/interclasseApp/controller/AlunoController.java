@@ -28,10 +28,8 @@ public class AlunoController {
 
     @Autowired
     private AlunoRepository alunoRepository;
-
     @Autowired
     private ProfessorRepository professorRepository;
-
     @Autowired
     private ModalidadeRepository modalidadeRepository;
 
@@ -74,12 +72,12 @@ public class AlunoController {
         */
 
         long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()
-                .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte) &&
-                             a.getGenero() != null && a.getGenero().equalsIgnoreCase(dto.genero))
+                .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte)
+                          && a.getGenero() != null && a.getGenero().equalsIgnoreCase(dto.genero))
                 .count();
 
         if (totalInscritosNaModalidade >= 100) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Desculpe, as 100 vagas para " + dto.esporte + " estão esgotadas!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Desculpe, as vagas para " + dto.esporte + " esgotaram.");
         }
 
         Aluno novoAluno = new Aluno();
@@ -90,6 +88,7 @@ public class AlunoController {
         novoAluno.setIconeEsporte(dto.iconeEsporte);
         novoAluno.setGenero(dto.genero);
         novoAluno.setProfessor(professor);
+
         alunoRepository.save(novoAluno);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição confirmada na Modalidade!");
