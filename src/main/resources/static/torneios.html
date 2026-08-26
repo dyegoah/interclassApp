@@ -172,11 +172,6 @@
                 let bloqueioAvisoHtml = '';
                 let isBloqueado = false;
 
-                // ==========================================
-                // 🔥 LÓGICA DE VALIDAÇÃO DA IA 🔥
-                // ==========================================
-                
-                // TRAVA ABSOLUTA SE NÃO HOUVER INSCRIÇÕES
                 if (inscritosBrutos.length === 0) {
                     isBloqueado = true; bloqueioGeralCritico = true;
                     bloqueioAvisoHtml = `
@@ -306,6 +301,14 @@
                     esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
                     esp.tipoDisputa = document.getElementById(`tipoDisputa-${esp.id}`).value;
                     esp.configurado = true;
+                    
+                    // 🔥 CORREÇÃO: Injetando o nome correto e o ícone para não dar "Modalidade Desconhecida"
+                    let modBase = modalidadeDefs.find(m => m.id === esp.id);
+                    if (modBase) {
+                        esp.nome = modBase.nome;
+                        esp.esporte = modBase.nome;
+                        esp.icone = modBase.icone;
+                    }
                 }
             });
             

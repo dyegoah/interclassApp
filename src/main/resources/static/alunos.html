@@ -336,11 +336,18 @@
             document.getElementById('titulo-lista-alunos').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function iniciarSetupDoEsporte(nomeEsporte) {
-            const defEsporte = modalidadeDefs.find(m => m.nome === nomeEsporte);
-            localStorage.setItem('arenaSetup', JSON.stringify({ genero: generoAtual, esportes: [ { id: defEsporte.id, configurado: false } ] }));
-            window.location.href = '/torneios.html';
-        }
+		function iniciarSetupDoEsporte(nomeEsporte) {
+		    const defEsporte = modalidadeDefs.find(m => m.nome === nomeEsporte);
+		    
+		    // 🔥 CORREÇÃO 1: Salvando o NOME do esporte explícito para evitar a "Modalidade Desconhecida"
+		    localStorage.setItem('arenaSetup', JSON.stringify({ 
+		        genero: generoAtual, 
+		        nomeEsporte: nomeEsporte, // O segredo está aqui! O nome agora viaja junto.
+		        esportes: [ { id: defEsporte ? defEsporte.id : 99, nome: nomeEsporte, configurado: false } ] 
+		    }));
+		    
+		    window.location.href = '/torneios.html';
+		}
 
         function renderizarGridPaginado() {
             const container = document.getElementById('grid-alunos');
