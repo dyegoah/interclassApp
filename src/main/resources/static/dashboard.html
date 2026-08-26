@@ -70,7 +70,7 @@
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; text-transform: uppercase; text-decoration: none;}
         .btn-acao:hover { box-shadow: 0 0 15px var(--theme-glow); background: #fff; }
 
-        /* 🔥 ESTILOS DOS BLOCOS DE MODALIDADE (Visual Original) 🔥 */
+        /* 🔥 ESTILOS ORIGINAIS DOS BLOCOS DE MODALIDADE 🔥 */
         .mod-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; margin-bottom: 20px; max-height: 280px; overflow-y: auto; padding: 5px; }
         .mod-block { background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.3s; user-select: none; }
         .mod-block:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
@@ -151,7 +151,7 @@
 
     </div>
 
-    <!-- 🔥 MODAL COM OS BLOCOS DE OPÇÃO (BLINDADO CONTRA ERRO 404) 🔥 -->
+    <!-- 🔥 MODAL COM OS BLOCOS DE OPÇÃO (Layout Antigo e Limpo) 🔥 -->
     <div id="modal-link" class="glass" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; justify-content: center; align-items: center; background: rgba(0,0,0,0.9);">
         <div style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid var(--theme-primary); text-align: center; max-width: 550px; width: 95%;">
             
@@ -166,7 +166,7 @@
             
             <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
 
-            <p style="font-family: 'Orbitron'; font-size: 0.9rem; color: #fff; margin-bottom: 10px;">Copie o link de convite:</p>
+            <p style="font-family: 'Orbitron'; font-size: 0.9rem; color: #fff; margin-bottom: 10px;">Copie o link gerado abaixo:</p>
             <input type="text" id="link-publico" readonly style="width: 100%; padding: 15px; border-radius: 8px; border: 1px dashed var(--theme-primary); background: #000; color: #fff; font-family: 'Segoe UI'; margin-bottom: 20px; text-align: center;">
             
             <div style="display: flex; gap: 10px;">
@@ -179,23 +179,24 @@
     <div id="footbar-placeholder"></div>
 
     <script>
-        let profName = localStorage.getItem('profNome') || 'Professor';
-        document.getElementById('dash-prof-nome').innerText = profName;
-        
-        // 🔥 CORREÇÃO: Lê apenas o Hash Real existente do Login. Nada de inventar hash! 🔥
-        let profHash = localStorage.getItem('profHash');
-        
-        let base = window.location.origin;
-        if (base === "null" || base.includes("file://")) {
-            base = "http://localhost:8080"; 
-        }
+		let profName = localStorage.getItem('profNome') || 'Professor';
+		        document.getElementById('dash-prof-nome').innerText = profName;
+		        
+		        // 🔥 CORREÇÃO: Pega apenas o Hash Real salvo no Login. Se não tiver, não inventa!
+		        let profHash = localStorage.getItem('profHash');
+		        
+		        let base = window.location.origin;
+		        if (base === "null" || base.includes("file://")) {
+		            base = "http://localhost:8080"; 
+		        }
 
-        if (profHash) {
-            document.getElementById('link-publico').value = `${base}/cadastro-aluno.html?ref=${profHash}`;
-        } else {
-            document.getElementById('link-publico').value = "⚠️ Erro: Faça login novamente para carregar o link.";
-        }
+		        if (profHash) {
+		            document.getElementById('link-publico').value = `${base}/cadastro-aluno.html?ref=${profHash}`;
+		        } else {
+		            document.getElementById('link-publico').value = "⚠️ Erro: Faça login novamente para carregar seu link.";
+		        }
 
+        // A lista universal de modalidades
         const listaTodasModalidades = [
             { id: 1, nomeEsporte: 'Futsal', icone: '⚽' }, { id: 2, nomeEsporte: 'Vôlei', icone: '🏐' },
             { id: 3, nomeEsporte: 'Basquete', icone: '🏀' }, { id: 4, nomeEsporte: 'Handebol', icone: '🤾' },
@@ -213,12 +214,12 @@
             carregarMetricasDaAPI();
         };
 
-        // 🔥 FUNÇÃO PARA INJETAR AS MODALIDADES NO LINK 🔥
+        // 🔥 ATUALIZA O LINK INJETANDO OS ESPORTES DENTRO DELE 🔥
         function atualizarLinkDinamico() {
-            if (!profHash) return;
             let cacheLocal = JSON.parse(localStorage.getItem('modalidadesAtivas'));
             let linkStr = `${base}/cadastro-aluno.html?ref=${profHash}`;
             
+            // Se tiver esportes no cache, joga na URL para o cadastro-aluno ler
             if(cacheLocal && cacheLocal.length > 0) {
                 let esportesFormatados = cacheLocal.join(',');
                 linkStr += `&mods=${encodeURIComponent(esportesFormatados)}`;
@@ -294,23 +295,18 @@
             }
         }
 
-        // 🔥 GERA OS BLOCOS (SEM API EXTERNA - APENAS FRONT-END) 🔥
+        // 🔥 RENDERIZAÇÃO DOS BLOCOS (TUDO DESMARCADO POR PADRÃO) 🔥
         function abrirPainelInscricoes() {
             document.getElementById('modal-link').style.display = 'flex';
             const container = document.getElementById('painel-controle-modalidades');
             
-            if(!profHash) {
-                container.innerHTML = '<p style="color:#ff0055;">⚠️ Faça login novamente para gerenciar.</p>';
-                return;
-            }
-
             let cacheAntigo = JSON.parse(localStorage.getItem('modalidadesAtivas'));
             let nomesAtivos = [];
 
-            if (cacheAntigo && Array.isArray(cacheAntigo)) {
+            if (cacheAntigo !== null && Array.isArray(cacheAntigo)) {
                 nomesAtivos = cacheAntigo.map(n => n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim());
             } else {
-                nomesAtivos = []; 
+                nomesAtivos = []; // 100% vazio por padrão
                 localStorage.setItem('modalidadesAtivas', JSON.stringify(nomesAtivos));
             }
 
@@ -323,7 +319,7 @@
                 let selectedClass = isAtiva ? 'selected' : '';
 
                 container.innerHTML += `
-                    <div class="mod-block ${selectedClass}" onclick="toggleModBlockLocal(this)">
+                    <div class="mod-block ${selectedClass}" onclick="toggleModBlock(this)">
                         <div class="mod-icon">${mod.icone}</div>
                         <div class="mod-name">${mod.nomeEsporte}</div>
                     </div>
@@ -333,8 +329,8 @@
             atualizarLinkDinamico();
         }
 
-        // 🔥 FUNÇÃO DE CLIQUE QUE GRAVA LOCALMENTE E ATUALIZA O LINK NA HORA 🔥
-        function toggleModBlockLocal(elemento) {
+        // 🔥 FUNÇÃO DE CLIQUE NO BLOCO QUE ATUALIZA O LINK EM TEMPO REAL 🔥
+        function toggleModBlock(elemento) {
             elemento.classList.toggle('selected');
             
             let cacheLocal = [];
@@ -342,8 +338,10 @@
                 cacheLocal.push(el.innerText.trim());
             });
             
-            // Grava na memória e atualiza a URL instantaneamente!
+            // Grava na memória
             localStorage.setItem('modalidadesAtivas', JSON.stringify(cacheLocal));
+            
+            // Atualiza o link público instantaneamente com os novos esportes!
             atualizarLinkDinamico();
         }
 
@@ -355,8 +353,8 @@
             const linkInput = document.getElementById('link-publico');
             const linkText = linkInput.value;
 
-            if (!linkText || linkText.includes("Erro")) {
-                alert("⚠️ Nenhum link válido disponível para copiar.");
+            if (!linkText) {
+                alert("⚠️ Nenhum link disponível para copiar.");
                 return;
             }
 
