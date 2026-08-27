@@ -58,7 +58,7 @@ public class JogoService {
                 String esporte = jData.get("esporte") != null ? jData.get("esporte").toString() : "";
                 String titulo = jData.get("titulo") != null ? jData.get("titulo").toString() : "";
 
-                // 4. Injeção segura de dados (Independente do nome que você deu às variáveis no model Jogo.java)
+                // 4. Injeção segura de dados
                 injetarDado(jogo, "setGenero", generoJogo);
                 injetarDado(jogo, "setDataJogo", diaId);
                 injetarDado(jogo, "setDiaId", diaId);
@@ -87,5 +87,10 @@ public class JogoService {
 
     public List<Jogo> buscarJogosPorProfessor(Professor professorLogado) {
         return jogoRepository.findByProfessorId(professorLogado.getId());
+    }
+
+    // 🔥 NOVO MÉTODO PARA A ROTA PÚBLICA (LINK DOS ALUNOS) 🔥
+    public List<Jogo> buscarJogosPorProfessorId(Long professorId) {
+        return jogoRepository.findByProfessorId(professorId);
     }
 }

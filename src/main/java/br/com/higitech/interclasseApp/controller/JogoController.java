@@ -54,4 +54,21 @@ public class JogoController {
     public ResponseEntity<List<Jogo>> getAllJogos(@AuthenticationPrincipal Professor professorLogado) {
         return ResponseEntity.ok(jogoService.buscarJogosPorProfessor(professorLogado));
     }
+    
+ // 🌐 ROTA PÚBLICA: Permite que alunos vejam os jogos do professor sem token de login
+    @GetMapping("/public/{professorId}/lote/{genero}")
+    public ResponseEntity<List<Jogo>> getJogosPublicoLote(@PathVariable Long professorId, @PathVariable String genero) {
+        List<Jogo> todos = jogoService.buscarJogosPorProfessorId(professorId);
+        
+        List<Jogo> filtrados = todos.stream().filter(j -> {
+            try {
+                String gen = (String) j.getClass().getMethod("getGenero").invoke(j);
+                return genero.equalsIgnoreCase(gen) || "geral".equalsIgnoreCase(gen);
+            } catch (Exception e) {
+                return true;
+            }
+        }).collect(Collectors.toList());
+        
+        return ResponseEntity.ok(filtrados);
+    }
 }
