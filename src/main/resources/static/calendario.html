@@ -137,6 +137,9 @@
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+		
+		
+		
     </style>
 	
 	<script>
@@ -489,263 +492,275 @@
         }
 
 		function gerarEstruturaDeDados(strInicio, strFim) {
-            diasGeradosGlobais = [];
-            jogosGeradosGlobais = [];
+		            diasGeradosGlobais = [];
+		            jogosGeradosGlobais = [];
 
-            const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
-            const simultaneo = document.getElementById('check-simultaneo').checked;
-            
-            let horaInicialBase = document.getElementById('hora-inicio').value || "08:00";
-            let horaFinalBase = document.getElementById('hora-fim').value || "12:00";
-            let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
-            let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
-            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
+		            const quadrasArray = document.getElementById('quadras-escola').value.split(',').map(q => q.trim());
+		            const simultaneo = document.getElementById('check-simultaneo').checked;
+		            
+		            let horaInicialBase = document.getElementById('hora-inicio').value || "08:00";
+		            let horaFinalBase = document.getElementById('hora-fim').value || "12:00";
+		            let minInicio = parseInt(horaInicialBase.split(':')[0]) * 60 + parseInt(horaInicialBase.split(':')[1]);
+		            let minFim = parseInt(horaFinalBase.split(':')[0]) * 60 + parseInt(horaFinalBase.split(':')[1]);
+		            let tempoPorJogo = 30 + (parseInt(document.getElementById('intervalo-jogos').value) || 5); 
 
-            let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
-            if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
+		            let slotsMaximosPorQuadraPorDia = Math.floor((minFim - minInicio) / tempoPorJogo);
+		            if(slotsMaximosPorQuadraPorDia <= 0) slotsMaximosPorQuadraPorDia = 1;
 
-            const botoesDias = document.querySelectorAll('.dia-btn.selected');
-            let diasPermitidos = Array.from(botoesDias).map(btn => parseInt(btn.getAttribute('data-dia')));
-            if(diasPermitidos.length === 0) diasPermitidos = [1,2,3,4,5]; 
+		            const botoesDias = document.querySelectorAll('.dia-btn.selected');
+		            let diasPermitidos = Array.from(botoesDias).map(btn => parseInt(btn.getAttribute('data-dia')));
+		            if(diasPermitidos.length === 0) diasPermitidos = [1,2,3,4,5]; 
 
-            let dataAtual = new Date(strInicio + "T12:00:00");
-            let dataFim = new Date(strFim + "T12:00:00");
-            const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
+		            let dataAtual = new Date(strInicio + "T12:00:00");
+		            let dataFim = new Date(strFim + "T12:00:00");
+		            const nomesDias = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
 
-            while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
-                if(diasPermitidos.includes(dataAtual.getDay())) {
-                    diasGeradosGlobais.push({
-                        idStr: dataAtual.toISOString().split('T')[0],
-                        titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
-                        partidasPendentes: []
-                    });
-                }
-                dataAtual.setDate(dataAtual.getDate() + 1);
-            }
+		            while(dataAtual <= dataFim && diasGeradosGlobais.length < 30) {
+		                if(diasPermitidos.includes(dataAtual.getDay())) {
+		                    diasGeradosGlobais.push({
+		                        idStr: dataAtual.toISOString().split('T')[0],
+		                        titulo: `${dataAtual.toLocaleDateString('pt-BR')} - ${nomesDias[dataAtual.getDay()]}`,
+		                        partidasPendentes: []
+		                    });
+		                }
+		                dataAtual.setDate(dataAtual.getDate() + 1);
+		            }
 
-            if(diasGeradosGlobais.length === 0) {
-                alert("Nenhum dia de competição bate com o período selecionado.");
-                refazerCalendario(); return;
-            }
+		            if(diasGeradosGlobais.length === 0) {
+		                alert("Nenhum dia de competição bate com o período selecionado.");
+		                refazerCalendario(); return;
+		            }
 
-            let totalDiasGerados = diasGeradosGlobais.length;
+		            let totalDiasGerados = diasGeradosGlobais.length;
 
-            setupData.esportes.forEach(esp => {
-                let def = modalidadeDefs.find(m => m.id === esp.id);
-                if(!def) return;
-                
-                let isIndividual = esportesIndividuais.includes(def.nome);
-                let tipoDisputa = esp.tipoDisputa || 'coletiva';
-                
-                let nTimes = esp.qtdTimes || 4;
-                let multIdaVolta = esp.idaEVolta ? 2 : 1;
-                let formato = esp.formato || 'eliminatoria';
-                let jogosDesteEsporte = [];
-                
-                let inscritosRaw = listaAlunosGlobais.filter(a => a.esporte === def.nome && a.genero === setupData.genero);
-                let participantes = [];
+		            setupData.esportes.forEach(esp => {
+		                let def = modalidadeDefs.find(m => m.id === esp.id);
+		                if(!def) return;
+		                
+		                let isIndividual = esportesIndividuais.includes(def.nome);
+		                let tipoDisputa = esp.tipoDisputa || 'coletiva';
+		                
+		                let nTimes = esp.qtdTimes || 4;
+		                let multIdaVolta = esp.idaEVolta ? 2 : 1;
+		                let formato = esp.formato || 'eliminatoria';
+		                let jogosDesteEsporte = [];
+		                
+		                let inscritosRaw = listaAlunosGlobais.filter(a => a.esporte === def.nome && a.genero === setupData.genero);
+		                let participantes = [];
 
-                if (tipoDisputa === 'coletiva' || !isIndividual) {
-                    let minReq = isIndividual ? 2 : (minJogadoresPorEsporte[def.nome] || 5);
-                    let contagemPorTurma = {};
-                    inscritosRaw.forEach(a => { contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; });
-                    
-                    let turmasValidas = Object.keys(contagemPorTurma).filter(t => contagemPorTurma[t] >= minReq);
-                    participantes = turmasValidas.map(t => ({ nomeVisivel: t, id: null }));
-                } else {
-                    participantes = inscritosRaw.map(a => ({
-                        nomeVisivel: `${a.nome.split(' ')[0]} (${a.turma})`,
-                        id: a.id
-                    }));
-                }
+		                if (tipoDisputa === 'coletiva' || !isIndividual) {
+		                    let minReq = isIndividual ? 2 : (minJogadoresPorEsporte[def.nome] || 5);
+		                    let contagemPorTurma = {};
+		                    inscritosRaw.forEach(a => { contagemPorTurma[a.turma] = (contagemPorTurma[a.turma] || 0) + 1; });
+		                    
+		                    let turmasValidas = Object.keys(contagemPorTurma).filter(t => contagemPorTurma[t] >= minReq);
+		                    participantes = turmasValidas.map(t => ({ nomeVisivel: t, id: null }));
+		                } else {
+		                    participantes = inscritosRaw.map(a => ({
+		                        nomeVisivel: `${a.nome.split(' ')[0]} (${a.turma})`,
+		                        id: a.id
+		                    }));
+		                }
 
-                participantes = embaralharAlunos(participantes);
+		                participantes = embaralharAlunos(participantes);
 
-                if(participantes.length > 0) {
-                    nTimes = participantes.length;
-                } else {
-                    for(let i=0; i < nTimes; i++) {
-                        let nomeTurma = turmasPlaceholder[i % turmasPlaceholder.length];
-                        if (i >= turmasPlaceholder.length) nomeTurma += ` (T${i+1})`; 
-                        let nomeFinal = (tipoDisputa === 'coletiva') ? nomeTurma : `Atleta ${i+1} (${nomeTurma})`;
-                        participantes.push({ nomeVisivel: nomeFinal, id: null });
-                    }
-                }
-                
-                let suffix = (isIndividual && tipoDisputa === 'coletiva') ? " (Série de Partidas)" : "";
+		                if(participantes.length > 0) {
+		                    nTimes = participantes.length;
+		                } else {
+		                    for(let i=0; i < nTimes; i++) {
+		                        let nomeTurma = turmasPlaceholder[i % turmasPlaceholder.length];
+		                        if (i >= turmasPlaceholder.length) nomeTurma += ` (T${i+1})`; 
+		                        let nomeFinal = (tipoDisputa === 'coletiva') ? nomeTurma : `Atleta ${i+1} (${nomeTurma})`;
+		                        participantes.push({ nomeVisivel: nomeFinal, id: null });
+		                    }
+		                }
+		                
+		                let suffix = (isIndividual && tipoDisputa === 'coletiva') ? " (Série de Partidas)" : "";
 
-                if (nTimes === 2) {
-                    let p1 = participantes[0]; let p2 = participantes[1];
-                    let n1 = p1 ? p1.nomeVisivel : "Equipe 1";
-                    let n2 = p2 ? p2.nomeVisivel : "Equipe 2";
-                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
+		                if (nTimes === 2) {
+		                    let p1 = participantes[0]; let p2 = participantes[1];
+		                    let n1 = p1 ? p1.nomeVisivel : "Equipe 1";
+		                    let n2 = p2 ? p2.nomeVisivel : "Equipe 2";
+		                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
 
-                    if (multIdaVolta === 1) {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                    } else {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}${suffix}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
-                    }
-                } 
-                else if (nTimes === 3) {
-                    let p1 = participantes[0]; let p2 = participantes[1]; let p3 = participantes[2];
-                    let n1 = p1 ? p1.nomeVisivel : "Equipe 1";
-                    let n2 = p2 ? p2.nomeVisivel : "Equipe 2";
-                    let n3 = p3 ? p3.nomeVisivel : "Equipe 3";
-                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
+		                    if (multIdaVolta === 1) {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                    } else {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 1) (Ida) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) (Volta) | ${n2} x ${n1}${suffix}`, equipeAId: id2, equipeANome: n2, equipeBId: id1, equipeBNome: n1 });
+		                    }
+		                } 
+		                else if (nTimes === 3) {
+		                    let p1 = participantes[0]; let p2 = participantes[1]; let p3 = participantes[2];
+		                    let n1 = p1 ? p1.nomeVisivel : "Equipe 1";
+		                    let n2 = p2 ? p2.nomeVisivel : "Equipe 2";
+		                    let n3 = p3 ? p3.nomeVisivel : "Equipe 3";
+		                    let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null; let id3 = p3 ? p3.id : null;
 
-                    if (formato === 'eliminatoria') {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 1 (Jogo 1) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1${suffix}`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
-                    } else {
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}${suffix}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado${suffix}`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
-                    }
-                }
-                else {
-                    let paresSorteados = [];
-                    for(let i=0; i < participantes.length; i+=2) {
-                        let p1 = participantes[i]; let p2 = participantes[i+1];
-                        let n1 = p1 ? p1.nomeVisivel : "A Definir";
-                        let n2 = p2 ? p2.nomeVisivel : "A Definir";
-                        let id1 = p1 ? p1.id : null; let id2 = p2 ? p2.id : null;
-                        
-                        paresSorteados.push({ tituloStr: `${n1} x ${n2}${suffix}`, nA: n1, nB: n2, idA: id1, idB: id2 });
-                    }
+		                    if (formato === 'eliminatoria') {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 1 (Jogo 1) | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 2) | ${n3} x Vencedor do Jogo 1${suffix}`, equipeAId: id3, equipeANome: n3, equipeBId: null, equipeBNome: 'Vencedor do Jogo 1' });
+		                    } else {
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 1 | ${n1} x ${n2}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id2, equipeBNome: n2 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 2 | ${n1} x ${n3}${suffix}`, equipeAId: id1, equipeANome: n1, equipeBId: id3, equipeBNome: n3 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `Classificação - Jogo 3 | ${n2} x ${n3}${suffix}`, equipeAId: id2, equipeANome: n2, equipeBId: id3, equipeBNome: n3 });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 4) | 1º Colocado x 2º Colocado${suffix}`, equipeAId: null, equipeANome: '1º Colocado', equipeBId: null, equipeBNome: '2º Colocado' });
+		                    }
+		                }
+		                else {
+		                    // 🔥 NOVO ALGORITMO: CHAVEAMENTO PERFEITO (POWER OF 2)
+		                    if (formato === 'eliminatoria') {
+		                        let idFaseAtual = 1;
+		                        let filaJogos = [];
+		                        
+		                        // 1. Descobre a próxima potência matemática de 2 perfeita
+		                        let potencia = 2;
+		                        while (potencia < nTimes) potencia *= 2;
+		                        
+		                        // 2. Calcula os times que ganham o "Chapéu" e vão aguardar na próxima fase
+		                        let byes = potencia - nTimes; 
+		                        let equipesFaseAtual = [];
+		                        
+		                        for (let i = 0; i < byes; i++) {
+		                            equipesFaseAtual.push({ isTeam: true, nome: participantes[i].nomeVisivel, id: participantes[i].id });
+		                        }
+		                        
+		                        // 3. Os times restantes jogam a Fase Preliminar
+		                        for (let i = byes; i < nTimes; i += 2) {
+		                            let p1 = participantes[i];
+		                            // Previne quebra caso haja número ímpar anômalo
+		                            let p2 = participantes[i+1] || { nomeVisivel: "A Definir", id: null }; 
+		                            
+		                            let nomeFase = "Fase Preliminar";
+		                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${p1.nomeVisivel} x ${p2.nomeVisivel}${suffix}`;
+		                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: p1.id, equipeANome: p1.nomeVisivel, equipeBId: p2.id, equipeBNome: p2.nomeVisivel });
+		                            
+		                            // O vencedor deste jogo sobe para a próxima fase na tabela
+		                            equipesFaseAtual.push({ isTeam: false, nome: `Vencedor do Jogo ${idFaseAtual}`, id: null });
+		                            idFaseAtual++;
+		                        }
+		                        
+		                        // 4. Agora a tabela tem times pares exatos! Fazemos o cruzamento das Fases Principais
+		                        while (equipesFaseAtual.length > 1) {
+		                            let proximaFase = [];
+		                            let isFinal = equipesFaseAtual.length === 2;
+		                            let isSemi = equipesFaseAtual.length === 4;
+		                            let isQuartas = equipesFaseAtual.length === 8;
+		                            let isOitavas = equipesFaseAtual.length === 16;
+		                            
+		                            let nomeFase = isFinal ? "🏆 GRANDE FINAL" : (isSemi ? "SEMIFINAL" : (isQuartas ? "Quartas de Final" : (isOitavas ? "Oitavas de Final" : "Eliminatória")));
+		                            
+		                            for (let i = 0; i < equipesFaseAtual.length; i += 2) {
+		                                let eqA = equipesFaseAtual[i];
+		                                let eqB = equipesFaseAtual[i+1] || { nome: "A Definir", id: null };
+		                                
+		                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${eqA.nome} x ${eqB.nome}${suffix}`;
+		                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: eqA.id, equipeANome: eqA.nome, equipeBId: eqB.id, equipeBNome: eqB.nome });
+		                                
+		                                proximaFase.push({ isTeam: false, nome: `Vencedor do Jogo ${idFaseAtual}`, id: null });
+		                                idFaseAtual++;
+		                            }
+		                            equipesFaseAtual = proximaFase;
+		                        }
 
-                    if (formato === 'eliminatoria') {
-                        let numJogos = (nTimes - 1);
-                        let idFaseAtual = 1;
-                        let filaJogos = [];
+		                        // Registra os jogos ordenados e cruzados na fila do torneio
+		                        filaJogos.forEach(fj => {
+		                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
+		                        });
+		                    } 
+		                    else { 
+		                        // Lógica para fase de Grupos 
+		                        for(let i=1; i<=3; i++) {
+		                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase de Grupos | Sorteio da Tabela ${i}${suffix}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
+		                        }
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 1 (Jogo 1) | 1º Grupo A x 2º Grupo B${suffix}`, equipeAId: null, equipeANome: "1º Grupo A", equipeBId: null, equipeBNome: "2º Grupo B" });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 2 (Jogo 2) | 1º Grupo B x 2º Grupo A${suffix}`, equipeAId: null, equipeANome: "1º Grupo B", equipeBId: null, equipeBNome: "2º Grupo A" });
+		                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2${suffix}`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
+		                    }
+		                }
 
-                        for (let i = 0; i < paresSorteados.length; i++) {
-                            let nomeFase = numJogos === 1 ? "🏆 GRANDE FINAL" :
-                                           (paresSorteados.length === 2 ? "SEMIFINAL " + (i+1) :
-                                           (paresSorteados.length === 4 ? "Quartas de Final" : "Eliminatória"));
+		                let indexJogo = 0;
+		                for(let d = 0; d < totalDiasGerados; d++) {
+		                    let diasSobrando = totalDiasGerados - d;
+		                    let jogosSobrando = jogosDesteEsporte.length - indexJogo;
+		                    
+		                    if (jogosSobrando === 0) break;
+		                    if (jogosSobrando < diasSobrando) continue;
+		                    
+		                    let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
+		                    for(let k = 0; k < qtdParaEsteDia; k++) {
+		                        diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
+		                        indexJogo++;
+		                    }
+		                }
+		            });
 
-                            let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${paresSorteados[i].tituloStr}`;
-                            filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: paresSorteados[i].idA, equipeANome: paresSorteados[i].nA, equipeBId: paresSorteados[i].idB, equipeBNome: paresSorteados[i].nB });
-                            idFaseAtual++;
-                        }
+		            let idJogoGlobal = jogosExistentesGlobais.length > 0 ? Math.max(...jogosExistentesGlobais.map(j => j.id || 0)) + 1 : 1;
+		            
+		            for(let d = 0; d < diasGeradosGlobais.length; d++) {
+		                let dia = diasGeradosGlobais[d];
+		                let trackersDeQuadra = {};
+		                quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
 
-                        let inicioFaseAnterior = 1;
-                        let fimFaseAnterior = paresSorteados.length;
-                        let loopSafety = 0; 
+		                let jogosDoMesmoDia = jogosExistentesGlobais.filter(j => (j.diaId || j.dataJogo) === dia.idStr);
+		                jogosDoMesmoDia.forEach(jAntigo => {
+		                    if (jAntigo.hora) {
+		                        let h = parseInt(jAntigo.hora.split(':')[0]);
+		                        let m = parseInt(jAntigo.hora.split(':')[1]);
+		                        let minsFim = h * 60 + m + tempoPorJogo;
+		                        
+		                        if (simultaneo) {
+		                            let q = jAntigo.quadra || quadrasArray[0];
+		                            if (trackersDeQuadra[q] < minsFim) trackersDeQuadra[q] = minsFim;
+		                        } else {
+		                            quadrasArray.forEach(q => { if (trackersDeQuadra[q] < minsFim) trackersDeQuadra[q] = minsFim; });
+		                        }
+		                    }
+		                });
 
-                        while (fimFaseAnterior < numJogos && loopSafety < 100) {
-                            loopSafety++;
-                            let qtdJogosNovaFase = Math.ceil((fimFaseAnterior - inicioFaseAnterior + 1) / 2);
-                            if (qtdJogosNovaFase <= 0) break; 
+		                let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
+		                let jogosAlocadosNesteDia = 0;
 
-                            let novoInicio = idFaseAtual;
+		                for (let i = 0; i < dia.partidasPendentes.length; i++) {
+		                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
+		                    let partida = dia.partidasPendentes[i];
+		                    let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
+		                    
+		                    if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
+		                        if (simultaneo) {
+		                            let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
+		                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
+		                        } else { continue; }
+		                    }
 
-                            for (let i = 0; i < qtdJogosNovaFase; i++) {
-                                let j1 = inicioFaseAnterior + (i * 2);
-                                let j2 = inicioFaseAnterior + (i * 2) + 1;
+		                    let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
+		                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
+		                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
 
-                                let nomeFase = qtdJogosNovaFase === 1 ? "🏆 GRANDE FINAL" :
-                                               (qtdJogosNovaFase === 2 ? "SEMIFINAL " + (i+1) :
-                                               (qtdJogosNovaFase === 4 ? "Quartas de Final" : "Eliminatória"));
-                                
-                                let nomeA = `Vencedor do Jogo ${j1}`;
-                                let nomeB = `Vencedor do Jogo ${j2}`;
-                                let titulo = `${nomeFase} (Jogo ${idFaseAtual}) | ${nomeA} x ${nomeB}${suffix}`;
-                                filaJogos.push({ idInterno: idFaseAtual, titulo: titulo, equipeAId: null, equipeANome: nomeA, equipeBId: null, equipeBNome: nomeB });
-                                idFaseAtual++;
-                            }
-                            inicioFaseAnterior = novoInicio;
-                            fimFaseAnterior = idFaseAtual - 1;
-                        }
+		                    let isIndividual = esportesIndividuais.includes(partida.espObj.nome);
+		                    let espSetup = setupData.esportes.find(e => e.id === partida.espObj.id);
+		                    let tipoDisputa = espSetup ? (espSetup.tipoDisputa || 'coletiva') : 'coletiva';
 
-                        filaJogos.forEach(fj => {
-                            jogosDesteEsporte.push({ espObj: def, titulo: fj.titulo, equipeAId: fj.equipeAId, equipeANome: fj.equipeANome, equipeBId: fj.equipeBId, equipeBNome: fj.equipeBNome });
-                        });
-                    } 
-                    else { 
-                        for(let i=1; i<=3; i++) {
-                            jogosDesteEsporte.push({ espObj: def, titulo: `Fase de Grupos | Sorteio da Tabela ${i}${suffix}`, equipeAId: null, equipeANome: "A Definir", equipeBId: null, equipeBNome: "A Definir" });
-                        }
-                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 1 (Jogo 1) | 1º Grupo A x 2º Grupo B${suffix}`, equipeAId: null, equipeANome: "1º Grupo A", equipeBId: null, equipeBNome: "2º Grupo B" });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `SEMIFINAL 2 (Jogo 2) | 1º Grupo B x 2º Grupo A${suffix}`, equipeAId: null, equipeANome: "1º Grupo B", equipeBId: null, equipeBNome: "2º Grupo A" });
-                        jogosDesteEsporte.push({ espObj: def, titulo: `🏆 GRANDE FINAL (Jogo 3) | Vencedor do Jogo 1 x Vencedor do Jogo 2${suffix}`, equipeAId: null, equipeANome: "Venc. Jogo 1", equipeBId: null, equipeBNome: "Venc. Jogo 2" });
-                    }
-                }
-
-                let indexJogo = 0;
-                for(let d = 0; d < totalDiasGerados; d++) {
-                    let diasSobrando = totalDiasGerados - d;
-                    let jogosSobrando = jogosDesteEsporte.length - indexJogo;
-                    
-                    if (jogosSobrando === 0) break;
-                    if (jogosSobrando < diasSobrando) continue;
-                    
-                    let qtdParaEsteDia = Math.ceil(jogosSobrando / diasSobrando);
-                    for(let k = 0; k < qtdParaEsteDia; k++) {
-                        diasGeradosGlobais[d].partidasPendentes.push(jogosDesteEsporte[indexJogo]);
-                        indexJogo++;
-                    }
-                }
-            });
-
-            let idJogoGlobal = jogosExistentesGlobais.length > 0 ? Math.max(...jogosExistentesGlobais.map(j => j.id || 0)) + 1 : 1;
-            
-            for(let d = 0; d < diasGeradosGlobais.length; d++) {
-                let dia = diasGeradosGlobais[d];
-                let trackersDeQuadra = {};
-                quadrasArray.forEach(q => trackersDeQuadra[q] = minInicio);
-
-                let jogosDoMesmoDia = jogosExistentesGlobais.filter(j => (j.diaId || j.dataJogo) === dia.idStr);
-                jogosDoMesmoDia.forEach(jAntigo => {
-                    if (jAntigo.hora) {
-                        let h = parseInt(jAntigo.hora.split(':')[0]);
-                        let m = parseInt(jAntigo.hora.split(':')[1]);
-                        let minsFim = h * 60 + m + tempoPorJogo;
-                        
-                        if (simultaneo) {
-                            let q = jAntigo.quadra || quadrasArray[0];
-                            if (trackersDeQuadra[q] < minsFim) trackersDeQuadra[q] = minsFim;
-                        } else {
-                            quadrasArray.forEach(q => { if (trackersDeQuadra[q] < minsFim) trackersDeQuadra[q] = minsFim; });
-                        }
-                    }
-                });
-
-                let limiteJogosDia = quadrasArray.length * slotsMaximosPorQuadraPorDia;
-                let jogosAlocadosNesteDia = 0;
-
-                for (let i = 0; i < dia.partidasPendentes.length; i++) {
-                    if (jogosAlocadosNesteDia >= limiteJogosDia) break; 
-                    let partida = dia.partidasPendentes[i];
-                    let quadraAlvo = getQuadraAdequada(partida.espObj.nome, quadrasArray);
-                    
-                    if (trackersDeQuadra[quadraAlvo] + tempoPorJogo > minFim) {
-                        if (simultaneo) {
-                            let quadraLivre = quadrasArray.find(q => trackersDeQuadra[q] + tempoPorJogo <= minFim);
-                            if(quadraLivre) { quadraAlvo = quadraLivre; } else continue; 
-                        } else { continue; }
-                    }
-
-                    let horaDoJogo = formatarMinutos(trackersDeQuadra[quadraAlvo]);
-                    if (simultaneo) trackersDeQuadra[quadraAlvo] += tempoPorJogo; 
-                    else quadrasArray.forEach(q => trackersDeQuadra[q] += tempoPorJogo); 
-
-                    let isIndividual = esportesIndividuais.includes(partida.espObj.nome);
-                    let espSetup = setupData.esportes.find(e => e.id === partida.espObj.id);
-                    let tipoDisputa = espSetup ? (espSetup.tipoDisputa || 'coletiva') : 'coletiva';
-
-                    jogosGeradosGlobais.push({
-                        id: idJogoGlobal++, diaId: dia.idStr, hora: horaDoJogo, esporte: partida.espObj.nome,
-                        icone: partida.espObj.icone, titulo: partida.titulo, quadra: quadraAlvo,
-                        equipeAId: partida.equipeAId, equipeANome: partida.equipeANome, 
-                        equipeBId: partida.equipeBId, equipeBNome: partida.equipeBNome,
-                        isIndividualSport: isIndividual, tipoDisputa: tipoDisputa
-                    });
-                    jogosAlocadosNesteDia++;
-                }
-            }
-        }
+		                    jogosGeradosGlobais.push({
+		                        id: idJogoGlobal++, 
+		                        diaId: dia.idStr, 
+		                        hora: horaDoJogo, 
+		                        esporte: partida.espObj.nome,
+		                        icone: partida.espObj.icone, 
+		                        genero: setupData.genero, 
+		                        titulo: `${partida.espObj.icone} ${partida.espObj.nome} | ${partida.titulo}`, 
+		                        quadra: quadraAlvo,
+		                        equipeAId: partida.equipeAId, 
+		                        equipeANome: partida.equipeANome, 
+		                        equipeBId: partida.equipeBId, 
+		                        equipeBNome: partida.equipeBNome,
+		                        isIndividualSport: isIndividual, 
+		                        tipoDisputa: tipoDisputa
+		                    });
+		                    jogosAlocadosNesteDia++;
+		                }
+		            }
+		        }
 
         function renderizarVisualizacoes() {
             renderizarAbaGeral();

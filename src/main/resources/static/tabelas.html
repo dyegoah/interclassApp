@@ -241,69 +241,76 @@
             buscarJogosDoBanco(genero);
         }
 
-        function resolverNomesDinamicos(jogos, generoCorrente) {
-            let mapVencedores = {};
+		function resolverNomesDinamicos(jogos, generoCorrente) {
+		            let mapVencedores = {};
 
-            jogos.forEach(j => {
-                let numMatch = j.titulo.match(/\(Jogo (\d+)\)/i);
-                if (numMatch) {
-                    let idJogoStr = numMatch[1];
-                    let rel = relatoriosSalvos[String(j.id)];
-                    
-                    if (rel || j.status === 'FINALIZADO') {
-                        let placares = obterPlacarSeguro(rel, j);
-                        let eqA = j.equipeANome || j.equipeaNome || j.titulo.split(' | ')[1]?.split(' x ')[0]?.trim() || "Equipe A";
-                        let eqB = j.equipeBNome || j.equipebNome || j.titulo.split(' | ')[1]?.split(' x ')[1]?.trim() || "Equipe B";
-                        
-                        eqA = eqA.replace(' (Série de Partidas)', '');
-                        eqB = eqB.replace(' (Série de Partidas)', '');
+		            jogos.forEach(j => {
+		                let numMatch = j.titulo.match(/\(Jogo (\d+)\)/i);
+		                if (numMatch) {
+		                    let idJogoStr = numMatch[1];
+		                    let rel = relatoriosSalvos[String(j.id)];
+		                    
+		                    if (rel || j.status === 'FINALIZADO') {
+		                        let placares = obterPlacarSeguro(rel, j);
+		                        let partes = j.titulo.split(' | ');
+		                        let idxConfronto = partes.length >= 3 ? 2 : 1;
+		                        
+		                        let confrontoPartes = partes[idxConfronto] ? partes[idxConfronto].split(' x ') : [];
+		                        let eqA = j.equipeANome || j.equipeaNome || (confrontoPartes[0] ? confrontoPartes[0].trim() : "Equipe A");
+		                        let eqB = j.equipeBNome || j.equipebNome || (confrontoPartes[1] ? confrontoPartes[1].trim() : "Equipe B");
+		                        
+		                        eqA = eqA.replace(' (Série de Partidas)', '');
+		                        eqB = eqB.replace(' (Série de Partidas)', '');
 
-                        if (placares.A > placares.B) {
-                            mapVencedores[idJogoStr] = { nome: eqA, id: j.equipeAId };
-                        } else if (placares.B > placares.A) {
-                            mapVencedores[idJogoStr] = { nome: eqB, id: j.equipeBId };
-                        }
-                    }
-                }
-            });
+		                        if (placares.A > placares.B) {
+		                            mapVencedores[idJogoStr] = { nome: eqA, id: j.equipeAId };
+		                        } else if (placares.B > placares.A) {
+		                            mapVencedores[idJogoStr] = { nome: eqB, id: j.equipeBId };
+		                        }
+		                    }
+		                }
+		            });
 
-            jogos.forEach(j => {
-                let partesTitulo = j.titulo.split(' | ');
-                if (partesTitulo.length < 2) return;
-                
-                let confrontoPartes = partesTitulo[1].split(' x ');
-                let nomeA = j.equipeANome || j.equipeaNome || confrontoPartes[0]?.trim();
-                let nomeB = j.equipeBNome || j.equipebNome || confrontoPartes[1]?.trim();
+		            jogos.forEach(j => {
+		                let partesTitulo = j.titulo.split(' | ');
+		                if (partesTitulo.length < 2) return;
+		                
+		                let idxConfronto = partesTitulo.length >= 3 ? 2 : 1;
+		                let confrontoPartes = partesTitulo[idxConfronto].split(' x ');
+		                
+		                let nomeA = j.equipeANome || j.equipeaNome || confrontoPartes[0]?.trim();
+		                let nomeB = j.equipeBNome || j.equipebNome || confrontoPartes[1]?.trim();
 
-                const regexVencedor = /(?:Vencedor do Jogo|Venc\.? Jogo) (\d+)/i;
+		                const regexVencedor = /(?:Vencedor do Jogo|Venc\.? Jogo) (\d+)/i;
 
-                let mudouA = false;
-                let matchA = nomeA.match(regexVencedor);
-                if (matchA && mapVencedores[matchA[1]]) {
-                    j.equipeANome = mapVencedores[matchA[1]].nome;
-                    j.equipeAId = mapVencedores[matchA[1]].id;
-                    nomeA = j.equipeANome; 
-                    mudouA = true;
-                }
+		                let mudouA = false;
+		                let matchA = nomeA.match(regexVencedor);
+		                if (matchA && mapVencedores[matchA[1]]) {
+		                    j.equipeANome = mapVencedores[matchA[1]].nome;
+		                    j.equipeAId = mapVencedores[matchA[1]].id;
+		                    nomeA = j.equipeANome; 
+		                    mudouA = true;
+		                }
 
-                let mudouB = false;
-                let matchB = nomeB.match(regexVencedor);
-                if (matchB && mapVencedores[matchB[1]]) {
-                    j.equipeBNome = mapVencedores[matchB[1]].nome;
-                    j.equipeBId = mapVencedores[matchB[1]].id;
-                    nomeB = j.equipeBNome; 
-                    mudouB = true;
-                }
+		                let mudouB = false;
+		                let matchB = nomeB.match(regexVencedor);
+		                if (matchB && mapVencedores[matchB[1]]) {
+		                    j.equipeBNome = mapVencedores[matchB[1]].nome;
+		                    j.equipeBId = mapVencedores[matchB[1]].id;
+		                    nomeB = j.equipeBNome; 
+		                    mudouB = true;
+		                }
 
-                if (mudouA || mudouB) {
-                    let sufixo = partesTitulo[1].includes('(Série de Partidas)') ? ' (Série de Partidas)' : '';
-                    j.titulo = `${partesTitulo[0]} | ${nomeA} x ${nomeB}${sufixo}`;
-                    j._mudou = true; 
-                }
-            });
-            
-            return jogos;
-        }
+		                if (mudouA || mudouB) {
+		                    let sufixo = partesTitulo[idxConfronto].includes('(Série de Partidas)') ? ' (Série de Partidas)' : '';
+		                    partesTitulo[idxConfronto] = `${nomeA} x ${nomeB}${sufixo}`;
+		                    j.titulo = partesTitulo.join(' | ');
+		                    j._mudou = true; 
+		                }
+		            });
+		            
+		            return jogos;
+		        }
 
 		async function buscarJogosDoBanco(genero) {
             const container = document.getElementById('lista-jogos');
@@ -427,105 +434,133 @@
                 
                 let temFaseDeGrupos = dados.jogos.some(j => (j.titulo||"").toUpperCase().includes('GRUPO') || (j.titulo||"").toUpperCase().includes('CLASSIFICAÇÃO') || (j.titulo||"").toUpperCase().includes('LIGA') || (j.titulo||"").toUpperCase().includes('SORTEIO'));
 
-                dados.jogos.forEach(jogo => {
-                    let relatorio = relatoriosSalvos[String(jogo.id)]; 
-                    
-                    let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
-                    let dataCurta = dataDoJogo;
-                    if(dataCurta.includes('-')) {
-                        let p = dataCurta.split('-');
-                        if(p.length === 3) dataCurta = p[2] + '/' + p[1];
-                    }
+				dados.jogos.forEach(jogo => {
+				                    let relatorio = relatoriosSalvos[String(jogo.id)]; 
+				                    
+				                    let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
+				                    let dataCurta = dataDoJogo;
+				                    if(dataCurta.includes('-')) {
+				                        let p = dataCurta.split('-');
+				                        if(p.length === 3) dataCurta = p[2] + '/' + p[1];
+				                    }
 
-                    let tituloOriginalSeguro = jogo.titulo || "Aguardando";
-                    let partesTitulo = tituloOriginalSeguro.split(' | ');
-                    let faseTag = partesTitulo[0].replace('🏆', '').trim();
-                    let fUpper = faseTag.toUpperCase();
-                    let confrontoStr = partesTitulo.length > 1 ? partesTitulo[1].trim() : "Aguardando Vencedores";
+				                    let tituloOriginalSeguro = jogo.titulo || "Aguardando";
+				                    let partesTitulo = tituloOriginalSeguro.split(' | ');
+				                    
+				                    // 🔥 MÁGICA: Lê perfeitamente se o título tem 2 ou 3 divisões
+				                    let faseTagOriginal = "";
+				                    let confrontoStr = "";
 
-                    if (temFaseDeGrupos && !entrouNaFaseFinal && (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('QUARTAS') || fUpper.includes('SEMI') || fUpper.includes('FINAL'))) {
-                        htmlJogosAgenda += `<div class="secao-agenda-titulo" style="margin-top: 30px; margin-bottom: 20px; color: #ff0055; justify-content: center; font-size: 1.1rem; border-top: 1px dashed rgba(255,0,85,0.3); padding-top: 20px; text-shadow: 0 0 10px rgba(255,0,85,0.5);">🔥 FASE FINAL (Mata-Mata) 🔥</div>`;
-                        entrouNaFaseFinal = true;
-                    }
+				                    if (partesTitulo.length >= 3) {
+				                        faseTagOriginal = partesTitulo[1].trim();
+				                        confrontoStr = partesTitulo[2].trim();
+				                    } else if (partesTitulo.length === 2) {
+				                        faseTagOriginal = partesTitulo[0].trim();
+				                        confrontoStr = partesTitulo[1].trim();
+				                    } else {
+				                        faseTagOriginal = partesTitulo[0].trim();
+				                        confrontoStr = "Aguardando Vencedores";
+				                    }
+				                    
+				                    let faseTagSemTrofeu = faseTagOriginal.replace('🏆', '').trim();
+				                    let fUpper = faseTagSemTrofeu.toUpperCase();
+				                    
+				                    // 🔥 SEPARAÇÃO INTELIGENTE DO "(Jogo X)" DA FASE
+				                    let matchJogo = faseTagSemTrofeu.match(/(\(Jogo \d+\))/i);
+				                    let numJogoStr = matchJogo ? matchJogo[1] : '';
+				                    let nomeFaseLimpa = matchJogo ? faseTagSemTrofeu.replace(matchJogo[0], '').trim() : faseTagSemTrofeu;
+				                    
+				                    // Recoloca o troféu para as finais
+				                    if (faseTagOriginal.includes('🏆')) {
+				                        nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
+				                    }
+				                    
+				                    // 🔥 AQUI ESTÁ O SEU LAYOUT: Junta o Número do Jogo com o nome das equipes
+				                    let textoConfrontoCompleto = numJogoStr ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${numJogoStr}</span> ${confrontoStr}` : confrontoStr;
 
-                    let corBorda = corTemaDefault;
-                    let corBg = 'rgba(255,255,255,0.02)';
-                    let corTextoFase = corTemaDefault;
+				                    if (temFaseDeGrupos && !entrouNaFaseFinal && (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('QUARTAS') || fUpper.includes('SEMI') || fUpper.includes('FINAL'))) {
+				                        htmlJogosAgenda += `<div class="secao-agenda-titulo" style="margin-top: 30px; margin-bottom: 20px; color: #ff0055; justify-content: center; font-size: 1.1rem; border-top: 1px dashed rgba(255,0,85,0.3); padding-top: 20px; text-shadow: 0 0 10px rgba(255,0,85,0.5);">🔥 FASE FINAL (Mata-Mata) 🔥</div>`;
+				                        entrouNaFaseFinal = true;
+				                    }
 
-                    if (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('OITAVAS')) {
-                        corBorda = '#ffd700'; 
-                        corBg = 'rgba(255, 215, 0, 0.08)';
-                        corTextoFase = '#ffd700';
-                    } else if (fUpper.includes('QUARTAS')) {
-                        corBorda = '#aaaaaa'; 
-                        corBg = 'rgba(170, 170, 170, 0.08)';
-                        corTextoFase = '#aaaaaa';
-                    } else if (fUpper.includes('SEMI')) {
-                        corBorda = '#00f2fe'; 
-                        corBg = 'rgba(0, 242, 254, 0.08)';
-                        corTextoFase = '#00f2fe';
-                    } else if (fUpper.includes('FINAL')) {
-                        corBorda = '#ff00de'; 
-                        corBg = 'rgba(255, 0, 222, 0.08)';
-                        corTextoFase = '#ff00de';
-                    }
+				                    let corBorda = corTemaDefault;
+				                    let corBg = 'rgba(255,255,255,0.02)';
+				                    let corTextoFase = corTemaDefault;
 
-                    let placares = obterPlacarSeguro(relatorio, jogo);
-                    let placarAExibicao = placares.A;
-                    let placarBExibicao = placares.B;
-                    let hor = jogo.hora || jogo.horario || '--:--';
+				                    if (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('OITAVAS')) {
+				                        corBorda = '#ffd700'; 
+				                        corBg = 'rgba(255, 215, 0, 0.08)';
+				                        corTextoFase = '#ffd700';
+				                    } else if (fUpper.includes('QUARTAS')) {
+				                        corBorda = '#aaaaaa'; 
+				                        corBg = 'rgba(170, 170, 170, 0.08)';
+				                        corTextoFase = '#aaaaaa';
+				                    } else if (fUpper.includes('SEMI')) {
+				                        corBorda = '#00f2fe'; 
+				                        corBg = 'rgba(0, 242, 254, 0.08)';
+				                        corTextoFase = '#00f2fe';
+				                    } else if (fUpper.includes('FINAL')) {
+				                        corBorda = '#ff00de'; 
+				                        corBg = 'rgba(255, 0, 222, 0.08)';
+				                        corTextoFase = '#ff00de';
+				                    }
 
-                    if (relatorio || jogo.status === 'FINALIZADO') {
-                        jogosConcluidos++;
-                        htmlJogosAgenda += `
-                            <div class="playhub-card" style="border-left: 4px solid #555; background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.05);">
-                                <div class="play-hora" style="border-right-color: #555;">
-                                    <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
-                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
-                                    <span style="font-size:0.75rem; color: #888;">${dataCurta}</span>
-                                </div>
-                                <div class="play-info">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                        <div>
-                                            <h3 style="color: #888; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${faseTag}</h3>
-                                            <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #ccc;">${confrontoStr}</p>
-                                        </div>
-                                        <div style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.3rem; color: #00ff00; background: rgba(0,255,0,0.05); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0,255,0,0.1); min-width: 80px; text-align: center;">
-                                            ${placarAExibicao} <span style="color:#555; font-size:0.9rem;">x</span> ${placarBExibicao}
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
-                            </div>
-                        `;
-                    } else {
-                        let isAguardando = confrontoStr.includes('Vencedor') || confrontoStr.includes('A Definir') || confrontoStr.includes('Venc.');
-                        
-                        let opacity = isAguardando ? '0.7' : '1';
-                        let brilhoBox = isAguardando ? '' : `box-shadow: inset 0 0 15px ${corBg.replace('0.08', '0.2')}; border-color: ${corBg.replace('0.08', '0.4')};`;
-                        
-                        let textoBotao = isAguardando ? 'AGUARDANDO' : '▶️ SÚMULA';
-                        let estiloBotao = isAguardando 
-                            ? `background: rgba(255,255,255,0.1); color: #aaa; box-shadow: none;` 
-                            : `background: ${corBorda}; color: #000; box-shadow: 0 0 15px ${corBg.replace('0.08', '0.5')};`;
+				                    let placares = obterPlacarSeguro(relatorio, jogo);
+				                    let placarAExibicao = placares.A;
+				                    let placarBExibicao = placares.B;
+				                    let hor = jogo.hora || jogo.horario || '--:--';
 
-                        htmlJogosAgenda += `
-                            <div class="playhub-card" style="border-left: 4px solid ${corBorda}; background: ${corBg}; opacity: ${opacity}; ${brilhoBox}">
-                                <div class="play-hora" style="border-right-color: ${corBorda};">
-                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
-                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda};">${dataCurta}</span>
-                                </div>
-                                <div class="play-info">
-                                    <h3 style="color: ${corTextoFase}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 8px ${corBg.replace('0.08', '0.6')};">${faseTag}</h3>
-                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${confrontoStr}</p>
-                                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra || 'A Definir'}</p>
-                                </div>
-                                <button class="btn-play" style="${estiloBotao}" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">${textoBotao}</button>
-                            </div>
-                        `;
-                    }
-                });
+				                    if (relatorio || jogo.status === 'FINALIZADO') {
+				                        jogosConcluidos++;
+				                        htmlJogosAgenda += `
+				                            <div class="playhub-card" style="border-left: 4px solid #555; background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.05);">
+				                                <div class="play-hora" style="border-right-color: #555;">
+				                                    <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
+				                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
+				                                    <span style="font-size:0.75rem; color: #888;">${dataCurta}</span>
+				                                </div>
+				                                <div class="play-info">
+				                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+				                                        <div>
+				                                            <h3 style="color: #888; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${nomeFaseLimpa}</h3>
+				                                            <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #ccc;">${textoConfrontoCompleto}</p>
+				                                        </div>
+				                                        <div style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.3rem; color: #00ff00; background: rgba(0,255,0,0.05); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0,255,0,0.1); min-width: 80px; text-align: center;">
+				                                            ${placarAExibicao} <span style="color:#555; font-size:0.9rem;">x</span> ${placarBExibicao}
+				                                        </div>
+				                                    </div>
+				                                </div>
+				                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
+				                            </div>
+				                        `;
+				                    } else {
+				                        let isAguardando = confrontoStr.includes('Vencedor') || confrontoStr.includes('A Definir') || confrontoStr.includes('Venc.');
+				                        
+				                        let opacity = isAguardando ? '0.7' : '1';
+				                        let brilhoBox = isAguardando ? '' : `box-shadow: inset 0 0 15px ${corBg.replace('0.08', '0.2')}; border-color: ${corBg.replace('0.08', '0.4')};`;
+				                        
+				                        let textoBotao = isAguardando ? 'AGUARDANDO' : '▶️ SÚMULA';
+				                        let estiloBotao = isAguardando 
+				                            ? `background: rgba(255,255,255,0.1); color: #aaa; box-shadow: none;` 
+				                            : `background: ${corBorda}; color: #000; box-shadow: 0 0 15px ${corBg.replace('0.08', '0.5')};`;
 
+				                        htmlJogosAgenda += `
+				                            <div class="playhub-card" style="border-left: 4px solid ${corBorda}; background: ${corBg}; opacity: ${opacity}; ${brilhoBox}">
+				                                <div class="play-hora" style="border-right-color: ${corBorda};">
+				                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
+				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda};">${dataCurta}</span>
+				                                </div>
+				                                <div class="play-info">
+				                                    <h3 style="color: ${corTextoFase}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 8px ${corBg.replace('0.08', '0.6')};">${nomeFaseLimpa}</h3>
+				                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${textoConfrontoCompleto}</p>
+				                                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra || 'A Definir'}</p>
+				                                </div>
+				                                <button class="btn-play" style="${estiloBotao}" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">${textoBotao}</button>
+				                            </div>
+				                        `;
+				                    }
+				                });
+								
                 let campeaoHtml = '';
                 if (campeaoNome) {
                     let fotoHtml = '';
@@ -623,115 +658,119 @@
             }
         }
 
-        function processarChaveECampeao(formato, jogos) {
-            let campeaoFinal = null;
-            let campeaoIdFinal = null;
-            let htmlTabela = '';
+		function processarChaveECampeao(formato, jogos) {
+		            let campeaoFinal = null;
+		            let campeaoIdFinal = null;
+		            let htmlTabela = '';
 
-            if (formato === 'liga' || formato === 'grupos' || formato.includes('pontos') || formato.includes('liga')) {
-                let tabela = {};
+		            if (formato === 'liga' || formato === 'grupos' || formato.includes('pontos') || formato.includes('liga')) {
+		                let tabela = {};
 
-                jogos.forEach(j => {
-                    let partes = (j.titulo||"").split(' | ');
-                    if(partes.length < 2) return;
-                    let confronto = partes[1].split(' x ');
-                    if(confronto.length < 2) return;
-                    
-                    let tA = confronto[0].trim();
-                    let tB = confronto[1].trim();
+		                jogos.forEach(j => {
+		                    let partes = (j.titulo||"").split(' | ');
+		                    if(partes.length < 2) return;
+		                    
+		                    let idxConfronto = partes.length >= 3 ? 2 : 1;
+		                    let confronto = partes[idxConfronto].split(' x ');
+		                    if(confronto.length < 2) return;
+		                    
+		                    let tA = confronto[0].trim();
+		                    let tB = confronto[1].trim();
 
-                    if(!tA.includes('Vencedor') && !tA.includes('A Definir') && !tA.includes('Colocado') && !tA.includes('Sorteio')) {
-                        if(!tabela[tA]) tabela[tA] = { nome: tA, id: j.equipeAId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
-                    }
-                    if(!tB.includes('Vencedor') && !tB.includes('A Definir') && !tB.includes('Colocado') && !tB.includes('Sorteio')) {
-                        if(!tabela[tB]) tabela[tB] = { nome: tB, id: j.equipeBId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
-                    }
+		                    if(!tA.includes('Vencedor') && !tA.includes('A Definir') && !tA.includes('Colocado') && !tA.includes('Sorteio')) {
+		                        if(!tabela[tA]) tabela[tA] = { nome: tA, id: j.equipeAId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
+		                    }
+		                    if(!tB.includes('Vencedor') && !tB.includes('A Definir') && !tB.includes('Colocado') && !tB.includes('Sorteio')) {
+		                        if(!tabela[tB]) tabela[tB] = { nome: tB, id: j.equipeBId, pts:0, j:0, v:0, e:0, d:0, gp:0, gc:0 };
+		                    }
 
-                    let rel = relatoriosSalvos[String(j.id)];
-                    
-                    let placares = obterPlacarSeguro(rel, j);
-                    let placarA = placares.A;
-                    let placarB = placares.B;
+		                    let rel = relatoriosSalvos[String(j.id)];
+		                    
+		                    let placares = obterPlacarSeguro(rel, j);
+		                    let placarA = placares.A;
+		                    let placarB = placares.B;
 
-                    if((rel || j.status === 'FINALIZADO') && tabela[tA] && tabela[tB]) {
-                        tabela[tA].j++; tabela[tB].j++;
-                        tabela[tA].gp += placarA; tabela[tA].gc += placarB;
-                        tabela[tB].gp += placarB; tabela[tB].gc += placarA;
+		                    if((rel || j.status === 'FINALIZADO') && tabela[tA] && tabela[tB]) {
+		                        tabela[tA].j++; tabela[tB].j++;
+		                        tabela[tA].gp += placarA; tabela[tA].gc += placarB;
+		                        tabela[tB].gp += placarB; tabela[tB].gc += placarA;
 
-                        if(placarA > placarB) { tabela[tA].v++; tabela[tB].d++; tabela[tA].pts += 3; }
-                        else if(placarB > placarA) { tabela[tB].v++; tabela[tA].d++; tabela[tB].pts += 3; }
-                        else { tabela[tA].e++; tabela[tB].e++; tabela[tA].pts += 1; tabela[tB].pts += 1; }
-                    }
-                });
+		                        if(placarA > placarB) { tabela[tA].v++; tabela[tB].d++; tabela[tA].pts += 3; }
+		                        else if(placarB > placarA) { tabela[tB].v++; tabela[tA].d++; tabela[tB].pts += 3; }
+		                        else { tabela[tA].e++; tabela[tB].e++; tabela[tA].pts += 1; tabela[tB].pts += 1; }
+		                    }
+		                });
 
-                let timesOrdenados = Object.values(tabela).sort((a,b) => {
-                    if(b.pts !== a.pts) return b.pts - a.pts;
-                    if(b.v !== a.v) return b.v - a.v;
-                    return (b.gp - b.gc) - (a.gp - a.gc);
-                });
+		                let timesOrdenados = Object.values(tabela).sort((a,b) => {
+		                    if(b.pts !== a.pts) return b.pts - a.pts;
+		                    if(b.v !== a.v) return b.v - a.v;
+		                    return (b.gp - b.gc) - (a.gp - a.gc);
+		                });
 
-                if(timesOrdenados.length > 0) {
-                    let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
-                    
-                    if (jogosEncerrados === jogos.length && jogos.length > 0) {
-                        campeaoFinal = timesOrdenados[0].nome;
-                        campeaoIdFinal = timesOrdenados[0].id;
-                    }
+		                if(timesOrdenados.length > 0) {
+		                    let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
+		                    
+		                    if (jogosEncerrados === jogos.length && jogos.length > 0) {
+		                        campeaoFinal = timesOrdenados[0].nome;
+		                        campeaoIdFinal = timesOrdenados[0].id;
+		                    }
 
-                    let trs = '';
-                    timesOrdenados.forEach((t, i) => {
-                        let classe = i === 0 ? 'linha-campeao' : '';
-                        let saldo = t.gp - t.gc;
-                        let corSaldo = saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff');
-                        trs += `
-                            <tr class="${classe}">
-                                <td>${i+1}º</td>
-                                <td style="text-align:left; font-weight:bold;">${t.nome}</td>
-                                <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
-                                <td>${t.j}</td>
-                                <td>${t.v}</td>
-                                <td>${t.e}</td>
-                                <td>${t.d}</td>
-                                <td>${t.gp}</td>
-                                <td>${t.gc}</td>
-                                <td style="color: ${corSaldo};">${saldo > 0 ? '+'+saldo : saldo}</td>
-                            </tr>
-                        `;
-                    });
+		                    let trs = '';
+		                    timesOrdenados.forEach((t, i) => {
+		                        let classe = i === 0 ? 'linha-campeao' : '';
+		                        let saldo = t.gp - t.gc;
+		                        let corSaldo = saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff');
+		                        trs += `
+		                            <tr class="${classe}">
+		                                <td>${i+1}º</td>
+		                                <td style="text-align:left; font-weight:bold;">${t.nome}</td>
+		                                <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
+		                                <td>${t.j}</td>
+		                                <td>${t.v}</td>
+		                                <td>${t.e}</td>
+		                                <td>${t.d}</td>
+		                                <td>${t.gp}</td>
+		                                <td>${t.gc}</td>
+		                                <td style="color: ${corSaldo};">${saldo > 0 ? '+'+saldo : saldo}</td>
+		                            </tr>
+		                        `;
+		                    });
 
-                    htmlTabela = `
-                        <div class="secao-agenda-titulo">📊 Tabela de Classificação Atualizada</div>
-                        <div class="table-wrapper">
-                            <table class="tabela-brasileirao">
-                                <thead><tr><th style="width:40px;">Pos</th><th style="text-align:left;">Turma / Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>Pró</th><th>Con</th><th>SG</th></tr></thead>
-                                <tbody>${trs}</tbody>
-                            </table>
-                        </div>
-                    `;
-                }
-                return { htmlTabela: htmlTabela, campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+		                    htmlTabela = `
+		                        <div class="secao-agenda-titulo">📊 Tabela de Classificação Atualizada</div>
+		                        <div class="table-wrapper">
+		                            <table class="tabela-brasileirao">
+		                                <thead><tr><th style="width:40px;">Pos</th><th style="text-align:left;">Turma / Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>Pró</th><th>Con</th><th>SG</th></tr></thead>
+		                                <tbody>${trs}</tbody>
+		                            </table>
+		                        </div>
+		                    `;
+		                }
+		                return { htmlTabela: htmlTabela, campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
 
-            } else {
-                let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
-                if (jogosEncerrados === jogos.length && jogos.length > 0) {
-                    let jogoFinal = jogos.find(j => (j.titulo||"").includes('FINAL') && !(j.titulo||"").includes('Ida')) || jogos[jogos.length - 1];
-                    let rel = relatoriosSalvos[String(jogoFinal.id)];
-                    
-                    let placares = obterPlacarSeguro(rel, jogoFinal);
-                    let pA = placares.A;
-                    let pB = placares.B;
-                    
-                    if (rel || jogoFinal.status === 'FINALIZADO') {
-                        let eqA = jogoFinal.equipeANome || (jogoFinal.titulo||"").split(' | ')[1]?.split(' x ')[0]?.trim();
-                        let eqB = jogoFinal.equipeBNome || (jogoFinal.titulo||"").split(' | ')[1]?.split(' x ')[1]?.trim();
-                        
-                        if (pA > pB) { campeaoFinal = eqA; campeaoIdFinal = jogoFinal.equipeAId; } 
-                        else if (pB > pA) { campeaoFinal = eqB; campeaoIdFinal = jogoFinal.equipeBId; }
-                    }
-                }
-                return { htmlTabela: '', campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
-            }
-        }
+		            } else {
+		                let jogosEncerrados = jogos.filter(j => relatoriosSalvos[String(j.id)] || j.status === 'FINALIZADO').length;
+		                if (jogosEncerrados === jogos.length && jogos.length > 0) {
+		                    let jogoFinal = jogos.find(j => (j.titulo||"").includes('FINAL') && !(j.titulo||"").includes('Ida')) || jogos[jogos.length - 1];
+		                    let rel = relatoriosSalvos[String(jogoFinal.id)];
+		                    
+		                    let placares = obterPlacarSeguro(rel, jogoFinal);
+		                    let pA = placares.A;
+		                    let pB = placares.B;
+		                    
+		                    if (rel || jogoFinal.status === 'FINALIZADO') {
+		                        let partes = (jogoFinal.titulo||"").split(' | ');
+		                        let idxConfronto = partes.length >= 3 ? 2 : 1;
+		                        let eqA = jogoFinal.equipeANome || partes[idxConfronto]?.split(' x ')[0]?.trim();
+		                        let eqB = jogoFinal.equipeBNome || partes[idxConfronto]?.split(' x ')[1]?.trim();
+		                        
+		                        if (pA > pB) { campeaoFinal = eqA; campeaoIdFinal = jogoFinal.equipeAId; } 
+		                        else if (pB > pA) { campeaoFinal = eqB; campeaoIdFinal = jogoFinal.equipeBId; }
+		                    }
+		                }
+		                return { htmlTabela: '', campeaoNome: campeaoFinal, campeaoId: campeaoIdFinal };
+		            }
+		        }
 
         window.toggleTorneio = function(id, headerEl) {
             const body = document.getElementById(`body-${id}`);

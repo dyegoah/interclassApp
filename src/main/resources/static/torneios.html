@@ -287,47 +287,61 @@
             });
         }
 
-        async function salvarConfiguracoes() {
-            if (bloqueioGeralCritico) {
-                alert("🚨 IMPOSSÍVEL AVANÇAR!\n\nVocê selecionou modalidades que não possuem alunos inscritos suficientes para formar o torneio (veja os alertas vermelhos na tela).\n\nPeça aos alunos para realizarem as inscrições pelo link, ou volte no Passo 2 e desative a modalidade incompleta.");
-                return;
-            }
+		async function salvarConfiguracoes() {
+		    if (bloqueioGeralCritico) {
+		        alert("🚨 IMPOSSÍVEL AVANÇAR!\n\nVocê selecionou modalidades que não possuem alunos inscritos suficientes para formar o torneio (veja os alertas vermelhos na tela).\n\nPeça aos alunos para realizarem as inscrições pelo link, ou volte no Passo 2 e desative a modalidade incompleta.");
+		        return;
+		    }
 
-            setupData.esportes.forEach(esp => {
-                let selectFormato = document.getElementById(`formato-${esp.id}`);
-                if (selectFormato) {
-                    esp.formato = selectFormato.value;
-                    esp.qtdTimes = parseInt(document.getElementById(`qtd-${esp.id}`).value);
-                    esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
-                    esp.tipoDisputa = document.getElementById(`tipoDisputa-${esp.id}`).value;
-                    esp.configurado = true;
-                    
-                    // 🔥 CORREÇÃO: Injetando o nome correto e o ícone para não dar "Modalidade Desconhecida"
-                    let modBase = modalidadeDefs.find(m => m.id === esp.id);
-                    if (modBase) {
-                        esp.nome = modBase.nome;
-                        esp.esporte = modBase.nome;
-                        esp.icone = modBase.icone;
-                    }
-                }
-            });
-            
-            setupData.esportes = setupData.esportes.filter(esp => esp.configurado);
-            localStorage.setItem('arenaSetup', JSON.stringify(setupData));
+		    setupData.esportes.forEach(esp => {
+		        let selectFormato = document.getElementById(`formato-${esp.id}`);
+		        if (selectFormato) {
+		            esp.formato = selectFormato.value;
+		            esp.qtdTimes = parseInt(document.getElementById(`qtd-${esp.id}`).value);
+		            esp.idaEVolta = document.getElementById(`ida-${esp.id}`).checked;
+		            esp.tipoDisputa = document.getElementById(`tipoDisputa-${esp.id}`).value;
+		            esp.configurado = true;
+		            
+		            let modBase = modalidadeDefs.find(m => m.id === esp.id);
+		            if (modBase) {
+		                esp.nome = modBase.nome;
+		                esp.esporte = modBase.nome;
+		                esp.icone = modBase.icone;
+		            }
+		        }
+		    });
+		    
+		    setupData.esportes = setupData.esportes.filter(esp => esp.configurado);
+		    localStorage.setItem('arenaSetup', JSON.stringify(setupData));
 
-            try {
-                const token = localStorage.getItem('interclassToken');
-                const response = await fetch('/api/torneios/setup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(setupData)
-                });
+		    // 🔥 SOLUÇÃO 1: ACUMULAR OS ESPORTES NO 'arenaLotes' (Não apagar os anteriores)
+		    let configLotes = JSON.parse(localStorage.getItem('arenaLotes')) || {};
+		    if (!configLotes[setupData.genero]) {
+		        configLotes[setupData.genero] = { esportes: [] };
+		    }
+		    setupData.esportes.forEach(esp => {
+		        let idx = configLotes[setupData.genero].esportes.findIndex(e => e.id === esp.id);
+		        if (idx >= 0) {
+		            configLotes[setupData.genero].esportes[idx] = esp;
+		        } else {
+		            configLotes[setupData.genero].esportes.push(esp);
+		        }
+		    });
+		    localStorage.setItem('arenaLotes', JSON.stringify(configLotes));
 
-                if (response.ok) window.location.href = '/calendario.html';
-                else if (response.status === 403) { alert("🚨 Sessão expirada."); window.location.href = '/login.html'; }
-                else { console.warn("Modo offline."); window.location.href = '/calendario.html'; }
-            } catch (error) { window.location.href = '/calendario.html'; }
-        }
+		    try {
+		        const token = localStorage.getItem('interclassToken');
+		        const response = await fetch('/api/torneios/setup', {
+		            method: 'POST',
+		            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+		            body: JSON.stringify(setupData)
+		        });
+
+		        if (response.ok) window.location.href = '/calendario.html';
+		        else if (response.status === 403) { alert("🚨 Sessão expirada."); window.location.href = '/login.html'; }
+		        else { console.warn("Modo offline."); window.location.href = '/calendario.html'; }
+		    } catch (error) { window.location.href = '/calendario.html'; }
+		}
     </script>
 </body>
 </html>

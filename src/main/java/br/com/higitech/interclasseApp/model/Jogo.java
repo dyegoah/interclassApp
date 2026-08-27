@@ -64,6 +64,12 @@ public class Jogo {
 
     @Column(name = "placar_b")
     private Integer placarB = 0;
+    
+    @Column
+    private String esporte;
+
+    @Column
+    private String icone;
 
     // 🛡️ CORTA O VAZAMENTO: O Jogo não vai mais "puxar" o Professor inteiro pro Frontend
     @JsonIgnore
