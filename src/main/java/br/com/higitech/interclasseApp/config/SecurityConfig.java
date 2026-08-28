@@ -3,8 +3,8 @@ package br.com.higitech.interclasseApp.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,8 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import br.com.higitech.interclasseApp.service.SecurityFilter;
 
@@ -25,45 +23,39 @@ public class SecurityConfig {
     private SecurityFilter securityFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) 
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                         
-                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar").permitAll()
-                
-                // 🚀 LIBERAÇÃO TOTAL DAS ROTAS PÚBLICAS
-                .requestMatchers("/api/alunos/public/**", "/api/jogos/public/**", "/api/modalidades/public/**").permitAll()
-                
-                // 🚀 ADICIONADO O /manifest.json NA LISTA DE LIBERAÇÃO
-                .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/img/**", "/setup/**", "/matchsheet/**", "/favicon.ico", "/manifest.json", "/error").permitAll()
-                
-                .anyRequest().authenticated() 
-            )
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
-            
+                .requestMatchers(
+                    "/**/*.html", "/", "/**/*.css", "/**/*.js", "/manifest.json", "/img/**",
+                    "/error", // 🔥 SEGREDO AQUI: Evita que falhas 404 se disfarcem de 403
+                    "/api/auth/**", 
+                    "/api/professores/cadastrar", 
+                    "/api/professores/login", 
+                    "/api/alunos/login", 
+                    "/api/alunos/cadastrar",
+                    "/api/jogos/public/**", 
+                    "/api/alunos/public/**",
+                    "/api/modalidades/public/**",
+                    "/api/professores/public/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            );
+
+        http.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") 
-                        .allowedOriginPatterns("*") 
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

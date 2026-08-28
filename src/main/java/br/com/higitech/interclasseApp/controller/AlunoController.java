@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.higitech.interclasseApp.model.Aluno;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.AlunoRepository;
-import br.com.higitech.interclasseApp.repositories.ModalidadeRepository;
 import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
 
 @RestController
@@ -28,10 +27,9 @@ public class AlunoController {
 
     @Autowired
     private AlunoRepository alunoRepository;
+
     @Autowired
     private ProfessorRepository professorRepository;
-    @Autowired
-    private ModalidadeRepository modalidadeRepository;
 
     public static class InscricaoRequestDTO {
         public String nome;
@@ -42,6 +40,9 @@ public class AlunoController {
         public String genero;
     }
 
+    // ==========================================
+    // ROTAS DE INSCRIÇÃO DOS ALUNOS
+    // ==========================================
     @PostMapping("/public/{professorHash}")
     public ResponseEntity<?> inscreverAluno(@PathVariable String professorHash, @RequestBody InscricaoRequestDTO dto) {
         Optional<Professor> profOpt = professorRepository.findByHashPublico(professorHash);
@@ -57,19 +58,6 @@ public class AlunoController {
         if (dto.nome == null || dto.nome.trim().length() < 2 || dto.nome.length() > 50) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
-
-        // 🔥 TRAVA DE SEGURANÇA DESATIVADA:
-        // Como o sistema agora usa Link Inteligente, o Front-End é quem controla os esportes permitidos!
-        /*
-        List<Modalidade> todasModalidades = modalidadeRepository.findByLoteProfessorHashPublico(professorHash);
-        boolean esportePermitido = todasModalidades.stream()
-                .filter(m -> m.getLote() != null && "geral".equalsIgnoreCase(m.getLote().getGenero()))
-                .anyMatch(m -> m.getNomeEsporte().equalsIgnoreCase(dto.esporte));
-
-        if (!esportePermitido) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta modalidade não está aberta para inscrições.");
-        }
-        */
 
         long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()
                 .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte)
@@ -94,18 +82,30 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição confirmada na Modalidade!");
     }
 
-    @PutMapping("/status-inscricoes")
-    public ResponseEntity<?> alterarStatusInscricoes(@AuthenticationPrincipal Professor professorLogado) {
-        professorLogado.setInscricoesAbertas(!professorLogado.isInscricoesAbertas());
-        professorRepository.save(professorLogado);
-        return ResponseEntity.ok(professorLogado.isInscricoesAbertas());
-    }
-
     @GetMapping("/public/status/{professorHash}")
     public ResponseEntity<?> checarStatusInscricoes(@PathVariable String professorHash) {
         Optional<Professor> profOpt = professorRepository.findByHashPublico(professorHash);
         if (profOpt.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(profOpt.get().isInscricoesAbertas());
+    }
+
+    // ==========================================
+    // ROTA PÚBLICA (PORTAL DO ATLETA - ARENA)
+    // ==========================================
+    @GetMapping("/public/{hashPublico}")
+    public ResponseEntity<List<Aluno>> getAlunosPublicos(@PathVariable String hashPublico) {
+        List<Aluno> alunos = alunoRepository.findByProfessorHashPublico(hashPublico);
+        return ResponseEntity.ok(alunos);
+    }
+
+    // ==========================================
+    // ROTAS ADMINISTRATIVAS DO PROFESSOR (COM LOGIN)
+    // ==========================================
+    @PutMapping("/status-inscricoes")
+    public ResponseEntity<?> alterarStatusInscricoes(@AuthenticationPrincipal Professor professorLogado) {
+        professorLogado.setInscricoesAbertas(!professorLogado.isInscricoesAbertas());
+        professorRepository.save(professorLogado);
+        return ResponseEntity.ok(professorLogado.isInscricoesAbertas());
     }
 
     @GetMapping

@@ -33,15 +33,13 @@
         .live-dot { width: 8px; height: 8px; background: var(--danger-color); border-radius: 50%; box-shadow: 0 0 8px var(--danger-color);}
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,85,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,0,85,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,85,0); } }
 
-        /* PAINEL DO PROFESSOR */
+        /* PAINEL DO PROFESSOR (COMPARTILHAMENTO) */
         #painel-professor { display: none; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 15px; border-left: 5px solid #00ff55; margin: 20px 15px; border: 1px solid rgba(0,255,85,0.2); }
-        .btn-master-share { background: linear-gradient(90deg, #00ff55, #00cc44); color: #000; border: none; padding: 15px 20px; border-radius: 30px; font-family: 'Orbitron'; font-weight: bold; font-size: 1rem; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(0,255,85,0.4); transition: 0.3s; margin-top: 15px;}
-        .btn-master-share:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(0,255,85,0.6); }
 
         /* NAVEGAÇÃO SUPERIOR (LOTES) */
         .filtros-lote { display: flex; gap: 10px; padding: 15px; overflow-x: auto; scrollbar-width: none;}
         .filtros-lote::-webkit-scrollbar { display: none; }
-        .btn-lote { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aaa; padding: 10px 20px; border-radius: 30px; font-family: 'Orbitron'; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; white-space: nowrap;}
+        .btn-lote { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #aaa; padding: 10px 20px; border-radius: 30px; font-family: 'Orbitron'; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; white-space: nowrap; transition: 0.3s;}
         .btn-lote.active { color: #fff; background: rgba(255,255,255,0.1); border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow);}
 
         /* CARROSSEL DE ESPORTES */
@@ -83,20 +81,20 @@
         .col-left { text-align: left !important;}
         tr:nth-child(1) td, tr:nth-child(2) td { background: linear-gradient(90deg, rgba(0, 255, 85, 0.05), transparent); border-left: 3px solid var(--win-color); color: #fff; font-weight: bold;}
 
-        /* CHAVEAMENTOS (MATA-MATA) - ULTRA COMPACTO */
-        .bracket-scroll-area { display: flex; align-items: center; gap: 15px; padding: 15px 5px; overflow-x: auto; scrollbar-width: none; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 100%); border-radius: 12px; margin-top: 15px; -webkit-overflow-scrolling: touch;}
+        /* CHAVEAMENTOS (MATA-MATA) - ULTRA COMPACTOS PARA CABER TUDO NA TELA */
+        .bracket-scroll-area { display: flex; align-items: center; gap: 8px; padding: 15px 5px; overflow-x: auto; scrollbar-width: none; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 100%); border-radius: 12px; margin-top: 15px; -webkit-overflow-scrolling: touch;}
         .bracket-scroll-area::-webkit-scrollbar { display: none; }
-        .bracket-col { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; justify-content: space-around; position: relative;}
+        .bracket-col { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: space-around; position: relative;}
         
-        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; width: 115px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.6); overflow: hidden; }
-        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.5rem; text-align: center; padding: 4px 2px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; width: 95px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.6); overflow: hidden; }
+        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.45rem; text-align: center; padding: 3px 2px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        .mini-team-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .mini-team-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .mini-team-row:last-child { border-bottom: none; }
         
-        .gamer-avatar { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; margin-right: 4px; }
-        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.6rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
-        .mini-team-score { font-family: 'Orbitron'; font-size: 0.65rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 1px 4px; border-radius: 4px; text-align: center; margin-left: 4px;}
+        .gamer-avatar { width: 12px; height: 12px; border-radius: 50%; object-fit: cover; margin-right: 3px; }
+        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.55rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
+        .mini-team-score { font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 1px 3px; border-radius: 4px; text-align: center; margin-left: 3px;}
         
         .mini-match .vencedor { background: linear-gradient(90deg, rgba(0, 255, 85, 0.1), transparent); border-left: 2px solid var(--win-color); }
         .mini-match .vencedor .mini-team-name { color: #fff; }
@@ -126,16 +124,19 @@
         .card-danger.rank-1 { background: linear-gradient(90deg, rgba(255, 0, 85, 0.15), rgba(0,0,0,0.5)); border-color: var(--danger-color);}
         .card-danger.rank-1 .player-rank, .card-danger.rank-1 .player-photo { color: var(--danger-color); border-color: var(--danger-color); text-shadow: 0 0 10px var(--danger-color); box-shadow: 0 0 15px var(--danger-color);}
 
-        .btn-share-section { background: rgba(37, 211, 102, 0.1); border: 1px solid #25D366; color: #25D366; width: 100%; padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 30px;}
-
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
+    <script>
+        if (!localStorage.getItem('interclassToken') && !new URLSearchParams(window.location.search).get('ref')) {
+            window.location.replace('/index.html');
+        }
+    </script>
 </head>
 <body>
 
     <div id="topbar-placeholder"></div>
 
-    <!-- HEADER PÚBLICO -->
+    <!-- HEADER PÚBLICO (ALUNO) -->
     <header id="header-aluno">
         <h1 style="color: #fff; font-family: 'Orbitron'; font-size: 1.2rem; margin-bottom: 5px;" id="escola-nome">Interclass Arena</h1>
         <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
@@ -146,11 +147,17 @@
 
     <div style="max-width: 800px; margin: 0 auto; position: relative;">
         
-        <!-- PAINEL DO PROFESSOR (COMPARTILHAMENTO) -->
+        <!-- PAINEL DO PROFESSOR (COMPARTILHAMENTO DE LINKS DUPLOS) -->
         <div id="painel-professor">
-            <h2 style="font-family: 'Orbitron'; color: #00ff55; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">📡 Central de Transmissão</h2>
-            <p style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ccc; margin-top: 5px;">Compartilhe o link deste painel com os alunos. Eles verão a interface interativa e atualizada em tempo real.</p>
-            <button class="btn-master-share" onclick="compartilharPainelGeral()">📲 ENVIAR LINK PARA OS ALUNOS</button>
+            <h2 style="font-family: 'Orbitron'; color: #00ff55; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">📡 Central de Links</h2>
+
+            <div style="margin-top: 15px;">
+                <p style="font-family: 'Segoe UI'; font-size: 0.85rem; color: #ccc; margin-bottom: 5px;"><b>📺 Portal do Atleta (Ao Vivo):</b> Envie para acompanharem o torneio e artilharia.</p>
+                <div style="display: flex; gap: 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,85,0.3); border-radius: 8px; padding: 5px;">
+                    <input type="text" id="link-arena-input" readonly style="flex-grow: 1; background: transparent; border: none; color: #00ff55; font-family: 'Segoe UI'; padding: 10px; outline: none; font-size: 0.85rem;">
+                    <button onclick="copiarLinkPublico('link-arena-input')" style="background: #00ff55; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; transition: 0.3s; white-space: nowrap;">COPIAR</button>
+                </div>
+            </div>
         </div>
 
         <!-- SELETOR DE LOTE -->
@@ -171,14 +178,12 @@
 
         <!-- CONTEÚDO: CLASSIFICAÇÃO / CHAVES -->
         <div id="tab-tabela" class="tab-content">
-            <button class="btn-share-section" onclick="compartilharAba('Tabela / Chaveamento')">📲 Compartilhar no WhatsApp</button>
             <div id="container-tabela"></div>
         </div>
 
         <!-- CONTEÚDO: ESTATÍSTICAS (MVP/ARTILHARIA/VITÓRIAS) -->
         <div id="tab-stats" class="tab-content">
             <h3 id="titulo-stats" style="font-family: 'Orbitron'; color: var(--gold); font-size: 1.1rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,215,0,0.5);">⭐ Destaques</h3>
-            <button class="btn-share-section" onclick="compartilharAba('Destaques do Campeonato')">📲 Compartilhar Top Players</button>
             <div id="container-stats" class="glass" style="padding: 15px;"></div>
         </div>
 
@@ -193,13 +198,10 @@
     <div id="footbar-placeholder"></div>
 
     <script>
-        // ==========================================
-        // CONFIGURAÇÕES GLOBAIS
-        // ==========================================
+        let professorIdInterno = localStorage.getItem('profId') || localStorage.getItem('userId');
         const urlParams = new URLSearchParams(window.location.search);
         let professorIdPublico = urlParams.get('ref');
         let isModoPublico = !!professorIdPublico;
-        if (!isModoPublico) professorIdPublico = localStorage.getItem('profId') || localStorage.getItem('userId') || '1';
         
         let todosJogosGlobais = [];
         let relatoriosSalvos = {}; 
@@ -224,6 +226,13 @@
                 fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
                 fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
                 document.getElementById('painel-professor').style.display = 'block';
+
+                let pNome = localStorage.getItem('profNome') || "Professor";
+                let pEscola = localStorage.getItem('profEscola') || "Escola";
+
+                let linkArena = `${window.location.origin}/resumo.html?ref=${professorIdInterno}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
+                document.getElementById('link-arena-input').value = linkArena;
+
                 let storageRel = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
                 Object.assign(relatoriosSalvos, storageRel);
             } else {
@@ -247,20 +256,15 @@
             montarFiltrosLote();
         };
 
-        // ==========================================
-        // EXTRAÇÃO DE ESPORTE E INTELIGÊNCIA
-        // ==========================================
         function extrairEsporteNome(j) {
             if (!j) return "Geral";
             let valor = j.esporte || j.nomeEsporte;
             if (typeof valor === 'object' && valor !== null) valor = valor.nomeEsporte || valor.esporte || valor.nome;
-            if (valor && typeof valor === 'string' && valor.trim() !== '' && valor !== '[object Object]' && valor !== 'undefined' && valor !== 'null') {
-                return valor.trim();
-            }
-            if (j.modalidade && j.modalidade.nomeEsporte) return j.modalidade.nomeEsporte.trim();
+            if (valor && typeof valor === 'string' && valor.trim() !== '') return valor.trim();
             if (j.titulo) {
+                let tituloUpper = j.titulo.toUpperCase();
                 for (let mod of modalidadeDefs) {
-                    if (j.titulo.includes(mod.nome)) return mod.nome;
+                    if (tituloUpper.includes(mod.nome.toUpperCase())) return mod.nome;
                 }
             }
             return "Geral";
@@ -278,7 +282,6 @@
             return { A: parseInt(pA) || 0, B: parseInt(pB) || 0 };
         }
 
-        // 🔥 CORREÇÃO: ISOLAMENTO TOTAL POR MODALIDADE (SEM VAZAMENTOS) 🔥
         function resolverNomesDinamicos(jogos) {
             let mapVencedores = {};
             
@@ -287,7 +290,7 @@
                 let numMatch = (j.titulo || "").match(/\(Jogo (\d+)\)/i);
                 if (numMatch) {
                     let idJogoStr = numMatch[1];
-                    let chaveVencedor = `${espNome}_${idJogoStr}`; // Ex: "xadrez_1", "futsal_1"
+                    let chaveVencedor = `${espNome}_${idJogoStr}`;
                     let rel = relatoriosSalvos[String(j.id)];
                     
                     if (rel || j.status === 'FINALIZADO') {
@@ -340,9 +343,35 @@
             return jogos;
         }
 
+        // 🔥 NOVA IA DE ABREVIAÇÃO DE NOMES PARA CABER NO CHAVEAMENTO 🔥
+        function abreviarNome(nome) {
+            if (!nome) return "?";
+            if (nome.includes("A Definir")) return "?";
+            if (nome.includes("Vencedor")) return nome.replace(/Vencedor( do)? Jogo/i, "V J");
+            
+            let n = nome.replace(' (Série de Partidas)', '').trim();
+            
+            // Se for uma turma (ex: "3º Ano A", "8º Série B"), remove palavras longas
+            if (/ano|série|turma/i.test(n)) {
+                return n.replace(/ano/i, "").replace(/série/i, "").replace(/turma/i, "").replace(/\s+/g, " ").trim();
+            }
+            
+            // Se for um nome próprio muito longo (ex: João Guilherme Silva -> João S.)
+            if (n.length > 8 && n.includes(" ")) {
+                let pts = n.split(" ");
+                if (pts.length >= 2) {
+                    return pts[0].substring(0,6) + " " + pts[pts.length - 1].charAt(0) + ".";
+                }
+            }
+            
+            // Corte final de segurança para não explodir a caixa de 95px
+            if (n.length > 9) return n.substring(0, 8) + "..";
+            return n;
+        }
+
         function buscarAvatarGamer(nomeEquipe) {
             if (!listaAlunosGlobais || listaAlunosGlobais.length === 0) return '';
-            if (!nomeEquipe || nomeEquipe.includes('Vencedor') || nomeEquipe.includes('A Definir') || nomeEquipe.includes('Colocado') || nomeEquipe.includes('Grupo')) return '';
+            if (!nomeEquipe || nomeEquipe.includes('Vencedor') || nomeEquipe.includes('A Definir') || nomeEquipe.includes('Colocado') || nomeEquipe.includes('Grupo') || nomeEquipe.includes('V J')) return '';
             
             let aluno = listaAlunosGlobais.find(a => nomeEquipe.includes(a.nome.split(' ')[0]) || a.nome.includes(nomeEquipe.split(' (')[0]));
             if (aluno && aluno.fotoUrl) return `<img src="${aluno.fotoUrl}" class="gamer-avatar">`;
@@ -351,11 +380,9 @@
 
         function extrairNomeLimpo(str) { return (str || "").replace(' (Série de Partidas)', '').trim(); }
 
-        // ==========================================
-        // FLUXO DE REQUISIÇÕES
-        // ==========================================
         function montarFiltrosLote() {
             const container = document.getElementById('filtros-lote');
+            container.innerHTML = '';
             ['masculino', 'feminino', 'misto'].forEach((gen, idx) => {
                 let active = idx === 0 ? 'active' : '';
                 container.innerHTML += `<button class="btn-lote ${active}" onclick="mudarLote('${gen}', this)">${gen}</button>`;
@@ -394,7 +421,9 @@
             jogos.forEach(j => {
                 if (j.status === 'FINALIZADO') {
                     if (!relatoriosSalvos[String(j.id)] || isModoPublico) relatoriosSalvos[String(j.id)] = { placar: { A: j.placarA||0, B: j.placarB||0 }, timeline: [] };
-                } else { if (isModoPublico && relatoriosSalvos[String(j.id)]) delete relatoriosSalvos[String(j.id)]; }
+                } else {
+                    if(isModoPublico && relatoriosSalvos[String(j.id)]) delete relatoriosSalvos[String(j.id)];
+                }
             });
 
             todosJogosGlobais = resolverNomesDinamicos(jogos);
@@ -463,17 +492,10 @@
             btnElement.classList.add('active');
         }
 
-        // ==========================================
-        // RENDERIZAÇÃO ESPECÍFICA DO ESPORTE
-        // ==========================================
         function renderizarTodasAsAbas() {
             let jogosDoEsporte = todosJogosGlobais.filter(j => extrairEsporteNome(j).toLowerCase() === esporteAtual.toLowerCase());
             
-            // ------------------------------------------
-            // ABA 1: PARTIDAS (ORDEM CRONOLÓGICA + ACORDEÃO)
-            // ------------------------------------------
             const cPartidas = document.getElementById('container-partidas');
-            
             jogosDoEsporte.sort((a,b) => {
                 let dataA = a.diaId || a.dataJogo || "9999-99-99";
                 let dataB = b.diaId || b.dataJogo || "9999-99-99";
@@ -512,8 +534,8 @@
                         </div>
                         <div class="match-body">
                             <div class="team-info">
-                                <div class="team-row ${winA}"><span class="team-name">${extrairNomeLimpo(eqA)}</span><span class="team-score">${isEncerrado?p.A:'-'}</span></div>
-                                <div class="team-row ${winB}"><span class="team-name">${extrairNomeLimpo(eqB)}</span><span class="team-score">${isEncerrado?p.B:'-'}</span></div>
+                                <div class="team-row ${winA}"><span class="team-name">${buscarAvatarGamer(eqA)}${extrairNomeLimpo(eqA)}</span><span class="team-score">${isEncerrado?p.A:'-'}</span></div>
+                                <div class="team-row ${winB}"><span class="team-name">${buscarAvatarGamer(eqB)}${extrairNomeLimpo(eqB)}</span><span class="team-score">${isEncerrado?p.B:'-'}</span></div>
                             </div>
                         </div>
                     </div>
@@ -536,9 +558,6 @@
                 cPartidas.innerHTML = htmlVisiveis || `<p style="text-align:center; color:#888;">Nenhuma partida encontrada.</p>`;
             }
 
-            // ------------------------------------------
-            // ABA 2: TABELA E CHAVES COMPACTAS
-            // ------------------------------------------
             const cTabela = document.getElementById('container-tabela');
             cTabela.innerHTML = '';
             
@@ -571,7 +590,7 @@
                     let linhas = ord.map((t, i) => `
                         <tr class="${i<2 ? 'linha-campeao' : ''}">
                             <td style="font-family:'Orbitron';">${i+1}º</td>
-                            <td class="col-left">${t.n}</td>
+                            <td class="col-left">${buscarAvatarGamer(t.n)}${t.n}</td>
                             <td style="color:var(--theme-primary); font-family:'Orbitron'; font-size:1.1rem;">${t.pts}</td>
                             <td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td>${t.gp}</td><td>${t.gc}</td>
                             <td style="color:${(t.gp-t.gc)>0?'#00ff55':((t.gp-t.gc)<0?'#ff0055':'#fff')}; font-weight:bold;">${(t.gp-t.gc)>0?'+'+(t.gp-t.gc):(t.gp-t.gc)}</td>
@@ -581,31 +600,35 @@
                 }
             } 
             
-            // CHAVEAMENTO ULTRA COMPACTO
-            let fases = { 'OITAVAS': [], 'QUARTAS': [], 'SEMIFINAL': [], 'FINAL': [] };
+            // 🔥 CHAVEAMENTO (BRACKET) ATUALIZADO PARA MOSTRAR TODAS AS FASES 🔥
+            let fases = { '16 AVOS': [], 'OITAVAS': [], 'QUARTAS': [], 'SEMIFINAL': [], 'FINAL': [] };
             jogosDoEsporte.forEach(j => {
                 let t = (j.titulo || '').toUpperCase();
-                if(t.includes('OITAVAS')) fases['OITAVAS'].push(j);
+                if(t.includes('16 AVOS') || t.includes('16AVOS')) fases['16 AVOS'].push(j);
+                else if(t.includes('OITAVAS')) fases['OITAVAS'].push(j);
                 else if(t.includes('QUARTAS')) fases['QUARTAS'].push(j);
                 else if(t.includes('SEMI')) fases['SEMIFINAL'].push(j);
                 else if(t.includes('FINAL') && !t.includes('SEMI') && !t.includes('QUARTAS')) fases['FINAL'].push(j);
             });
 
-            if (fases['FINAL'].length > 0 || fases['SEMIFINAL'].length > 0 || fases['QUARTAS'].length > 0) {
+            if (fases['FINAL'].length > 0 || fases['SEMIFINAL'].length > 0 || fases['QUARTAS'].length > 0 || fases['OITAVAS'].length > 0) {
                 let ext = (j) => {
-                    if(!j) return {a:"A Definir", b:"A Definir", pA:"-", pB:"-", cA:"", cB:"", fA:"", fB:""};
+                    if(!j) return {a:"?", b:"?", pA:"-", pB:"-", cA:"", cB:"", fA:"", fB:""};
                     let rel = relatoriosSalvos[String(j.id)]; 
                     let p = obterPlacarSeguro(rel, j);
                     let pts = (j.titulo||'').split(' | '); 
                     let c = pts[pts.length-1].split(' x ');
-                    let eqA = extrairNomeLimpo(j.equipeANome || c[0] || "A Definir"); 
-                    let eqB = extrairNomeLimpo(j.equipeBNome || c[1] || "A Definir");
+                    
+                    // Chama o encurtador de nomes na hora de desenhar a caixa
+                    let eqA = abreviarNome(j.equipeANome || c[0] || "A Definir"); 
+                    let eqB = abreviarNome(j.equipeBNome || c[1] || "A Definir");
+                    
                     let isE = j.status==='FINALIZADO' || rel;
                     return {
                         a: eqA, b: eqB,
                         pA: isE ? p.A : "-", pB: isE ? p.B : "-",
                         cA: (isE && p.A>p.B) ? "vencedor" : "", cB: (isE && p.B>p.A) ? "vencedor" : "",
-                        fA: buscarAvatarGamer(eqA), fB: buscarAvatarGamer(eqB)
+                        fA: buscarAvatarGamer(j.equipeANome || c[0]), fB: buscarAvatarGamer(j.equipeBNome || c[1])
                     };
                 };
 
@@ -614,12 +637,13 @@
                     let html = `<div class="bracket-col">`;
                     listaJogos.forEach(j => {
                         let d = ext(j);
-                        let tStr = (j.titulo||'').split(' | ')[0];
+                        // Encurta o título do jogo para caber (ex: Mata-Mata - Quartas de Final -> Quartas)
+                        let tStr = (j.titulo||'').split(' | ')[0].replace(' de Final', '').replace('Mata-Mata - ', '');
                         html += `
                             <div class="mini-match ${isFinal ? 'final' : ''}">
                                 <div class="mini-match-header" title="${tStr}">${tStr}</div>
-                                <div class="mini-team-row ${d.cA}">${d.fA}<span class="mini-team-name">${d.a}</span><span class="mini-team-score">${d.pA}</span></div>
-                                <div class="mini-team-row ${d.cB}">${d.fB}<span class="mini-team-name">${d.b}</span><span class="mini-team-score">${d.pB}</span></div>
+                                <div class="mini-team-row ${d.cA}">${d.fA}<span class="mini-team-name" title="${d.a}">${d.a}</span><span class="mini-team-score">${d.pA}</span></div>
+                                <div class="mini-team-row ${d.cB}">${d.fB}<span class="mini-team-name" title="${d.b}">${d.b}</span><span class="mini-team-score">${d.pB}</span></div>
                             </div>
                         `;
                     });
@@ -630,6 +654,7 @@
                 cTabela.innerHTML += `
                     <div style="font-family: 'Orbitron'; color: var(--gold); margin-top: 10px; font-size: 0.9rem; text-shadow: 0 0 10px rgba(255,215,0,0.5); text-align: center;">⚔️ Caminho do Título</div>
                     <div class="bracket-scroll-area">
+                        ${renderFase(fases['16 AVOS'])}
                         ${renderFase(fases['OITAVAS'])}
                         ${renderFase(fases['QUARTAS'])}
                         ${renderFase(fases['SEMIFINAL'])}
@@ -638,9 +663,6 @@
                 `;
             }
 
-            // ------------------------------------------
-            // ABA 3: ESTATÍSTICAS E ABA 4: CARTÕES
-            // ------------------------------------------
             let objPts = {}; let objFaltas = {};
 
             if(isEsporteAtualIndividual) {
@@ -711,9 +733,6 @@
             if(!isEsporteAtualIndividual) renderLista(objFaltas, 'container-cartoes', true, false);
         }
 
-        // ==========================================
-        // ACORDEÃO E COMPARTILHAMENTO
-        // ==========================================
         window.togglePartidas = function() {
             const divOculta = document.getElementById('partidas-ocultas');
             const btn = document.getElementById('btn-toggle-partidas');
@@ -732,26 +751,15 @@
             }
         };
 
-        function compartilharPainelGeral() {
-            let pNome = localStorage.getItem('profNome') || "Professor";
-            let pEscola = localStorage.getItem('profEscola') || "Escola";
-            let link = `${window.location.origin}/resumo.html?ref=${professorIdPublico}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
-            let txt = `🏆 *INTERCLASS ARENA AO VIVO* 🏆\n\nFala galera! Acompanhem os resultados, chaves e artilharia do campeonato em tempo real no nosso aplicativo web:\n\n👉 ${link}`;
-            
-            navigator.clipboard.writeText(txt).then(() => alert("✅ Link Copiado com Sucesso!\n\nCole no grupo do WhatsApp dos alunos:\n" + link));
-        }
-
-        function compartilharAba(tituloSecao) {
-            let pNome = localStorage.getItem('profNome') || "Professor";
-            let pEscola = localStorage.getItem('profEscola') || "Escola";
-            let link = `${window.location.origin}/resumo.html?ref=${professorIdPublico}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
-            let txt = `🏆 *INTERCLASS - ${esporteAtual.toUpperCase()}* 🏆\n\nAcompanhe a *${tituloSecao}* em tempo real:\n👉 ${link}`;
-            
-            if (navigator.share) {
-                navigator.share({ title: `Interclass Arena`, text: txt, url: link }).catch(console.error);
-            } else {
-                navigator.clipboard.writeText(txt).then(() => alert("✅ Texto copiado! Cole no WhatsApp para enviar aos alunos."));
-            }
+        function copiarLinkPublico(inputId) {
+            const input = document.getElementById(inputId);
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert(`✅ Link copiado com sucesso! Envie para seus alunos.`);
+            }).catch(err => {
+                alert("⚠️ Erro ao copiar. Copie manualmente o texto do campo.");
+            });
         }
     </script>
 </body>

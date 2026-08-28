@@ -23,8 +23,15 @@ public class TorneioService {
     public void salvarSetupCompleto(SetupDTO payload, Professor professorLogado) {
         for (EsporteSetup esporte : payload.esportes) {
             Torneio torneio = new Torneio();
+            
+            // Preenche o Titulo
             torneio.setTitulo(payload.genero.toUpperCase() + " | Esporte ID: " + esporte.id + " | Formato: " + esporte.formato);
+            
+            // 🔥 Preenche o Nome para evitar o Erro do Postgres
+            torneio.setNome("Categoria " + payload.genero.toUpperCase()); 
+            
             torneio.setStatus("CONFIGURADO");
+            
             torneioRepository.save(torneio);
         }
     }
@@ -32,12 +39,12 @@ public class TorneioService {
     public Torneio criarTorneio(TorneioDTO dto, Professor professorLogado) {
         Torneio torneio = new Torneio();
         torneio.setTitulo(dto.getTitulo()); 
+        torneio.setNome(dto.getTitulo()); // 🔥 Copia o título para o nome
         torneio.setStatus("ATIVO");
         return torneioRepository.save(torneio);
     }
 
     public List<Torneio> listarTodos(Professor professorLogado) {
-        // Como o BD atual não tem professor_id em Torneio, listamos todos:
         return torneioRepository.findAll();
     }
 }

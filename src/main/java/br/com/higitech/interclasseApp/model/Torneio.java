@@ -1,5 +1,7 @@
 package br.com.higitech.interclasseApp.model;
 
+import java.time.Year;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +18,12 @@ public class Torneio {
 
     private String titulo;
     private String status;
+    
+    private Integer ano = Year.now().getValue();
+    private Boolean ativo = true;
+
+    // 🔥 CORREÇÃO: A coluna "nome" que o PostgreSQL está exigindo
+    private String nome = "Torneio Oficial";
 
     // ==========================
     // GETTERS E SETTERS
@@ -28,4 +36,13 @@ public class Torneio {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    
+    public Integer getAno() { return ano; }
+    public void setAno(Integer ano) { this.ano = ano; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 }

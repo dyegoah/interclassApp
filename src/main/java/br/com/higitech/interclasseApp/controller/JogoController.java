@@ -32,18 +32,16 @@ public class JogoController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 🔄 ROTA QUE A TABELAS.HTML USA PARA EXIBIR OS JOGOS POR GÊNERO
     @GetMapping("/lote/{genero}")
     public ResponseEntity<List<Jogo>> getJogosDoLote(@PathVariable String genero, @AuthenticationPrincipal Professor professorLogado) {
         List<Jogo> todos = jogoService.buscarJogosPorProfessor(professorLogado);
         
-        // 🔥 FILTRO BLINDADO: Puxa só as chaves correspondentes para não misturar Masculino com Feminino
         List<Jogo> filtrados = todos.stream().filter(j -> {
             try {
                 String gen = (String) j.getClass().getMethod("getGenero").invoke(j);
                 return genero.equalsIgnoreCase(gen) || "geral".equalsIgnoreCase(gen);
             } catch (Exception e) {
-                return true; // Se o modelo for diferente, envia tudo por precaução
+                return true; 
             }
         }).collect(Collectors.toList());
         
@@ -55,10 +53,10 @@ public class JogoController {
         return ResponseEntity.ok(jogoService.buscarJogosPorProfessor(professorLogado));
     }
     
- // 🌐 ROTA PÚBLICA: Permite que alunos vejam os jogos do professor sem token de login
-    @GetMapping("/public/{professorId}/lote/{genero}")
-    public ResponseEntity<List<Jogo>> getJogosPublicoLote(@PathVariable Long professorId, @PathVariable String genero) {
-        List<Jogo> todos = jogoService.buscarJogosPorProfessorId(professorId);
+    // 🌐 ROTA PÚBLICA CORRIGIDA: Agora aceita o Hash (String) ao invés do ID (Long)
+    @GetMapping("/public/{hashPublico}/lote/{genero}")
+    public ResponseEntity<List<Jogo>> getJogosPublicoLote(@PathVariable String hashPublico, @PathVariable String genero) {
+        List<Jogo> todos = jogoService.buscarJogosPorProfessorHash(hashPublico);
         
         List<Jogo> filtrados = todos.stream().filter(j -> {
             try {

@@ -24,22 +24,18 @@ public class JogoService {
 
         if (jogosPayload != null) {
             for (Map<String, Object> jData : jogosPayload) {
-                
                 Jogo jogo = new Jogo();
 
-                // 1. Proteção contra IDs: Se já tem ID, é edição. Senão, é um jogo novo.
                 if (jData.get("id") != null && !jData.get("id").toString().isEmpty()) {
                     try {
                         Long idFront = Long.valueOf(jData.get("id").toString());
                         Optional<Jogo> existe = jogoRepository.findById(idFront);
-                        // Garante que o jogo só será alterado se pertencer ao professor logado
                         if (existe.isPresent() && existe.get().getProfessor() != null && existe.get().getProfessor().getId().equals(professorLogado.getId())) {
                             jogo = existe.get();
                         }
                     } catch (Exception e) {}
                 }
 
-                // 2. Configurações base do Jogo
                 jogo.setProfessor(professorLogado);
                 try {
                     String statusAtual = (String) jogo.getClass().getMethod("getStatus").invoke(jogo);
@@ -48,7 +44,6 @@ public class JogoService {
                     }
                 } catch (Exception e) {}
 
-                // 3. Extração dos dados enviados pelo Calendário
                 String generoJogo = jData.get("genero") != null ? jData.get("genero").toString() : generoDefault;
                 String diaId = jData.get("diaId") != null ? jData.get("diaId").toString() : (jData.get("dataJogo") != null ? jData.get("dataJogo").toString() : "");
                 String icone = jData.get("icone") != null ? jData.get("icone").toString() : "🏅";
@@ -58,7 +53,6 @@ public class JogoService {
                 String esporte = jData.get("esporte") != null ? jData.get("esporte").toString() : "";
                 String titulo = jData.get("titulo") != null ? jData.get("titulo").toString() : "";
 
-                // 4. Injeção segura de dados
                 injetarDado(jogo, "setGenero", generoJogo);
                 injetarDado(jogo, "setDataJogo", diaId);
                 injetarDado(jogo, "setDiaId", diaId);
@@ -70,27 +64,23 @@ public class JogoService {
                 injetarDado(jogo, "setEsporte", esporte);
                 injetarDado(jogo, "setTitulo", titulo);
 
-                // 5. Salva no banco de dados
                 jogoRepository.save(jogo);
             }
         }
     }
 
-    // 🔥 Ferramenta Interna: Previne erros de compilação se a classe Jogo não tiver algum atributo
     private void injetarDado(Object alvo, String nomeDoMetodo, String valor) {
         try {
             alvo.getClass().getMethod(nomeDoMetodo, String.class).invoke(alvo, valor);
-        } catch (Exception e) {
-            // Ignora silenciosamente se a coluna não existir no model
-        }
+        } catch (Exception e) {}
     }
 
     public List<Jogo> buscarJogosPorProfessor(Professor professorLogado) {
         return jogoRepository.findByProfessorId(professorLogado.getId());
     }
 
-    // 🔥 NOVO MÉTODO PARA A ROTA PÚBLICA (LINK DOS ALUNOS) 🔥
-    public List<Jogo> buscarJogosPorProfessorId(Long professorId) {
-        return jogoRepository.findByProfessorId(professorId);
+    // 🔥 NOVO MÉTODO PARA A ROTA PÚBLICA (LINK DOS ALUNOS COM HASH) 🔥
+    public List<Jogo> buscarJogosPorProfessorHash(String hashPublico) {
+        return jogoRepository.findByProfessorHashPublico(hashPublico);
     }
 }
