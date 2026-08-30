@@ -30,7 +30,6 @@ public class SetupService {
     public void processarLote(Map<String, Object> payload, Professor professorLogado) {
         String genero = payload.get("genero") != null ? payload.get("genero").toString() : "geral";
         
-        // 🔥 A MÁGICA: Limpa os esportes anteriores do Link de Inscrição usando o Hibernate (100% Seguro)
         if ("geral".equalsIgnoreCase(genero)) {
             try {
                 List<Modalidade> antigas = modalidadeRepository.findByLoteProfessorHashPublico(professorLogado.getHashPublico())
@@ -83,19 +82,37 @@ public class SetupService {
         }
     }
 
+    // 🔥 CORREÇÃO: Função blindada para rodar em Localhost (Plural) e Render (Singular) 🔥
     public void resetarTudo(Professor profLogado) {
         Long idProf = profLogado.getId();
 
+        // 1. Apaga Súmulas e Escalações
         try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM evento_sumula WHERE jogo_id IN (SELECT id FROM jogo WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM escalacao WHERE jogo_id IN (SELECT id FROM jogo WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogos WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM escalacoes WHERE jogo_id IN (SELECT id FROM jogo WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        
+        // 2. Apaga Classificações
         try { jdbcTemplate.update("DELETE FROM classificacao WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM classificacoes WHERE professor_id = ?", idProf); } catch (Exception e) {}
+        
+        // 3. Apaga Jogos e Alunos
         try { jdbcTemplate.update("DELETE FROM jogos WHERE professor_id = ?", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM jogo WHERE professor_id = ?", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM alunos WHERE professor_id = ?", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM aluno WHERE professor_id = ?", idProf); } catch (Exception e) {}
+        
+        // 4. Apaga Modalidades e Lotes
         try { jdbcTemplate.update("DELETE FROM modalidades WHERE lote_id IN (SELECT id FROM lotes WHERE professor_id = ?)", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM modalidade WHERE lote_id IN (SELECT id FROM lote WHERE professor_id = ?)", idProf); } catch (Exception e) {}
         try { jdbcTemplate.update("DELETE FROM lotes WHERE professor_id = ?", idProf); } catch (Exception e) {}
-        try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM lotes)"); } catch (Exception e) {}
-        try { jdbcTemplate.update("DELETE FROM torneios WHERE id NOT IN (SELECT torneio_id FROM tb_lote)"); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM lote WHERE professor_id = ?", idProf); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM tb_lote WHERE professor_id = ?", idProf); } catch (Exception e) {}
+        
+        // 5. Apaga Torneios (A tabela oficial do Render ficou como tb_torneio)
+        try { jdbcTemplate.update("DELETE FROM torneios"); } catch (Exception e) {}
+        try { jdbcTemplate.update("DELETE FROM tb_torneio"); } catch (Exception e) {}
     }
 }
