@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
                     "http://localhost:8080",      // Para testes locais
                     "http://localhost:5500",      // Caso use Live Server do VSCode
                     "https://seu-site-oficial.com.br", // URL final do seu frontend em produção
-                    "https://interclassapp.onrender.com/index.html" // URL do Render
+                    "https://interclassapp.onrender.com" // URL do Render
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
                 .allowedHeaders("*")
