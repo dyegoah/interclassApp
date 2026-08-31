@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+// 🔥 IMPORTAÇÃO NOVA ADICIONADA AQUI
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
@@ -16,9 +18,9 @@ import br.com.higitech.interclasseApp.model.Professor;
 @Service
 public class TokenService {
 
-    // ⚠️ ATENÇÃO: No futuro (no Render), essa senha deve vir das Variáveis de Ambiente!
-    // Por enquanto, usaremos essa senha forte fixa para testes.
-    private final String segredo = "H1ghT3ch-4r3n4-S3cur1ty-K3y-2026!";
+    // 🔥 ALTERAÇÃO AQUI: Removemos o valor fixo e usamos o @Value
+    @Value("${api.security.token.secret:H1ghT3ch-4r3n4-S3cur1ty-K3y-2026!}")
+    private String segredo;
 
     // 1. MÉTODO QUE GERA O CRACHÁ
     public String gerarToken(Professor professor) {
