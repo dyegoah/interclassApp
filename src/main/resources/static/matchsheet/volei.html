@@ -44,9 +44,13 @@
         .timeout-dot { width: 15px; height: 15px; background: #00ff00; border-radius: 3px; box-shadow: 0 0 5px #00ff00; cursor: pointer;}
         .timeout-dot.used { background: #333; box-shadow: none; cursor: default;}
 
-        .prancheta { display: flex; gap: 20px; flex-wrap: wrap; }
-        .time-list { flex: 1; min-width: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent;}
-        .time-list.a { border-top-color: var(--team-a); } .time-list.b { border-top-color: var(--team-b); }
+        /* 🔥 LAYOUT ARENA COLETIVA (LINHA DO TEMPO NO MEIO) 🔥 */
+        .arena-prancheta { display: flex; width: 100%; margin: 25px auto; gap: 20px; align-items: flex-start; justify-content: center; }
+        @media (max-width: 900px) { .arena-prancheta { flex-direction: column; } }
+
+        .coluna-time { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 280px; width: 100%; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent; }
+        .coluna-time.a { border-top-color: var(--team-a); }
+        .coluna-time.b { border-top-color: var(--team-b); }
         
         .player-row { display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
         .player-row:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); transform: scale(1.02);}
@@ -62,6 +66,14 @@
         .stat-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; color: white; display: flex; align-items: center; gap: 4px; }
         .stat-pill b { font-family: 'Orbitron'; color: var(--theme-primary); font-size: 0.9rem;}
 
+        .timeline-container { flex: 1.2; min-width: 300px; width: 100%; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; min-height: 250px; }
+        .timeline-titulo { font-size: 1rem; color: var(--theme-primary); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Orbitron';}
+        .timeline-list { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; overflow-y: auto; max-height: 450px; padding-right: 5px;}
+        .timeline-item { display: flex; align-items: center; gap: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #555;}
+        .timeline-item.evt-a { border-left-color: var(--team-a); }
+        .timeline-item.evt-b { border-left-color: var(--team-b); }
+        .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
+
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
         .modal-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
@@ -72,10 +84,6 @@
         .btn-erro { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
         .btn-card-amarelo { background: rgba(255, 234, 0, 0.2); border: 1px solid #ffea00; color: #ffea00;}
         .btn-card-vermelho { background: rgba(255, 0, 0, 0.5); border: 1px solid #ff0000; color: #fff;}
-
-        .timeline-box { margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; display: none; }
-        .timeline-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-family: 'Segoe UI'; font-size: 0.9rem; }
-        .timeline-time { color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -98,7 +106,7 @@
 
         <div class="placar-board">
             <div class="team-col team-a">
-                <div class="team-name" id="nome-time-a">Equipe A</div>
+                <div class="team-name" id="placar-nome-a">Equipe A</div>
                 <div class="sets-won" id="sets-dots-a"></div>
                 <div class="team-score score-a" id="score-a">0</div>
                 <div class="timeouts-area" id="box-timeouts-a">
@@ -113,7 +121,7 @@
             <div style="display:flex; flex-direction: column; justify-content: center; font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.2);">X</div>
             
             <div class="team-col team-b">
-                <div class="team-name" id="nome-time-b">Equipe B</div>
+                <div class="team-name" id="placar-nome-b">Equipe B</div>
                 <div class="sets-won" id="sets-dots-b"></div>
                 <div class="team-score score-b" id="score-b">0</div>
                 <div class="timeouts-area" id="box-timeouts-b">
@@ -131,14 +139,18 @@
             <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 15px; border-radius: 10px; cursor: pointer;" onclick="corrigirPlacar('B', -1)">-1 Ponto (B)</button>
         </div>
 
-        <div class="prancheta">
-            <div class="time-list a" id="lista-a"></div>
-            <div class="time-list b" id="lista-b"></div>
-        </div>
-
-        <div class="timeline-box" id="timeline-container">
-            <h3 style="color: #fff; font-family: 'Orbitron'; margin-bottom: 10px;">📄 Relatório da Partida</h3>
-            <div id="timeline-lista"></div>
+        <!-- 🔥 LINHA DO TEMPO CENTRALIZADA 🔥 -->
+        <div class="arena-prancheta">
+            <div class="coluna-time a" id="lista-a"></div>
+            
+            <div class="timeline-container">
+                <div class="timeline-titulo">⏱️ Relatório Oficial da Partida</div>
+                <div class="timeline-list" id="timeline-lista">
+                    <div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>
+                </div>
+            </div>
+            
+            <div class="coluna-time b" id="lista-b"></div>
         </div>
 
     </div>
@@ -183,6 +195,7 @@
         let timeoutsUsados = { A: [false, false], B: [false, false] }; 
         let escalacao = { A: [], B: [] };
         let timeline = [];
+        let listaAlunosGlobais = [];
         
         let jogadorAcao = null; let timeAcao = null;
         
@@ -192,7 +205,14 @@
         window.onload = async () => {
             const token = localStorage.getItem('interclassToken');
 
-            // 🔥 NOVA BUSCA SEGURA VIA LOTE
+            // 🔥 NOVO: BUSCA OS ALUNOS CADASTRADOS PARA INJETAR AUTOMATICAMENTE NAS EQUIPES 🔥
+            try {
+                let resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (resAlunos.ok) {
+                    listaAlunosGlobais = await resAlunos.json();
+                }
+            } catch (error) { console.warn("Erro ao buscar alunos."); }
+
             try {
                 let res = await fetch(`/api/jogos/lote/${lote}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (res.ok) {
@@ -214,8 +234,8 @@
             let iconeEsporte = matchAtiva.icone || (matchAtiva.modalidade ? matchAtiva.modalidade.icone : "🏐");
 
             document.getElementById('match-info').innerHTML = `${iconeEsporte} <b>${nomeEsporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
-            document.getElementById('nome-time-a').innerText = matchAtiva.equipeANome || "Equipe A";
-            document.getElementById('nome-time-b').innerText = matchAtiva.equipeBNome || "Equipe B";
+            document.getElementById('placar-nome-a').innerText = matchAtiva.equipeANome || "Equipe A";
+            document.getElementById('placar-nome-b').innerText = matchAtiva.equipeBNome || "Equipe B";
 
             if(isReadOnly) {
                 let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
@@ -226,24 +246,67 @@
                 timeline = rel.timeline || [];
                 setAtualIndex = rel.setAtualIndex || 0;
                 
+                document.getElementById('crono-area').style.display = 'none';
                 document.getElementById('btn-finalizar').style.display = 'none';
                 document.getElementById('manual-controls').style.display = 'none';
                 document.getElementById('box-timeouts-a').style.display = 'none';
                 document.getElementById('box-timeouts-b').style.display = 'none';
-                document.getElementById('timeline-container').style.display = 'block';
                 
-                renderTimeline(); atualizarPlacarVisual(true);
             } else {
-                escalarMock(); atualizarPlacarVisual();
+                // 🔥 CARREGANDO JOGADORES REAIS DA SÚMULA NO BANCO DE DADOS 🔥
+                if (matchAtiva.escalacoes && matchAtiva.escalacoes.length > 0) {
+                    matchAtiva.escalacoes.forEach(esc => {
+                        let nome = esc.aluno ? esc.aluno.nome : (esc.nomeAluno || "Atleta");
+                        let eq = esc.equipe;
+                        let num = esc.numeroCamisa || '-';
+                        let id = esc.aluno ? esc.aluno.id : (esc.alunoId || ('esc_' + Math.random()));
+                        let corEq = eq === 'A' ? '00f2fe' : 'ff00de';
+                        let fotoUrl = (esc.aluno && esc.aluno.fotoUrl) ? esc.aluno.fotoUrl : (esc.fotoUrl || '');
+                        if(!fotoUrl) fotoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=222&color=${corEq}&bold=true`;
+                        escalacao[eq].push({ id: id, numero: num, nome: nome, foto: fotoUrl, stats: [] });
+                    });
+                } else {
+                    // 🔥 BUSCA INTELIGENTE: Puxa os alunos da Turma e Esporte, mesmo se a escala não estiver salva na partida! 🔥
+                    let sportName = nomeEsporte.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    let rawA = (matchAtiva.equipeANome || "Equipe A").split(' (')[0].trim();
+                    let rawB = (matchAtiva.equipeBNome || "Equipe B").split(' (')[0].trim();
+
+                    let alunosA = listaAlunosGlobais.filter(a => a.turma === rawA && (a.esporte || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() === sportName && a.genero === lote);
+                    let alunosB = listaAlunosGlobais.filter(a => a.turma === rawB && (a.esporte || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() === sportName && a.genero === lote);
+
+                    if(alunosA.length > 0) {
+                        alunosA.forEach((a, i) => {
+                            let fotoUrl = a.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=222&color=00f2fe&bold=true`;
+                            escalacao.A.push({ id: a.id, numero: i+1, nome: a.nome, foto: fotoUrl, stats: [] });
+                        });
+                    } else {
+                        escalarMockEquipe('A', rawA, '00f2fe', 1);
+                    }
+
+                    if(alunosB.length > 0) {
+                        alunosB.forEach((a, i) => {
+                            let fotoUrl = a.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=222&color=ff00de&bold=true`;
+                            escalacao.B.push({ id: a.id, numero: i+1, nome: a.nome, foto: fotoUrl, stats: [] });
+                        });
+                    } else {
+                        escalarMockEquipe('B', rawB, 'ff00de', 10);
+                    }
+                }
             }
+            atualizarPlacarVisual(isReadOnly);
             renderizarListas();
+            renderTimeline();
         };
 
-        function escalarMock() {
-            const nomes = ["Lucas", "Pedro", "João", "Gabriel", "Matheus", "Carlos", "Rafael", "Felipe", "Thiago", "Bruno"];
+        function escalarMockEquipe(eq, nomeTurma, cor, startNum) {
             for(let i=0; i<6; i++) {
-                escalacao.A.push({ id: 'A'+i, numero: i+2, nome: nomes[i], foto: `https://i.pravatar.cc/150?img=${i+10}`, stats: [] });
-                escalacao.B.push({ id: 'B'+i, numero: i+7, nome: nomes[i+4] || 'Atleta B', foto: `https://i.pravatar.cc/150?img=${i+20}`, stats: [] });
+                escalacao[eq].push({ 
+                    id: eq + i, 
+                    numero: startNum + i, 
+                    nome: `Atleta ${i+1} (${nomeTurma})`, 
+                    foto: `https://ui-avatars.com/api/?name=A+${i+1}&background=222&color=${cor}&bold=true`, 
+                    stats: [] 
+                });
             }
         }
 
@@ -254,7 +317,7 @@
 
             if(venceuA || venceuB) {
                 let timeVencedor = venceuA ? 'A' : 'B';
-                addTimeline(`🏆 FIM DO ${setAtualIndex}º SET! Vitória da Equipe ${timeVencedor} por ${placar.A} x ${placar.B}`);
+                addTimeline(`🏆 FIM DO ${setAtualIndex}º SET! Vitória da Equipe ${timeVencedor} por ${placar.A} x ${placar.B}`, timeVencedor);
                 setsGanhos[timeVencedor]++;
                 
                 if(setsGanhos[timeVencedor] === totalSetsParaVencer) {
@@ -301,14 +364,14 @@
             if(timeoutsUsados[time][index]) return; 
             if(confirm(`Confirmar Pedido de Tempo para a Equipe ${time}?`)) {
                 timeoutsUsados[time][index] = true;
-                addTimeline(`⏱️ TEMPO TÉCNICO: Solicitado pela Equipe ${time}.`);
+                addTimeline(`⏱️ TEMPO TÉCNICO: Solicitado pela Equipe ${time}.`, time);
                 atualizarPlacarVisual();
             }
         }
 
         function corrigirPlacar(time, valor) {
             placar[time] += valor; if(placar[time] < 0) placar[time] = 0;
-            addTimeline(`Corretor Manual: Placar Equipe ${time} ajustado.`);
+            addTimeline(`Corretor Manual: Placar Equipe ${time} ajustado.`, time);
             atualizarPlacarVisual();
         }
 
@@ -328,7 +391,14 @@
 
                     let estiloLinha = tomouVermelho ? 'border-color: #ff0000; background: rgba(255,0,0,0.1); opacity: 0.5;' : '';
                     let pointer = isReadOnly || tomouVermelho ? 'readonly' : '';
-                    let click = (isReadOnly || tomouVermelho) ? `onclick="alert('Jogador expulso.')"` : `onclick="abrirModal('${j.id}', '${t}')"`;
+                    
+                    // 🔥 CORREÇÃO DE CLIQUE 🔥
+                    let click = '';
+                    if (tomouVermelho) {
+                        click = `onclick="alert('Jogador expulso.')"`;
+                    } else if (!isReadOnly) {
+                        click = `onclick="abrirModal('${j.id}', '${t}')"`;
+                    }
                     
                     html += `
                         <div class="player-row ${pointer}" ${click} style="${estiloLinha}">
@@ -345,7 +415,9 @@
         }
 
         function abrirModal(id, t) {
-            jogadorAcao = escalacao[t].find(j => j.id === id); timeAcao = t;
+            // 🔥 CORREÇÃO DO BUG: COMPARAÇÃO CONVERTIDA PARA STRING 🔥
+            jogadorAcao = escalacao[t].find(j => String(j.id) === String(id)); 
+            timeAcao = t;
             document.getElementById('acao-foto').src = jogadorAcao.foto;
             document.getElementById('acao-nome').textContent = jogadorAcao.nome;
             document.getElementById('acao-num').textContent = `Camisa ${jogadorAcao.numero}`;
@@ -366,27 +438,35 @@
             if(!jogadorAcao.stats) jogadorAcao.stats = [];
             jogadorAcao.stats.push(icone);
 
-            addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`);
+            addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`, timeAcao);
             fecharModal(); atualizarPlacarVisual(); renderizarListas(); checarFimDeSet();
         }
 
-        function addTimeline(txt) {
-            timeline.push({ set: setAtualIndex, placarStr: `${placar.A}x${placar.B}`, txt: txt });
+        function addTimeline(txt, eq = null) {
+            timeline.push({ set: setAtualIndex, placarStr: `${placar.A}x${placar.B}`, txt: txt, equipe: eq });
+            renderTimeline();
         }
         
         function renderTimeline() {
             let html = '';
-            timeline.forEach(t => {
-                html += `<div class="timeline-item"><span class="timeline-time">[Set ${t.set} | ${t.placarStr}]</span> <div style="flex-grow:1;">${t.txt}</div></div>`;
-            });
+            if(timeline.length === 0) {
+                html = '<div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>';
+            } else {
+                [...timeline].reverse().forEach(t => {
+                    let eqClass = t.equipe === 'A' ? 'evt-a' : (t.equipe === 'B' ? 'evt-b' : '');
+                    html += `<div class="timeline-item ${eqClass}">
+                                <div class="time-stamp">${t.placarStr}</div>
+                                <div style="flex-grow:1; font-family:'Segoe UI';"><b>[Set ${t.set}]</b> ${t.txt}</div>
+                             </div>`;
+                });
+            }
             document.getElementById('timeline-lista').innerHTML = html;
         }
 
         async function finalizarPartida() {
             if(confirm("Encerrar partida e gravar súmula oficial no Banco de Dados? O resultado não poderá ser alterado.")) {
-                const token = localStorage.getItem('interclassToken');
                 
-                // 🔥 Usa o Set ganho como o Placar final no JSON principal
+                const token = localStorage.getItem('interclassToken');
                 let placarFinalA = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.A : placar.A;
                 let placarFinalB = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.B : placar.B;
 
@@ -405,7 +485,7 @@
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({ status: 'FINALIZADO', placarA: placarFinalA, placarB: placarFinalB })
-                    }).catch(e => console.warn("Fallback PUT Jogos ignorado"));
+                    }).catch(e => console.warn("Fallback PUT Jogos ignorado:", e));
 
                     const response = await fetch(`/api/sumulas/${idJogo}/finalizar`, {
                         method: 'POST',

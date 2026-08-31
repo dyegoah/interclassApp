@@ -94,7 +94,6 @@
 <body>
     <div class="arena-container">
         
-        <!-- O Placeholder original, mantendo a estrutura limpa e modular -->
         <div id="topbar-placeholder"></div>
 
         <div class="dashboard-header">
@@ -169,7 +168,7 @@
             
             <div style="display: flex; gap: 10px;">
                 <button class="btn-acao" style="background: #333; color: #fff; flex: 1;" onclick="document.getElementById('modal-link').style.display = 'none';">Fechar</button>
-                <button class="btn-acao" style="flex: 1;" onclick="copiarLink()">Copiar Link</button>
+                <button class="btn-acao" style="flex: 1;" onclick="copiarLink()">Copiar e Compartilhar</button>
             </div>
         </div>
     </div>
@@ -341,6 +340,7 @@
             atualizarLinkDinamico();
         }
 
+        // 🔥 FUNÇÃO COPIAR LINK COM COMPARTILHAMENTO NATIVO (WEB SHARE API) 🔥
         function copiarLink() {
             const linkInput = document.getElementById('link-publico');
             const linkText = linkInput.value;
@@ -349,29 +349,42 @@
                 alert("⚠️ Nenhum link disponível para copiar. Por favor, faça login novamente."); return;
             }
 
-            const ghostInput = document.createElement('textarea');
-            ghostInput.value = linkText;
-            ghostInput.style.position = 'absolute';
-            ghostInput.style.left = '-9999px'; 
-            ghostInput.setAttribute('readonly', ''); 
+            // Deixa o texto selecionado visualmente
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); 
 
-            document.body.appendChild(ghostInput);
-            ghostInput.select();
-            ghostInput.setSelectionRange(0, 99999); 
-
-            try {
-                document.execCommand('copy');
-                alert("✅ Link copiado com sucesso! Envie para os seus alunos.");
-            } catch (err) {
-                alert("⚠️ Seu navegador bloqueou a cópia. Selecione o texto e copie manualmente.");
+            // Usa o clipboard mais moderno com fallback
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(linkText).then(() => dispararCompartilhamento(linkText));
+            } else {
+                const ghostInput = document.createElement('textarea');
+                ghostInput.value = linkText;
+                ghostInput.style.position = 'absolute';
+                ghostInput.style.left = '-9999px'; 
+                document.body.appendChild(ghostInput);
+                ghostInput.select();
+                try {
+                    document.execCommand('copy');
+                    dispararCompartilhamento(linkText);
+                } catch (err) {
+                    alert("⚠️ Seu navegador bloqueou a cópia invisível. Selecione o texto e copie manualmente.");
+                }
+                document.body.removeChild(ghostInput); 
             }
-            document.body.removeChild(ghostInput); 
+
+            function dispararCompartilhamento(url) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Inscrição - Interclass Arena',
+                        text: 'Faça sua inscrição no torneio através deste link!',
+                        url: url
+                    }).catch(console.error); // Ignora erros se o usuário fechar a janela
+                } else {
+                    alert("✅ Link copiado com sucesso! Cole nas suas redes sociais ou WhatsApp para enviar.");
+                }
+            }
         }
 
-        document.addEventListener('click', () => { 
-            const d = document.getElementById('user-dropdown'); 
-            if(d && d.style.display === 'block') d.style.display = 'none'; 
-        });
     </script>
 </body>
 </html>

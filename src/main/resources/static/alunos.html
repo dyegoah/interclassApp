@@ -125,6 +125,7 @@
         <div id="topbar-placeholder"></div>
 
         <div class="glass">
+            <!-- 🔥 TOPO COM O BOTÃO DE GERAR PDF ADICIONADO AQUI 🔥 -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 1.5rem;">
                 <div>
                     <h2 class="section-title">👥 Gestão de Atletas</h2>
@@ -135,6 +136,9 @@
                     <div id="badge-total-geral" class="total-geral-badge" style="display: none;">
                         🏆 Total Geral: <b id="valor-total-geral" style="color: var(--theme-primary);">0</b>
                     </div>
+                    
+                    <button class="btn-acao" style="background: #fff; color: #000; padding: 10px 15px; box-shadow: 0 0 15px rgba(255,255,255,0.3);" onclick="gerarPDFAlunos()">📄 Gerar PDF</button>
+
                     <button class="btn-acao" onclick="window.location.href='/dashboard.html'">🡨 Voltar ao Painel</button>
                 </div>
             </div>
@@ -475,6 +479,86 @@
             for (let i = 1; i <= totalPaginas; i++) html += `<button class="btn-page ${paginaAtual === i ? 'active' : ''}" onclick="paginaAtual=${i}; renderizarGridPaginado();">${i}</button>`;
             html += `<button class="btn-page" ${paginaAtual === totalPaginas ? 'disabled' : ''} onclick="paginaAtual++; renderizarGridPaginado();">Próx »</button>`;
             container.innerHTML = html;
+        }
+
+        // 🔥 FUNÇÃO DE GERAR PDF EXCEL-LIKE (CORRIGIDA) 🔥
+        function gerarPDFAlunos() {
+            if (listaAlunosBase.length === 0) {
+                alert("Nenhum atleta inscrito para gerar o relatório.");
+                return;
+            }
+
+            let alunosOrdenados = [...listaAlunosBase].sort((a, b) => {
+                if(a.turma < b.turma) return -1;
+                if(a.turma > b.turma) return 1;
+                return a.nome.localeCompare(b.nome);
+            });
+
+            let inst = localStorage.getItem('profEscola') ? localStorage.getItem('profEscola').replace(/"/g, '') : 'Instituição Não Definida';
+            let prof = localStorage.getItem('profNome') ? localStorage.getItem('profNome').replace(/"/g, '') : 'Professor';
+            let dataAtual = new Date().toLocaleDateString('pt-BR');
+            let horaAtual = new Date().toLocaleTimeString('pt-BR');
+
+            let linhas = "";
+            alunosOrdenados.forEach((a, idx) => {
+                linhas += "<tr>" +
+                    "<td style='text-align:center; padding: 3px;'>" + (idx + 1) + "</td>" +
+                    "<td style='padding: 3px;'><b>" + a.turma + "</b></td>" +
+                    "<td style='padding: 3px;'>" + a.nome + "</td>" +
+                    "<td style='padding: 3px; text-transform: capitalize;'>" + a.genero + "</td>" +
+                    "<td style='padding: 3px;'>" + a.esporte + "</td>" +
+                "</tr>";
+            });
+
+            let html = "<!DOCTYPE html><html><head><title>Relatório de Alunos - InterclassApp</title>" +
+            "<style>" +
+                "body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; color: #000; font-size: 10px; }" +
+                ".header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }" +
+                ".app-name { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }" +
+                ".inst-name { font-size: 24px; font-weight: bold; text-transform: uppercase; margin: 0; }" +
+                ".prof-name { font-size: 13px; margin-top: 5px; color: #222; }" +
+                "table { width: 100%; border-collapse: collapse; margin-top: 10px; }" +
+                "th, td { border: 1px solid #000; text-align: left; vertical-align: middle; }" +
+                "th { background-color: #ddd; font-weight: bold; font-size: 11px; padding: 4px; }" +
+                "tbody tr:nth-child(even) { background-color: #f4f4f4; }" +
+                ".no-print { text-align: center; margin-bottom: 20px; padding: 15px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; }" +
+                ".btn-print { background: #00f2fe; color: #000; border: 1px solid #00a8b3; padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; text-transform: uppercase; font-family: sans-serif; }" +
+                ".btn-print:hover { background: #00cce6; }" +
+                "@media print {" +
+                    "@page { margin: 15mm 10mm; }" +
+                    "body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }" +
+                    "thead { display: table-header-group; }" +
+                    "tfoot { display: table-footer-group; }" +
+                    ".no-print { display: none !important; }" +
+                "}" +
+                ".footer { text-align: right; font-size: 9px; margin-top: 15px; color: #555; }" +
+            "</style></head><body>" +
+            "<div class='no-print'>" +
+                "<h3 style='margin-top: 0; font-size: 16px; color: #333;'>Confira a lista antes de imprimir</h3>" +
+                "<button class='btn-print' onclick='window.print()'>🖨️ Imprimir Relatório</button>" +
+            "</div>" +
+            "<div class='header'>" +
+                "<div class='app-name'>InterclassApp - Relatório Esportivo Oficial</div>" +
+                "<h1 class='inst-name'>" + inst + "</h1>" +
+                "<div class='prof-name'>Professor(a) Responsável: <b>" + prof + "</b></div>" +
+            "</div>" +
+            "<table>" +
+                "<thead><tr>" +
+                    "<th style='width: 30px; text-align:center;'>#</th>" +
+                    "<th style='width: 100px;'>Turma</th>" +
+                    "<th>Nome do Atleta</th>" +
+                    "<th style='width: 80px;'>Gênero</th>" +
+                    "<th style='width: 150px;'>Modalidade</th>" +
+                "</tr></thead>" +
+                "<tbody>" + linhas + "</tbody>" +
+            "</table>" +
+            "<div class='footer'>Gerado em " + dataAtual + " às " + horaAtual + " - A paginação é inserida automaticamente pelo navegador na impressão.</div>" +
+            "</body></html>";
+
+            let printWindow = window.open('', '_blank');
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
         }
     </script>
 	

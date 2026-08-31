@@ -157,7 +157,6 @@
             return { A: parseInt(pA) || 0, B: parseInt(pB) || 0 };
         }
 
-        // 🔥 CORREÇÃO DA EXTRAÇÃO DE NOME PARA EVITAR "DESCONHECIDA"
         function extrairEsporteNomeSeguro(j) {
             if(j.esporte && typeof j.esporte === 'string' && j.esporte.trim() !== '') return j.esporte;
             if(j.modalidade && j.modalidade.nomeEsporte && j.modalidade.nomeEsporte.trim() !== '') return j.modalidade.nomeEsporte;
@@ -241,76 +240,87 @@
             buscarJogosDoBanco(genero);
         }
 
-		function resolverNomesDinamicos(jogos, generoCorrente) {
-		            let mapVencedores = {};
+        // 🔥 CORREÇÃO DE VAZAMENTO: Inteligência para amarrar a chave vencedora ao Esporte 🔥
+        function resolverNomesDinamicos(jogos, generoCorrente) {
+            let mapVencedores = {};
 
-		            jogos.forEach(j => {
-		                let numMatch = j.titulo.match(/\(Jogo (\d+)\)/i);
-		                if (numMatch) {
-		                    let idJogoStr = numMatch[1];
-		                    let rel = relatoriosSalvos[String(j.id)];
-		                    
-		                    if (rel || j.status === 'FINALIZADO') {
-		                        let placares = obterPlacarSeguro(rel, j);
-		                        let partes = j.titulo.split(' | ');
-		                        let idxConfronto = partes.length >= 3 ? 2 : 1;
-		                        
-		                        let confrontoPartes = partes[idxConfronto] ? partes[idxConfronto].split(' x ') : [];
-		                        let eqA = j.equipeANome || j.equipeaNome || (confrontoPartes[0] ? confrontoPartes[0].trim() : "Equipe A");
-		                        let eqB = j.equipeBNome || j.equipebNome || (confrontoPartes[1] ? confrontoPartes[1].trim() : "Equipe B");
-		                        
-		                        eqA = eqA.replace(' (Série de Partidas)', '');
-		                        eqB = eqB.replace(' (Série de Partidas)', '');
+            jogos.forEach(j => {
+                let espNome = extrairEsporteNomeSeguro(j).toLowerCase().trim();
+                let numMatch = j.titulo.match(/\(Jogo (\d+)\)/i);
+                
+                if (numMatch) {
+                    let idJogoStr = numMatch[1];
+                    let chaveVencedor = `${espNome}_${idJogoStr}`; // ✅ Chave agora é 100% isolada por esporte
+                    let rel = relatoriosSalvos[String(j.id)];
+                    
+                    if (rel || j.status === 'FINALIZADO') {
+                        let placares = obterPlacarSeguro(rel, j);
+                        let partes = j.titulo.split(' | ');
+                        let idxConfronto = partes.length >= 3 ? 2 : 1;
+                        
+                        let confrontoPartes = partes[idxConfronto] ? partes[idxConfronto].split(' x ') : [];
+                        let eqA = j.equipeANome || j.equipeaNome || (confrontoPartes[0] ? confrontoPartes[0].trim() : "Equipe A");
+                        let eqB = j.equipeBNome || j.equipebNome || (confrontoPartes[1] ? confrontoPartes[1].trim() : "Equipe B");
+                        
+                        eqA = eqA.replace(' (Série de Partidas)', '');
+                        eqB = eqB.replace(' (Série de Partidas)', '');
 
-		                        if (placares.A > placares.B) {
-		                            mapVencedores[idJogoStr] = { nome: eqA, id: j.equipeAId };
-		                        } else if (placares.B > placares.A) {
-		                            mapVencedores[idJogoStr] = { nome: eqB, id: j.equipeBId };
-		                        }
-		                    }
-		                }
-		            });
+                        if (placares.A > placares.B) {
+                            mapVencedores[chaveVencedor] = { nome: eqA, id: j.equipeAId };
+                        } else if (placares.B > placares.A) {
+                            mapVencedores[chaveVencedor] = { nome: eqB, id: j.equipeBId };
+                        }
+                    }
+                }
+            });
 
-		            jogos.forEach(j => {
-		                let partesTitulo = j.titulo.split(' | ');
-		                if (partesTitulo.length < 2) return;
-		                
-		                let idxConfronto = partesTitulo.length >= 3 ? 2 : 1;
-		                let confrontoPartes = partesTitulo[idxConfronto].split(' x ');
-		                
-		                let nomeA = j.equipeANome || j.equipeaNome || confrontoPartes[0]?.trim();
-		                let nomeB = j.equipeBNome || j.equipebNome || confrontoPartes[1]?.trim();
+            jogos.forEach(j => {
+                let espNome = extrairEsporteNomeSeguro(j).toLowerCase().trim();
+                let partesTitulo = j.titulo.split(' | ');
+                if (partesTitulo.length < 2) return;
+                
+                let idxConfronto = partesTitulo.length >= 3 ? 2 : 1;
+                let confrontoPartes = partesTitulo[idxConfronto].split(' x ');
+                
+                let nomeA = j.equipeANome || j.equipeaNome || confrontoPartes[0]?.trim();
+                let nomeB = j.equipeBNome || j.equipebNome || confrontoPartes[1]?.trim();
 
-		                const regexVencedor = /(?:Vencedor do Jogo|Venc\.? Jogo) (\d+)/i;
+                const regexVencedor = /(?:Vencedor do Jogo|Venc\.? Jogo) (\d+)/i;
 
-		                let mudouA = false;
-		                let matchA = nomeA.match(regexVencedor);
-		                if (matchA && mapVencedores[matchA[1]]) {
-		                    j.equipeANome = mapVencedores[matchA[1]].nome;
-		                    j.equipeAId = mapVencedores[matchA[1]].id;
-		                    nomeA = j.equipeANome; 
-		                    mudouA = true;
-		                }
+                let mudouA = false;
+                let matchA = nomeA.match(regexVencedor);
+                if (matchA) {
+                    let chaveA = `${espNome}_${matchA[1]}`; // ✅ Busca vencedores apenas do mesmo esporte
+                    if (mapVencedores[chaveA]) {
+                        j.equipeANome = mapVencedores[chaveA].nome;
+                        j.equipeAId = mapVencedores[chaveA].id;
+                        nomeA = j.equipeANome; 
+                        mudouA = true;
+                    }
+                }
 
-		                let mudouB = false;
-		                let matchB = nomeB.match(regexVencedor);
-		                if (matchB && mapVencedores[matchB[1]]) {
-		                    j.equipeBNome = mapVencedores[matchB[1]].nome;
-		                    j.equipeBId = mapVencedores[matchB[1]].id;
-		                    nomeB = j.equipeBNome; 
-		                    mudouB = true;
-		                }
+                let mudouB = false;
+                let matchB = nomeB.match(regexVencedor);
+                if (matchB) {
+                    let chaveB = `${espNome}_${matchB[1]}`; // ✅ Busca vencedores apenas do mesmo esporte
+                    if (mapVencedores[chaveB]) {
+                        j.equipeBNome = mapVencedores[chaveB].nome;
+                        j.equipeBId = mapVencedores[chaveB].id;
+                        nomeB = j.equipeBNome; 
+                        mudouB = true;
+                    }
+                }
 
-		                if (mudouA || mudouB) {
-		                    let sufixo = partesTitulo[idxConfronto].includes('(Série de Partidas)') ? ' (Série de Partidas)' : '';
-		                    partesTitulo[idxConfronto] = `${nomeA} x ${nomeB}${sufixo}`;
-		                    j.titulo = partesTitulo.join(' | ');
-		                    j._mudou = true; 
-		                }
-		            });
-		            
-		            return jogos;
-		        }
+                if (mudouA || mudouB) {
+                    let sufixo = partesTitulo[idxConfronto].includes('(Série de Partidas)') ? ' (Série de Partidas)' : '';
+                    partesTitulo[idxConfronto] = `${nomeA} x ${nomeB}${sufixo}`;
+                    j.titulo = partesTitulo.join(' | ');
+                    j._mudou = true; 
+                }
+            });
+            
+            return jogos;
+        }
 
 		async function buscarJogosDoBanco(genero) {
             const container = document.getElementById('lista-jogos');
@@ -400,7 +410,6 @@
                 let eNome = extrairEsporteNomeSeguro(jogo);
                 let eIcon = extrairEsporteIconeSeguro(jogo);
                 
-                // 🔥 SOLUÇÃO DEFINITIVA DO VAZAMENTO 🔥
                 // Agrupando rigorosamente pelo GÊNERO e ESPORTE para não misturar chaves
                 let chaveUnica = `${genero}_${eNome}`;
 
@@ -447,7 +456,7 @@
 				                    let tituloOriginalSeguro = jogo.titulo || "Aguardando";
 				                    let partesTitulo = tituloOriginalSeguro.split(' | ');
 				                    
-				                    // 🔥 MÁGICA: Lê perfeitamente se o título tem 2 ou 3 divisões
+				                    // Lê perfeitamente se o título tem 2 ou 3 divisões
 				                    let faseTagOriginal = "";
 				                    let confrontoStr = "";
 
@@ -465,7 +474,7 @@
 				                    let faseTagSemTrofeu = faseTagOriginal.replace('🏆', '').trim();
 				                    let fUpper = faseTagSemTrofeu.toUpperCase();
 				                    
-				                    // 🔥 SEPARAÇÃO INTELIGENTE DO "(Jogo X)" DA FASE
+				                    // SEPARAÇÃO INTELIGENTE DO "(Jogo X)" DA FASE
 				                    let matchJogo = faseTagSemTrofeu.match(/(\(Jogo \d+\))/i);
 				                    let numJogoStr = matchJogo ? matchJogo[1] : '';
 				                    let nomeFaseLimpa = matchJogo ? faseTagSemTrofeu.replace(matchJogo[0], '').trim() : faseTagSemTrofeu;
@@ -475,7 +484,7 @@
 				                        nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
 				                    }
 				                    
-				                    // 🔥 AQUI ESTÁ O SEU LAYOUT: Junta o Número do Jogo com o nome das equipes
+				                    // AQUI ESTÁ O SEU LAYOUT: Junta o Número do Jogo com o nome das equipes
 				                    let textoConfrontoCompleto = numJogoStr ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${numJogoStr}</span> ${confrontoStr}` : confrontoStr;
 
 				                    if (temFaseDeGrupos && !entrouNaFaseFinal && (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('QUARTAS') || fUpper.includes('SEMI') || fUpper.includes('FINAL'))) {

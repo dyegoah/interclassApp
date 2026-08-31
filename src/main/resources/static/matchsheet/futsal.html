@@ -39,18 +39,35 @@
         .faltas-dots span.active { background: #ffea00; box-shadow: 0 0 5px #ffea00; }
         .faltas-dots.estourado span.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        .prancheta { display: flex; gap: 20px; flex-wrap: wrap; }
-        .time-list { flex: 1; min-width: 300px; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent;}
-        .time-list.a { border-top-color: var(--team-a); } .time-list.b { border-top-color: var(--team-b); }
+        /* 🔥 LAYOUT ARENA COLETIVA (LINHA DO TEMPO NO MEIO) 🔥 */
+        .arena-prancheta { display: flex; width: 100%; margin: 25px auto; gap: 20px; align-items: flex-start; justify-content: center; }
+        @media (max-width: 900px) { .arena-prancheta { flex-direction: column; } }
+
+        .coluna-time { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 280px; width: 100%; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; border-top: 3px solid transparent; }
+        .coluna-time.a { border-top-color: var(--team-a); }
+        .coluna-time.b { border-top-color: var(--team-b); }
         
-        .player-row { display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent;}
-        .player-row:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1);}
+        .player-row { display: flex; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
+        .player-row:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); transform: scale(1.02);}
         .player-row.readonly { cursor: default; }
+        .player-row.readonly:hover { transform: none; background: rgba(0,0,0,0.4); border-color: transparent;}
+        
         .player-photo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 2px solid #555;}
         .player-num { font-size: 1.2rem; font-weight: bold; color: #fff; width: 30px; }
         .player-info { flex-grow: 1; }
         .player-name { font-family: 'Segoe UI'; font-weight: bold; font-size: 1rem; color: #fff; }
-        .player-stats { font-size: 1.2rem; letter-spacing: 2px; }
+        
+        .player-stats { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+        .stat-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; color: white; display: flex; align-items: center; gap: 4px; }
+        .stat-pill b { font-family: 'Orbitron'; color: var(--theme-primary); font-size: 0.9rem;}
+
+        .timeline-container { flex: 1.2; min-width: 300px; width: 100%; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; min-height: 250px; }
+        .timeline-titulo { font-size: 1rem; color: var(--theme-primary); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Orbitron';}
+        .timeline-list { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; overflow-y: auto; max-height: 450px; padding-right: 5px;}
+        .timeline-item { display: flex; align-items: center; gap: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #555;}
+        .timeline-item.evt-a { border-left-color: var(--team-a); }
+        .timeline-item.evt-b { border-left-color: var(--team-b); }
+        .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
         .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 400px; text-align: center; }
@@ -63,10 +80,6 @@
         .btn-vermelho { background: #ff0000; color: #fff;}
         .btn-falta { background: #ff8c00; color: #fff;}
         .btn-contra { background: #555; color: #fff;}
-
-        .timeline-box { margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 10px; padding: 15px; display: none; }
-        .timeline-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-family: 'Segoe UI'; font-size: 0.9rem; }
-        .timeline-time { color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
@@ -117,14 +130,18 @@
             </div>
         </div>
 
-        <div class="prancheta">
-            <div class="time-list a" id="lista-a"></div>
-            <div class="time-list b" id="lista-b"></div>
-        </div>
-
-        <div class="timeline-box" id="timeline-container">
-            <h3 style="color: #fff; font-family: 'Orbitron'; margin-bottom: 10px;">📄 Relatório da Partida</h3>
-            <div id="timeline-lista"></div>
+        <!-- 🔥 LINHA DO TEMPO CENTRALIZADA 🔥 -->
+        <div class="arena-prancheta">
+            <div class="coluna-time a" id="lista-a"></div>
+            
+            <div class="timeline-container">
+                <div class="timeline-titulo">⏱️ Relatório da Partida</div>
+                <div class="timeline-list" id="timeline-lista">
+                    <div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>
+                </div>
+            </div>
+            
+            <div class="coluna-time b" id="lista-b"></div>
         </div>
 
     </div>
@@ -157,6 +174,7 @@
         let faltas = { A: 0, B: 0 };
         let escalacao = { A: [], B: [] };
         let timeline = [];
+        let listaAlunosGlobais = [];
         
         let jogadorAcao = null; let timeAcao = null;
         let cronoInt = null; let secs = 0; let rodando = false; let periodo = "1º Tempo";
@@ -165,7 +183,13 @@
         window.onload = async () => {
             const token = localStorage.getItem('interclassToken');
 
-            // 🔥 NOVA BUSCA SEGURA VIA LOTE
+            try {
+                let resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (resAlunos.ok) {
+                    listaAlunosGlobais = await resAlunos.json();
+                }
+            } catch (error) { console.warn("Erro ao buscar alunos."); }
+
             try {
                 let res = await fetch(`/api/jogos/lote/${lote}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (res.ok) {
@@ -179,9 +203,7 @@
                 if(calOficial[lote]) matchAtiva = calOficial[lote].jogos.find(j => j.id === idJogo);
             }
 
-            if(!matchAtiva) {
-                matchAtiva = { id: idJogo, esporte: 'Futsal', titulo: 'Partida', quadra: 'Quadra', icone: '⚽' };
-            }
+            if(!matchAtiva) matchAtiva = { id: idJogo, esporte: 'Futsal', titulo: 'Partida', quadra: 'Quadra', icone: '⚽' };
 
             let nomeEsporte = matchAtiva.esporte || (matchAtiva.modalidade ? matchAtiva.modalidade.nomeEsporte : "Futsal");
             let iconeEsporte = matchAtiva.icone || (matchAtiva.modalidade ? matchAtiva.modalidade.icone : "⚽");
@@ -200,20 +222,59 @@
                 
                 document.getElementById('crono-area').style.display = 'none';
                 document.getElementById('btn-finalizar').style.display = 'none';
-                document.getElementById('timeline-container').style.display = 'block';
-                renderTimeline();
             } else {
-                escalarMock();
+                if (matchAtiva.escalacoes && matchAtiva.escalacoes.length > 0) {
+                    matchAtiva.escalacoes.forEach(esc => {
+                        let nome = esc.aluno ? esc.aluno.nome : (esc.nomeAluno || "Atleta");
+                        let eq = esc.equipe;
+                        let num = esc.numeroCamisa || '-';
+                        let id = esc.aluno ? esc.aluno.id : (esc.alunoId || ('esc_' + Math.random()));
+                        let corEq = eq === 'A' ? '00f2fe' : 'ff00de';
+                        let fotoUrl = (esc.aluno && esc.aluno.fotoUrl) ? esc.aluno.fotoUrl : (esc.fotoUrl || '');
+                        if(!fotoUrl) fotoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=222&color=${corEq}&bold=true`;
+                        escalacao[eq].push({ id: id, numero: num, nome: nome, foto: fotoUrl, stats: [] });
+                    });
+                } else {
+                    let sportName = nomeEsporte.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    let rawA = (matchAtiva.equipeANome || "Equipe A").split(' (')[0].trim();
+                    let rawB = (matchAtiva.equipeBNome || "Equipe B").split(' (')[0].trim();
+
+                    let alunosA = listaAlunosGlobais.filter(a => a.turma === rawA && (a.esporte || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() === sportName && a.genero === lote);
+                    let alunosB = listaAlunosGlobais.filter(a => a.turma === rawB && (a.esporte || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() === sportName && a.genero === lote);
+
+                    if(alunosA.length > 0) {
+                        alunosA.forEach((a, i) => {
+                            let fotoUrl = a.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=222&color=00f2fe&bold=true`;
+                            escalacao.A.push({ id: a.id, numero: i+1, nome: a.nome, foto: fotoUrl, stats: [] });
+                        });
+                    } else {
+                        escalarMockEquipe('A', rawA, '00f2fe', 1);
+                    }
+
+                    if(alunosB.length > 0) {
+                        alunosB.forEach((a, i) => {
+                            let fotoUrl = a.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=222&color=ff00de&bold=true`;
+                            escalacao.B.push({ id: a.id, numero: i+1, nome: a.nome, foto: fotoUrl, stats: [] });
+                        });
+                    } else {
+                        escalarMockEquipe('B', rawB, 'ff00de', 10);
+                    }
+                }
             }
 
             atualizarTela();
+            renderTimeline();
         };
 
-        function escalarMock() {
-            const nomes = ["Lucas", "Pedro", "João", "Gabriel", "Matheus", "Carlos", "Rafael", "Felipe", "Thiago", "Bruno"];
+        function escalarMockEquipe(eq, nomeTurma, cor, startNum) {
             for(let i=0; i<5; i++) {
-                escalacao.A.push({ id: 'A'+i, numero: i+2, nome: nomes[i], foto: `https://i.pravatar.cc/150?img=${i+10}`, stats: [] });
-                escalacao.B.push({ id: 'B'+i, numero: i+7, nome: nomes[i+5], foto: `https://i.pravatar.cc/150?img=${i+20}`, stats: [] });
+                escalacao[eq].push({ 
+                    id: eq + i, 
+                    numero: startNum + i, 
+                    nome: `Atleta ${i+1} (${nomeTurma})`, 
+                    foto: `https://ui-avatars.com/api/?name=A+${i+1}&background=222&color=${cor}&bold=true`, 
+                    stats: [] 
+                });
             }
         }
 
@@ -235,16 +296,33 @@
             const renderTime = (t, domId) => {
                 let html = '';
                 escalacao[t].forEach(j => {
+                    let contagemStats = {}; let tomouVermelho = false;
                     if(!j.stats) j.stats = [];
-                    let st = j.stats.join('');
-                    let pointer = isReadOnly ? 'readonly' : '';
-                    let click = isReadOnly ? '' : `onclick="abrirModal('${j.id}', '${t}')"`;
+                    j.stats.forEach(icone => {
+                        contagemStats[icone] = (contagemStats[icone] || 0) + 1;
+                        if(icone === '🟥') tomouVermelho = true;
+                    });
+                    
+                    let statsHtml = '';
+                    for(let icone in contagemStats) statsHtml += `<span class="stat-pill">${icone} <b>${contagemStats[icone]}</b></span>`;
+
+                    let estiloLinha = tomouVermelho ? 'border-color: #ff0000; background: rgba(255,0,0,0.1); opacity:0.7;' : '';
+                    let pointer = isReadOnly || tomouVermelho ? 'readonly' : '';
+                    
+                    // 🔥 CORREÇÃO DE CLIQUE E MUDANÇA VISUAL 🔥
+                    let click = '';
+                    if (tomouVermelho) {
+                        click = `onclick="alert('Jogador expulso.')"`;
+                    } else if (!isReadOnly) {
+                        click = `onclick="abrirModal('${j.id}', '${t}')"`;
+                    }
+                    
                     html += `
-                        <div class="player-row ${pointer}" ${click}>
+                        <div class="player-row ${pointer}" ${click} style="${estiloLinha}">
                             <img src="${j.foto}" class="player-photo">
                             <div class="player-num">${j.numero}</div>
                             <div class="player-info"><div class="player-name">${j.nome}</div></div>
-                            <div class="player-stats">${st}</div>
+                            <div class="player-stats">${statsHtml}</div>
                         </div>
                     `;
                 });
@@ -254,7 +332,9 @@
         }
 
         function abrirModal(id, t) {
-            jogadorAcao = escalacao[t].find(j => j.id === id); timeAcao = t;
+            // 🔥 CORREÇÃO DO BUG: COMPARAÇÃO CONVERTIDA PARA STRING 🔥
+            jogadorAcao = escalacao[t].find(j => String(j.id) === String(id)); 
+            timeAcao = t;
             document.getElementById('acao-foto').src = jogadorAcao.foto;
             document.getElementById('acao-nome').textContent = jogadorAcao.nome;
             document.getElementById('acao-num').textContent = `Camisa ${jogadorAcao.numero}`;
@@ -269,7 +349,7 @@
             
             if(!jogadorAcao.stats) jogadorAcao.stats = [];
             jogadorAcao.stats.push(icone);
-            addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`);
+            addTimeline(`${icone} ${nome}: ${jogadorAcao.nome}`, timeAcao);
             fecharModal(); atualizarTela();
         }
 
@@ -277,7 +357,7 @@
             faltas[timeAcao]++;
             if(!jogadorAcao.stats) jogadorAcao.stats = [];
             jogadorAcao.stats.push('🛑');
-            addTimeline(`🛑 Falta cometida por ${jogadorAcao.nome}`);
+            addTimeline(`🛑 Falta cometida por ${jogadorAcao.nome}`, timeAcao);
             fecharModal(); atualizarTela();
             if(faltas[timeAcao] >= 5) alert(`⚠️ LIMITE ESTOURADO! Tiro livre direto para a Equipe ${timeAcao === 'A' ? 'B' : 'A'}.`);
         }
@@ -298,15 +378,25 @@
             document.getElementById('periodo-lbl').textContent = periodo + " (Trocar)"; 
         }
 
-        function addTimeline(txt) {
+        function addTimeline(txt, eq = null) {
             let tStr = document.getElementById('crono-display').textContent;
-            timeline.push({ tempo: tStr, periodo: periodo, txt: txt });
+            timeline.push({ tempo: tStr, periodo: periodo, txt: txt, equipe: eq });
+            renderTimeline();
         }
+
         function renderTimeline() {
             let html = '';
-            timeline.forEach(t => {
-                html += `<div class="timeline-item"><span class="timeline-time">[${t.periodo} - ${t.tempo}]</span> ${t.txt}</div>`;
-            });
+            if(timeline.length === 0) {
+                html = '<div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>';
+            } else {
+                [...timeline].reverse().forEach(t => {
+                    let eqClass = t.equipe === 'A' ? 'evt-a' : (t.equipe === 'B' ? 'evt-b' : '');
+                    html += `<div class="timeline-item ${eqClass}">
+                                <div class="time-stamp">${t.tempo}</div>
+                                <div style="flex-grow:1; font-family:'Segoe UI';"><b>[${t.periodo}]</b> ${t.txt}</div>
+                             </div>`;
+                });
+            }
             document.getElementById('timeline-lista').innerHTML = html;
         }
 

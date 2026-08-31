@@ -81,20 +81,20 @@
         .col-left { text-align: left !important;}
         tr:nth-child(1) td, tr:nth-child(2) td { background: linear-gradient(90deg, rgba(0, 255, 85, 0.05), transparent); border-left: 3px solid var(--win-color); color: #fff; font-weight: bold;}
 
-        /* CHAVEAMENTOS (MATA-MATA) - ULTRA COMPACTOS PARA CABER TUDO NA TELA */
+        /* CHAVEAMENTOS ULTRA COMPACTOS PARA CABER TODAS AS FASES */
         .bracket-scroll-area { display: flex; align-items: center; gap: 8px; padding: 15px 5px; overflow-x: auto; scrollbar-width: none; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 100%); border-radius: 12px; margin-top: 15px; -webkit-overflow-scrolling: touch;}
         .bracket-scroll-area::-webkit-scrollbar { display: none; }
         .bracket-col { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: space-around; position: relative;}
         
-        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; width: 95px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.6); overflow: hidden; }
-        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.45rem; text-align: center; padding: 3px 2px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; width: 85px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.6); overflow: hidden; }
+        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.4rem; text-align: center; padding: 2px 1px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
         .mini-team-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .mini-team-row:last-child { border-bottom: none; }
         
-        .gamer-avatar { width: 12px; height: 12px; border-radius: 50%; object-fit: cover; margin-right: 3px; }
-        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.55rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
-        .mini-team-score { font-family: 'Orbitron'; font-size: 0.6rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 1px 3px; border-radius: 4px; text-align: center; margin-left: 3px;}
+        .gamer-avatar { width: 10px; height: 10px; border-radius: 50%; object-fit: cover; margin-right: 3px; }
+        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.5rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
+        .mini-team-score { font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 1px 2px; border-radius: 4px; text-align: center; margin-left: 3px;}
         
         .mini-match .vencedor { background: linear-gradient(90deg, rgba(0, 255, 85, 0.1), transparent); border-left: 2px solid var(--win-color); }
         .mini-match .vencedor .mini-team-name { color: #fff; }
@@ -108,7 +108,7 @@
         .bracket-col:not(:last-child) .mini-match::after { content: ''; position: absolute; right: -10px; top: 50%; width: 10px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
         .bracket-col:not(:first-child) .mini-match::before { content: ''; position: absolute; left: -10px; top: 50%; width: 10px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
 
-        /* CARDS GAMER */
+        /* CARDS GAMER (ESTATÍSTICAS) */
         .player-card { display: flex; align-items: center; background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);}
         .player-rank { font-family: 'Orbitron'; font-size: 1.2rem; font-weight: bold; color: #555; width: 30px;}
         .player-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #555; margin-right: 15px;}
@@ -116,28 +116,30 @@
         .player-name { font-family: 'Segoe UI'; font-weight: bold; font-size: 1rem; color: #fff;}
         .player-team { font-size: 0.75rem; color: var(--theme-primary); text-transform: uppercase;}
         .player-stat { font-family: 'Orbitron'; font-size: 1.4rem; font-weight: bold;}
+        
         .rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(0,0,0,0.5)); border-color: var(--gold);}
         .rank-1 .player-rank { color: var(--gold); text-shadow: 0 0 10px var(--gold);}
         .rank-1 .player-photo { border-color: var(--gold); box-shadow: 0 0 15px var(--gold);}
         .rank-1 .player-stat { color: var(--gold); }
+        
         .card-danger .player-stat { color: var(--danger-color); }
         .card-danger.rank-1 { background: linear-gradient(90deg, rgba(255, 0, 85, 0.15), rgba(0,0,0,0.5)); border-color: var(--danger-color);}
         .card-danger.rank-1 .player-rank, .card-danger.rank-1 .player-photo { color: var(--danger-color); border-color: var(--danger-color); text-shadow: 0 0 10px var(--danger-color); box-shadow: 0 0 15px var(--danger-color);}
 
+        /* RADAR DE ERROS */
+        .erro-box { background: rgba(255, 0, 85, 0.1); border: 1px solid var(--danger-color); padding: 15px; border-radius: 10px; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); width: 100%; margin-bottom: 15px;}
+        .erro-box h4 { color: var(--danger-color); font-family: 'Orbitron'; margin-bottom: 5px;}
+        .erro-box p { font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffccdd; word-break: break-all;}
+
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
-    <script>
-        if (!localStorage.getItem('interclassToken') && !new URLSearchParams(window.location.search).get('ref')) {
-            window.location.replace('/index.html');
-        }
-    </script>
 </head>
 <body>
 
     <div id="topbar-placeholder"></div>
 
     <!-- HEADER PÚBLICO (ALUNO) -->
-    <header id="header-aluno">
+    <header class="public-header" id="header-aluno">
         <h1 style="color: #fff; font-family: 'Orbitron'; font-size: 1.2rem; margin-bottom: 5px;" id="escola-nome">Interclass Arena</h1>
         <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
             <div class="live-badge"><div class="live-dot"></div> AO VIVO</div>
@@ -147,7 +149,7 @@
 
     <div style="max-width: 800px; margin: 0 auto; position: relative;">
         
-        <!-- PAINEL DO PROFESSOR (COMPARTILHAMENTO DE LINKS DUPLOS) -->
+        <!-- PAINEL DO PROFESSOR (APENAS LINK ARENA) -->
         <div id="painel-professor">
             <h2 style="font-family: 'Orbitron'; color: #00ff55; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">📡 Central de Links</h2>
 
@@ -160,15 +162,18 @@
             </div>
         </div>
 
+        <!-- ALERTAS DE ERRO (RADAR) -->
+        <div id="radar-erros" style="padding: 0 15px;"></div>
+
         <!-- SELETOR DE LOTE -->
         <div class="filtros-lote" id="filtros-lote"></div>
 
         <!-- SELETOR DE ESPORTE -->
         <div class="esportes-carousel" id="esportes-carousel">
-            <p style="color:#888; font-size: 0.85rem; text-align: center; width: 100%;">Carregando esportes...</p>
+            <p style="color:#888; font-size: 0.85rem; text-align: center; width: 100%;">Carregando informações...</p>
         </div>
 
-        <!-- NAVEGAÇÃO DE ABAS -->
+        <!-- NAVEGAÇÃO DE ABAS PADRONIZADA PARA TODOS ESPORTES -->
         <div class="app-nav" id="app-nav"></div>
 
         <!-- CONTEÚDO: PARTIDAS -->
@@ -186,7 +191,7 @@
             <h3 id="titulo-stats" style="font-family: 'Orbitron'; color: var(--gold); font-size: 1.1rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,215,0,0.5);">⭐ Destaques</h3>
             <div id="container-stats" class="glass" style="padding: 15px;"></div>
         </div>
-
+        
         <!-- CONTEÚDO: CARTÕES -->
         <div id="tab-cartoes" class="tab-content">
             <h3 style="font-family: 'Orbitron'; color: var(--danger-color); font-size: 1.1rem; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,0,85,0.5);">🟥 Quadro Disciplinar</h3>
@@ -198,14 +203,29 @@
     <div id="footbar-placeholder"></div>
 
     <script>
-        let professorIdInterno = localStorage.getItem('profId') || localStorage.getItem('userId');
         const urlParams = new URLSearchParams(window.location.search);
+        let professorIdInterno = localStorage.getItem('profId') || localStorage.getItem('userId');
         let professorIdPublico = urlParams.get('ref');
-        let isModoPublico = !!professorIdPublico;
         
+        // Verifica se é aluno ou professor acessando a página
+        let isModoPublico = !!professorIdPublico;
+
+        // 🔥 CORREÇÃO DA TRAVA DO PROFESSOR: Permite o acesso se estiver logado 🔥
+        if (!isModoPublico) {
+            if (localStorage.getItem('interclassToken')) {
+                // Professor logado sem ?ref: Usa a própria hash armazenada
+                professorIdPublico = localStorage.getItem('profHash') || localStorage.getItem('hashPublico') || localStorage.getItem('professorHash');
+                if(!professorIdPublico) professorIdPublico = professorIdInterno; // Fallback
+            } else {
+                // Nem aluno com link, nem professor logado: Expulsa
+                document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; color:#fff; font-family:\'Orbitron\'; text-align:center; padding: 20px;"><h2>Acesso Inválido.<br>Faça login ou acesse pelo link oficial.</h2></div>';
+                throw new Error("Link sem referência.");
+            }
+        }
+
         let todosJogosGlobais = [];
-        let relatoriosSalvos = {}; 
         let listaAlunosGlobais = [];
+        let relatoriosSalvos = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
         
         let loteAtual = 'masculino';
         let esporteAtual = null;
@@ -222,20 +242,22 @@
         ];
 
         window.onload = async () => {
-            if (!isModoPublico) {
+            // CARREGA O FOOTBAR SEMPRE (PARA ALUNOS E PROFESSORES) 
+            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+
+            if (!isModoPublico && localStorage.getItem('interclassToken')) {
+                // Professor Logado (Carrega o Topbar)
                 fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-                fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
                 document.getElementById('painel-professor').style.display = 'block';
 
                 let pNome = localStorage.getItem('profNome') || "Professor";
                 let pEscola = localStorage.getItem('profEscola') || "Escola";
 
-                let linkArena = `${window.location.origin}/resumo.html?ref=${professorIdInterno}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
+                let linkArena = `${window.location.origin}/resumo.html?ref=${professorIdPublico}&p=${encodeURIComponent(pNome)}&e=${encodeURIComponent(pEscola)}`;
                 document.getElementById('link-arena-input').value = linkArena;
 
-                let storageRel = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                Object.assign(relatoriosSalvos, storageRel);
             } else {
+                // Aluno visualizando
                 document.getElementById('header-aluno').style.display = 'block';
                 let eNome = urlParams.get('e') || "Interclass Arena";
                 document.getElementById('escola-nome').innerText = eNome.toUpperCase();
@@ -249,15 +271,18 @@
             try {
                 let urlAlunos = isModoPublico ? `/api/alunos/public/${professorIdPublico}` : '/api/alunos';
                 let headers = isModoPublico ? {} : { 'Authorization': `Bearer ${localStorage.getItem('interclassToken')}` };
+                
                 const resAlunos = await fetch(urlAlunos, { headers });
                 if (resAlunos.ok) listaAlunosGlobais = await resAlunos.json();
-            } catch (error) { console.warn("Falha ao buscar alunos."); }
+                else throw new Error("Erro na resposta de Alunos");
+            } catch (error) { 
+                document.getElementById('radar-erros').innerHTML += `<div class="erro-box"><h4>🚨 Erro (Alunos)</h4><p>${error.message}</p></div>`;
+            }
 
             montarFiltrosLote();
         };
 
         function extrairEsporteNome(j) {
-            if (!j) return "Geral";
             let valor = j.esporte || j.nomeEsporte;
             if (typeof valor === 'object' && valor !== null) valor = valor.nomeEsporte || valor.esporte || valor.nome;
             if (valor && typeof valor === 'string' && valor.trim() !== '') return valor.trim();
@@ -322,18 +347,12 @@
                 let mA = nA.match(regex);
                 if (mA) {
                     let chaveA = `${espNome}_${mA[1]}`;
-                    if (mapVencedores[chaveA]) {
-                        nA = j.equipeANome = mapVencedores[chaveA].nome;
-                        j.equipeAId = mapVencedores[chaveA].id;
-                    }
+                    if (mapVencedores[chaveA]) { nA = j.equipeANome = mapVencedores[chaveA].nome; j.equipeAId = mapVencedores[chaveA].id; }
                 }
                 let mB = nB.match(regex);
                 if (mB) {
                     let chaveB = `${espNome}_${mB[1]}`;
-                    if (mapVencedores[chaveB]) {
-                        nB = j.equipeBNome = mapVencedores[chaveB].nome;
-                        j.equipeBId = mapVencedores[chaveB].id;
-                    }
+                    if (mapVencedores[chaveB]) { nB = j.equipeBNome = mapVencedores[chaveB].nome; j.equipeBId = mapVencedores[chaveB].id; }
                 }
                 
                 let sufixo = pts[idx].includes('(Série de Partidas)') ? ' (Série de Partidas)' : '';
@@ -343,7 +362,8 @@
             return jogos;
         }
 
-        // 🔥 NOVA IA DE ABREVIAÇÃO DE NOMES PARA CABER NO CHAVEAMENTO 🔥
+        function extrairNomeLimpo(str) { return (str || "").replace(' (Série de Partidas)', '').trim(); }
+
         function abreviarNome(nome) {
             if (!nome) return "?";
             if (nome.includes("A Definir")) return "?";
@@ -351,21 +371,16 @@
             
             let n = nome.replace(' (Série de Partidas)', '').trim();
             
-            // Se for uma turma (ex: "3º Ano A", "8º Série B"), remove palavras longas
-            if (/ano|série|turma/i.test(n)) {
-                return n.replace(/ano/i, "").replace(/série/i, "").replace(/turma/i, "").replace(/\s+/g, " ").trim();
+            if (/ano|série|turma|serie/i.test(n)) {
+                return n.replace(/ano/i, "").replace(/série/i, "").replace(/serie/i, "").replace(/turma/i, "").replace(/\s+/g, " ").trim();
             }
             
-            // Se for um nome próprio muito longo (ex: João Guilherme Silva -> João S.)
-            if (n.length > 8 && n.includes(" ")) {
+            if (n.includes(" ")) {
                 let pts = n.split(" ");
-                if (pts.length >= 2) {
-                    return pts[0].substring(0,6) + " " + pts[pts.length - 1].charAt(0) + ".";
-                }
+                if(pts.length >= 2) return pts[0].substring(0, 5) + " " + pts[pts.length-1].charAt(0) + ".";
             }
             
-            // Corte final de segurança para não explodir a caixa de 95px
-            if (n.length > 9) return n.substring(0, 8) + "..";
+            if (n.length > 8) return n.substring(0, 7) + "..";
             return n;
         }
 
@@ -377,8 +392,6 @@
             if (aluno && aluno.fotoUrl) return `<img src="${aluno.fotoUrl}" class="gamer-avatar">`;
             return `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(nomeEquipe)}&background=333&color=fff&bold=true" class="gamer-avatar">`;
         }
-
-        function extrairNomeLimpo(str) { return (str || "").replace(' (Série de Partidas)', '').trim(); }
 
         function montarFiltrosLote() {
             const container = document.getElementById('filtros-lote');
@@ -405,28 +418,37 @@
         async function buscarDadosDaAPI() {
             let jogos = [];
             try {
-                let url = isModoPublico ? `/api/jogos/public/${professorIdPublico}/lote/${loteAtual}` : `/api/jogos/lote/${loteAtual}`;
+                let urlJogos = isModoPublico ? `/api/jogos/public/${professorIdPublico}/lote/${loteAtual}` : `/api/jogos/lote/${loteAtual}`;
                 let headers = isModoPublico ? {} : { 'Authorization': `Bearer ${localStorage.getItem('interclassToken')}` };
-                let res = await fetch(url, { headers });
                 
-                if (res.ok) jogos = await res.json(); 
-                if (!jogos || jogos.length === 0) throw new Error('Vazio');
+                let res = await fetch(urlJogos, { headers });
+                if (!res.ok) throw new Error(`HTTP ${res.status} - Falha na API`);
+                
+                jogos = await res.json(); 
+                document.getElementById('radar-erros').innerHTML = ''; 
             } catch (error) {
                 if (!isModoPublico) {
                     let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
                     if (calOffline[loteAtual] && calOffline[loteAtual].jogos) jogos = calOffline[loteAtual].jogos;
+                } else {
+                    document.getElementById('radar-erros').innerHTML += `<div class="erro-box"><h4>🚨 Erro (Jogos)</h4><p>${error.message}</p></div>`;
                 }
             }
 
             jogos.forEach(j => {
                 if (j.status === 'FINALIZADO') {
-                    if (!relatoriosSalvos[String(j.id)] || isModoPublico) relatoriosSalvos[String(j.id)] = { placar: { A: j.placarA||0, B: j.placarB||0 }, timeline: [] };
+                    if (!relatoriosSalvos[String(j.id)] || isModoPublico) {
+                        relatoriosSalvos[String(j.id)] = { 
+                            placar: { A: j.placarA||0, B: j.placarB||0 }, 
+                            timeline: j.eventos || j.timeline || j.sumula || [] 
+                        };
+                    }
                 } else {
                     if(isModoPublico && relatoriosSalvos[String(j.id)]) delete relatoriosSalvos[String(j.id)];
                 }
             });
 
-            todosJogosGlobais = resolverNomesDinamicos(jogos);
+            todosJogosGlobais = resolverNomesDinamicos(jogos || []);
             montarCarrosselDeEsportes();
         }
 
@@ -473,11 +495,11 @@
             const nav = document.getElementById('app-nav');
             let html = `
                 <button class="nav-btn active" onclick="switchTab('tab-partidas', this)">Partidas</button>
-                <button class="nav-btn" onclick="switchTab('tab-tabela', this)">${isEsporteAtualIndividual ? 'Chaves' : 'Classificação'}</button>
-                <button class="nav-btn" onclick="switchTab('tab-stats', this)">${isEsporteAtualIndividual ? '👑 Ranking' : '⚽ Artilharia'}</button>
+                <button class="nav-btn" onclick="switchTab('tab-tabela', this)">Classificação / Chaves</button>
+                <button class="nav-btn" onclick="switchTab('tab-stats', this)">Ranking / Estatística</button>
             `;
             if(!isEsporteAtualIndividual) {
-                html += `<button class="nav-btn" onclick="switchTab('tab-cartoes', this)">🟥 Punições</button>`;
+                html += `<button class="nav-btn" onclick="switchTab('tab-cartoes', this)">Punições</button>`;
             }
             nav.innerHTML = html;
             
@@ -512,48 +534,37 @@
                 return a.id - b.id; 
             });
 
-            let htmlVisiveis = '';
-            let htmlOcultos = '';
+            let htmlVisiveis = ''; let htmlOcultos = '';
 
             jogosDoEsporte.forEach((j, index) => {
                 let rel = relatoriosSalvos[String(j.id)];
                 let p = obterPlacarSeguro(rel, j);
-                let isEncerrado = j.status === 'FINALIZADO' || rel;
-                let winA = (isEncerrado && p.A > p.B) ? "winner" : "";
-                let winB = (isEncerrado && p.B > p.A) ? "winner" : "";
+                let isE = j.status === 'FINALIZADO' || rel;
+                let winA = (isE && p.A > p.B) ? "winner" : ""; let winB = (isE && p.B > p.A) ? "winner" : "";
                 
                 let tL = (j.titulo || "").split(' | ');
                 let eqA = j.equipeANome || "Equipe A"; let eqB = j.equipeBNome || "Equipe B";
-                let dataExibicao = (j.diaId || j.dataJogo || "").split('-').reverse().slice(0,2).join('/');
+                let dt = (j.diaId || j.dataJogo || "").split('-').reverse().slice(0,2).join('/');
 
                 let cardHtml = `
                     <div class="match-card">
                         <div class="match-header">
-                            <span>📅 ${dataExibicao} ${j.hora ? 'às '+j.hora : ''} | ${tL[0]}</span> 
-                            <span style="color:${isEncerrado?'#888':'var(--theme-primary)'}; font-weight: bold;">${isEncerrado?'ENCERRADO':'AGUARDANDO'}</span>
+                            <span>📅 ${dt} ${j.hora ? 'às '+j.hora : ''} | ${tL[0]}</span> 
+                            <span style="color:${isE?'#888':'var(--theme-primary)'}; font-weight: bold;">${isE?'ENCERRADO':'AGUARDANDO'}</span>
                         </div>
                         <div class="match-body">
                             <div class="team-info">
-                                <div class="team-row ${winA}"><span class="team-name">${buscarAvatarGamer(eqA)}${extrairNomeLimpo(eqA)}</span><span class="team-score">${isEncerrado?p.A:'-'}</span></div>
-                                <div class="team-row ${winB}"><span class="team-name">${buscarAvatarGamer(eqB)}${extrairNomeLimpo(eqB)}</span><span class="team-score">${isEncerrado?p.B:'-'}</span></div>
+                                <div class="team-row ${winA}"><span class="team-name">${buscarAvatarGamer(eqA)}${extrairNomeLimpo(eqA)}</span><span class="team-score">${isE?p.A:'-'}</span></div>
+                                <div class="team-row ${winB}"><span class="team-name">${buscarAvatarGamer(eqB)}${extrairNomeLimpo(eqB)}</span><span class="team-score">${isE?p.B:'-'}</span></div>
                             </div>
                         </div>
                     </div>
                 `;
-                
-                if (index < 3) htmlVisiveis += cardHtml;
-                else htmlOcultos += cardHtml;
+                if (index < 3) htmlVisiveis += cardHtml; else htmlOcultos += cardHtml;
             });
 
             if (htmlOcultos !== '') {
-                cPartidas.innerHTML = `
-                    ${htmlVisiveis}
-                    <div id="partidas-ocultas" style="display: none;">${htmlOcultos}</div>
-                    <button id="btn-toggle-partidas" class="btn-toggle-partidas" onclick="togglePartidas()">
-                        <span>📅 VER TODAS AS ${jogosDoEsporte.length} PARTIDAS</span>
-                        <span id="seta-partidas">▼</span>
-                    </button>
-                `;
+                cPartidas.innerHTML = `${htmlVisiveis}<div id="partidas-ocultas" style="display: none;">${htmlOcultos}</div><button id="btn-toggle-partidas" class="btn-toggle-partidas" onclick="togglePartidas()"><span>📅 VER TODAS AS ${jogosDoEsporte.length} PARTIDAS</span><span id="seta-partidas">▼</span></button>`;
             } else {
                 cPartidas.innerHTML = htmlVisiveis || `<p style="text-align:center; color:#888;">Nenhuma partida encontrada.</p>`;
             }
@@ -561,9 +572,9 @@
             const cTabela = document.getElementById('container-tabela');
             cTabela.innerHTML = '';
             
-            let isGruposLiga = jogosDoEsporte.some(j => { let t = (j.titulo||'').toUpperCase(); return t.includes('GRUPO') || t.includes('CLASSIFICAÇÃO') || t.includes('LIGA'); });
+            let isGrupos = jogosDoEsporte.some(j => { let t = (j.titulo||'').toUpperCase(); return t.includes('GRUPO') || t.includes('CLASSIFICAÇÃO') || t.includes('LIGA') || t.includes('PONTOS'); });
             
-            if (isGruposLiga && !isEsporteAtualIndividual) {
+            if (isGrupos) {
                 let tabela = {};
                 jogosDoEsporte.forEach(j => {
                     let pts = (j.titulo || "").split(' | '); if(pts.length < 2) return;
@@ -577,8 +588,7 @@
                     if((j.status === 'FINALIZADO' || rel) && tabela[tA] && tabela[tB]) {
                         let p = obterPlacarSeguro(rel, j);
                         tabela[tA].j++; tabela[tB].j++;
-                        tabela[tA].gp += p.A; tabela[tA].gc += p.B;
-                        tabela[tB].gp += p.B; tabela[tB].gc += p.A;
+                        tabela[tA].gp += p.A; tabela[tA].gc += p.B; tabela[tB].gp += p.B; tabela[tB].gc += p.A;
                         if(p.A > p.B) { tabela[tA].v++; tabela[tB].d++; tabela[tA].pts+=3; }
                         else if(p.B > p.A) { tabela[tB].v++; tabela[tA].d++; tabela[tB].pts+=3; }
                         else { tabela[tA].e++; tabela[tB].e++; tabela[tA].pts++; tabela[tB].pts++; }
@@ -587,31 +597,29 @@
 
                 let ord = Object.values(tabela).sort((a,b) => b.pts !== a.pts ? b.pts - a.pts : (b.gp-b.gc) - (a.gp-a.gc));
                 if(ord.length > 0) {
-                    let linhas = ord.map((t, i) => `
-                        <tr class="${i<2 ? 'linha-campeao' : ''}">
-                            <td style="font-family:'Orbitron';">${i+1}º</td>
-                            <td class="col-left">${buscarAvatarGamer(t.n)}${t.n}</td>
-                            <td style="color:var(--theme-primary); font-family:'Orbitron'; font-size:1.1rem;">${t.pts}</td>
-                            <td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td>${t.gp}</td><td>${t.gc}</td>
-                            <td style="color:${(t.gp-t.gc)>0?'#00ff55':((t.gp-t.gc)<0?'#ff0055':'#fff')}; font-weight:bold;">${(t.gp-t.gc)>0?'+'+(t.gp-t.gc):(t.gp-t.gc)}</td>
-                        </tr>
-                    `).join('');
-                    cTabela.innerHTML = `<div class="table-wrapper"><table class="tabela-brasileirao"><thead><tr><th style="width:30px;">#</th><th class="col-left">Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+                    let linhas = ord.map((t, i) => `<tr class="${i<2 ? 'linha-campeao' : ''}"><td>${i+1}º</td><td class="col-left">${buscarAvatarGamer(t.n)}${t.n}</td><td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td>${t.gp}</td><td>${t.gc}</td><td style="color:${(t.gp-t.gc)>0?'#00ff55':((t.gp-t.gc)<0?'#ff0055':'#fff')}; font-weight:bold;">${(t.gp-t.gc)>0?'+'+(t.gp-t.gc):(t.gp-t.gc)}</td></tr>`).join('');
+                    cTabela.innerHTML = `<div class="table-wrapper"><table><thead><tr><th style="width:30px;">#</th><th class="col-left">Equipe</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
                 }
             } 
             
-            // 🔥 CHAVEAMENTO (BRACKET) ATUALIZADO PARA MOSTRAR TODAS AS FASES 🔥
-            let fases = { '16 AVOS': [], 'OITAVAS': [], 'QUARTAS': [], 'SEMIFINAL': [], 'FINAL': [] };
+            let fases = { 'FASE INICIAL': [], '64 AVOS': [], '32 AVOS': [], '16 AVOS': [], 'OITAVAS': [], 'QUARTAS': [], 'SEMIFINAL': [], 'TERCEIRO': [], 'FINAL': [] };
+            
             jogosDoEsporte.forEach(j => {
                 let t = (j.titulo || '').toUpperCase();
-                if(t.includes('16 AVOS') || t.includes('16AVOS')) fases['16 AVOS'].push(j);
+                if(t.includes('GRUPO') || t.includes('LIGA') || t.includes('PONTOS')) return;
+                
+                if(t.includes('64 AVOS') || t.includes('64AVOS')) fases['64 AVOS'].push(j);
+                else if(t.includes('32 AVOS') || t.includes('32AVOS')) fases['32 AVOS'].push(j);
+                else if(t.includes('16 AVOS') || t.includes('16AVOS')) fases['16 AVOS'].push(j);
                 else if(t.includes('OITAVAS')) fases['OITAVAS'].push(j);
                 else if(t.includes('QUARTAS')) fases['QUARTAS'].push(j);
                 else if(t.includes('SEMI')) fases['SEMIFINAL'].push(j);
-                else if(t.includes('FINAL') && !t.includes('SEMI') && !t.includes('QUARTAS')) fases['FINAL'].push(j);
+                else if(t.includes('3º LUGAR') || t.includes('TERCEIRO') || t.includes('3 LUGAR')) fases['TERCEIRO'].push(j);
+                else if(t.includes('FINAL') && !t.includes('SEMI') && !t.includes('QUARTAS') && !t.includes('OITAVAS') && !t.includes('16 AVOS') && !t.includes('32 AVOS') && !t.includes('64 AVOS')) fases['FINAL'].push(j);
+                else fases['FASE INICIAL'].push(j);
             });
 
-            if (fases['FINAL'].length > 0 || fases['SEMIFINAL'].length > 0 || fases['QUARTAS'].length > 0 || fases['OITAVAS'].length > 0) {
+            if (fases['FINAL'].length > 0 || fases['SEMIFINAL'].length > 0 || fases['QUARTAS'].length > 0 || fases['OITAVAS'].length > 0 || fases['16 AVOS'].length > 0 || fases['32 AVOS'].length > 0 || fases['64 AVOS'].length > 0 || fases['FASE INICIAL'].length > 0) {
                 let ext = (j) => {
                     if(!j) return {a:"?", b:"?", pA:"-", pB:"-", cA:"", cB:"", fA:"", fB:""};
                     let rel = relatoriosSalvos[String(j.id)]; 
@@ -619,7 +627,6 @@
                     let pts = (j.titulo||'').split(' | '); 
                     let c = pts[pts.length-1].split(' x ');
                     
-                    // Chama o encurtador de nomes na hora de desenhar a caixa
                     let eqA = abreviarNome(j.equipeANome || c[0] || "A Definir"); 
                     let eqB = abreviarNome(j.equipeBNome || c[1] || "A Definir");
                     
@@ -637,8 +644,7 @@
                     let html = `<div class="bracket-col">`;
                     listaJogos.forEach(j => {
                         let d = ext(j);
-                        // Encurta o título do jogo para caber (ex: Mata-Mata - Quartas de Final -> Quartas)
-                        let tStr = (j.titulo||'').split(' | ')[0].replace(' de Final', '').replace('Mata-Mata - ', '');
+                        let tStr = (j.titulo||'').split(' | ')[0].replace(' de Final', '').replace('Mata-Mata - ', '').replace('Fase ', '');
                         html += `
                             <div class="mini-match ${isFinal ? 'final' : ''}">
                                 <div class="mini-match-header" title="${tStr}">${tStr}</div>
@@ -654,10 +660,14 @@
                 cTabela.innerHTML += `
                     <div style="font-family: 'Orbitron'; color: var(--gold); margin-top: 10px; font-size: 0.9rem; text-shadow: 0 0 10px rgba(255,215,0,0.5); text-align: center;">⚔️ Caminho do Título</div>
                     <div class="bracket-scroll-area">
+                        ${renderFase(fases['FASE INICIAL'])}
+                        ${renderFase(fases['64 AVOS'])}
+                        ${renderFase(fases['32 AVOS'])}
                         ${renderFase(fases['16 AVOS'])}
                         ${renderFase(fases['OITAVAS'])}
                         ${renderFase(fases['QUARTAS'])}
                         ${renderFase(fases['SEMIFINAL'])}
+                        ${renderFase(fases['TERCEIRO'])}
                         ${renderFase(fases['FINAL'], true)}
                     </div>
                 `;
@@ -687,18 +697,37 @@
                     if (rel && rel.timeline) {
                         rel.timeline.forEach(evt => {
                             if (!evt) return;
-                            let txt = evt.txt || evt.texto || evt.descricao || "";
-                            let nome = null;
-                            if (txt.includes(': ')) nome = txt.split(': ')[1].trim(); 
-                            else if (txt.includes('por ')) nome = txt.split('por ')[1].trim(); 
+                            let txt = evt.texto || evt.txt || evt.descricao || "";
+                            if (!txt) return;
+
+                            let ic = evt.icone || "";
+                            let isP = iconesPontos.includes(ic) || iconesPontos.some(p => txt.includes(p));
+                            let isF = iconesFaltas.includes(ic) || iconesFaltas.some(f => txt.includes(f));
                             
-                            if (nome) {
-                                let ic = evt.icone || "";
-                                let isP = iconesPontos.includes(ic) || iconesPontos.some(p => txt.includes(p));
-                                let isF = iconesFaltas.includes(ic) || iconesFaltas.some(f => txt.includes(f));
+                            if (isP || isF) {
+                                let cleanTxt = txt.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+                                let nome = cleanTxt;
                                 
-                                if (isP) { if(!objPts[nome]) objPts[nome] = {n:nome, v:0, e:j.esporte}; objPts[nome].v++; }
-                                if (isF) { if(!objFaltas[nome]) objFaltas[nome] = {n:nome, v:0, e:j.esporte}; objFaltas[nome].v++; }
+                                let matchPreposicao = cleanTxt.match(/(?: de | do | da | por | para )\s*(.+)/i);
+                                
+                                if (matchPreposicao && matchPreposicao[1]) {
+                                    nome = matchPreposicao[1].trim();
+                                } else if (cleanTxt.includes(':')) {
+                                    nome = cleanTxt.split(':').pop().trim();
+                                } else if (cleanTxt.includes('-')) {
+                                    nome = cleanTxt.split('-').pop().trim();
+                                } else {
+                                    nome = cleanTxt.replace(/gol|falta|ponto|cartão|cartao|marcou/gi, '').trim();
+                                }
+                                
+                                nome = nome.replace(/[\(\)\[\]\.]/g, '').trim();
+
+                                if (nome.length > 0) {
+                                    nome = nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
+
+                                    if (isP) { if(!objPts[nome]) objPts[nome] = {n:nome, v:0, e:j.esporte}; objPts[nome].v++; }
+                                    if (isF) { if(!objFaltas[nome]) objFaltas[nome] = {n:nome, v:0, e:j.esporte}; objFaltas[nome].v++; }
+                                }
                             }
                         });
                     }
@@ -751,15 +780,46 @@
             }
         };
 
+        // 🔥 FUNÇÃO DE COPIAR LINK COM COMPARTILHAMENTO NATIVO (WEB SHARE API) 🔥
         function copiarLinkPublico(inputId) {
-            const input = document.getElementById(inputId);
-            input.select();
-            input.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(input.value).then(() => {
-                alert(`✅ Link copiado com sucesso! Envie para seus alunos.`);
-            }).catch(err => {
-                alert("⚠️ Erro ao copiar. Copie manualmente o texto do campo.");
-            });
+            const linkInput = document.getElementById(inputId);
+            const linkText = linkInput.value;
+
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+
+            // Usa o clipboard mais moderno com fallback
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(linkText).then(() => dispararCompartilhamento(linkText));
+            } else {
+                const ghostInput = document.createElement('textarea');
+                ghostInput.value = linkText;
+                ghostInput.style.position = 'absolute';
+                ghostInput.style.left = '-9999px'; 
+                ghostInput.setAttribute('readonly', ''); 
+                document.body.appendChild(ghostInput);
+                ghostInput.select();
+                ghostInput.setSelectionRange(0, 99999); 
+                try {
+                    document.execCommand('copy');
+                    dispararCompartilhamento(linkText);
+                } catch (err) {
+                    alert("⚠️ Erro ao copiar. Copie manualmente o texto do campo.");
+                }
+                document.body.removeChild(ghostInput); 
+            }
+
+            function dispararCompartilhamento(url) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Portal do Atleta - Interclass Arena',
+                        text: 'Acompanhe as tabelas, chaves e artilharia do torneio ao vivo!',
+                        url: url
+                    }).catch(console.error); // Ignora erros se o usuário fechar a janela
+                } else {
+                    alert("✅ Link copiado com sucesso! Cole nas suas redes sociais ou WhatsApp para enviar aos alunos.");
+                }
+            }
         }
     </script>
 </body>
