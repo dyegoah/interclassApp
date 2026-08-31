@@ -112,7 +112,12 @@ public class SetupService {
         try { jdbcTemplate.update("DELETE FROM tb_lote WHERE professor_id = ?", idProf); } catch (Exception e) {}
         
         // 5. Apaga Torneios (A tabela oficial do Render ficou como tb_torneio)
-        try { jdbcTemplate.update("DELETE FROM torneios"); } catch (Exception e) {}
-        try { jdbcTemplate.update("DELETE FROM tb_torneio"); } catch (Exception e) {}
+        try { 
+            jdbcTemplate.update("DELETE FROM torneios WHERE professor_id = ?", idProf); 
+        } catch (Exception e) {}
+
+        try { 
+            jdbcTemplate.update("DELETE FROM tb_torneio WHERE professor_id = ?", idProf); 
+        } catch (Exception e) {}
     }
 }
