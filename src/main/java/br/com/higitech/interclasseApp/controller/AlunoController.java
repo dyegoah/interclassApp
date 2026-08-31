@@ -59,13 +59,12 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
-        long totalInscritosNaModalidade = alunoRepository.findByProfessorId(professor.getId()).stream()
-                .filter(a -> a.getEsporte() != null && a.getEsporte().equalsIgnoreCase(dto.esporte)
-                          && a.getGenero() != null && a.getGenero().equalsIgnoreCase(dto.genero))
-                .count();
+        // 🔥 ALTERAÇÃO AQUI: Verifica o limite GERAL de alunos do professor no banco
+        long totalAlunos = alunoRepository.countByProfessorId(professor.getId());
 
-        if (totalInscritosNaModalidade >= 100) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Desculpe, as vagas para " + dto.esporte + " esgotaram.");
+        // Trava fixada em 200 (futuramente será dinâmica via SaaS)
+        if (totalAlunos >= 200) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O limite total de alunos inscritos para esta instituição foi atingido.");
         }
 
         Aluno novoAluno = new Aluno();

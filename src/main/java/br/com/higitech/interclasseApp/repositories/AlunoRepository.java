@@ -19,4 +19,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     
     // 🔥 NOVA ROTA PÚBLICA: Usado na Arena Ao Vivo para baixar os alunos do torneio sem login
     List<Aluno> findByProfessorHashPublico(String hashPublico);
+    
+ // Conta rapidamente o total de alunos de um professor direto no banco
+    long countByProfessorId(Long professorId);
 }
