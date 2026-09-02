@@ -1,4 +1,4 @@
-package br.com.higitech.baixarQuestoes;
+package br.com.higitech.interclassApp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -3,6 +3,7 @@ package br.com.higitech.interclasseApp.model;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore; // 🚀 IMPORTAÇÃO DA BLINDAGEM
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,8 +32,7 @@ public class Professor {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // 🛡️ NUNCA envia a senha para a tela (JSON)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100) 
     private String senha;
 

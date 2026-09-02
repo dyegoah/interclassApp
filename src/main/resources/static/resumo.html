@@ -242,12 +242,10 @@
         ];
 
         window.onload = async () => {
-            // CARREGA O FOOTBAR SEMPRE (PARA ALUNOS E PROFESSORES) 
-            fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
-
             if (!isModoPublico && localStorage.getItem('interclassToken')) {
-                // Professor Logado (Carrega o Topbar)
+                // Professor Logado (Carrega o Topbar e Footbar)
                 fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
+                fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
                 document.getElementById('painel-professor').style.display = 'block';
 
                 let pNome = localStorage.getItem('profNome') || "Professor";
@@ -257,7 +255,7 @@
                 document.getElementById('link-arena-input').value = linkArena;
 
             } else {
-                // Aluno visualizando
+                // Aluno visualizando (Sem Footbar)
                 document.getElementById('header-aluno').style.display = 'block';
                 let eNome = urlParams.get('e') || "Interclass Arena";
                 document.getElementById('escola-nome').innerText = eNome.toUpperCase();

@@ -149,7 +149,7 @@
             document.getElementById('mensagem-alerta').className = 'alert'; // Esconde alertas anteriores
 
             try {
-                const response = await fetch('/api/auth/registrar', {
+                const response = await fetch('/api/professores/cadastrar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nome: nome, escola: escola, email: email, senha: senha })
