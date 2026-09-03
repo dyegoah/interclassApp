@@ -4,70 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Interclass Arena</title>
+
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
+    
     <style>
-
-        :root { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        
-        body { 
-            background-color: #05050f;
-            background-image: 
-                radial-gradient(circle at 50% 30%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
-                linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
-            animation: moveGrid 20s linear infinite;
-            color: #ffffff; 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 2rem; 
-        }
-
-        @keyframes moveGrid {
-            0% { background-position: center center, 0 0, 0 0; }
-            100% { background-position: center center, 40px 40px, 40px 40px; }
-        }
-        
-        .glass-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 4px solid var(--theme-primary); }
-        
-        h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 0 15px var(--theme-glow); text-align: center;}
-        p.subtitle { color: rgba(255,255,255,0.6); margin-bottom: 20px; font-size: 0.95rem; text-align: center; }
-
-        /* 🔥 ESTILO DOS AVISOS (TIPO BOOTSTRAP) 🔥 */
-        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 8px; font-size: 0.9rem; text-align: center; display: none; font-weight: bold; font-family: 'Segoe UI'; }
-        .alert-danger { color: #ffccdd; background-color: rgba(255, 0, 85, 0.1); border-color: #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.3); }
-        .alert-success { color: #ccffcc; background-color: rgba(0, 255, 0, 0.1); border-color: #00ff00; box-shadow: 0 0 15px rgba(0,255,0,0.3); }
-        .d-block { display: block !important; }
-
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
-        
-        /* Travas de limite e dicas visuais */
-        .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
-        .form-group input:focus { border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
+        /* CSS EXCLUSIVO DO CADASTRO DE PROFESSORES */
         .char-counter { font-size: 0.75rem; color: #888; float: right; margin-top: 5px; }
-
-        .btn-submit { width: 100%; padding: 15px; background: linear-gradient(90deg, #ff00de, #b200ff); border: none; border-radius: 30px; color: #fff; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 15px; transition: 0.3s; box-shadow: 0 0 15px var(--theme-glow); }
-        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 0, 222, 0.8); }
 
         .links-rodape { margin-top: 20px; font-size: 0.9rem; text-align: center;}
         .links-rodape a { color: #00f2fe; text-decoration: none; font-weight: bold; transition: 0.3s; }
         .links-rodape a:hover { text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); text-decoration: underline; }
-        
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
-<body>
+<body class="bg-arena-login">
 
     <div class="glass-form">
-        <h1>Criar Conta</h1>
+        <h1 class="form-title">Criar Conta</h1>
         <p class="subtitle">Faça a gestão dos torneios da sua escola.</p>
 
         <!-- CAIXA DE MENSAGENS -->

@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Configuração de Torneios - InterclassApp</title>
+
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,17 +17,13 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
-        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
-        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
-        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); --bg-gradient: linear-gradient(-45deg, #0a001a, #2a004d, #000000, #1f0033); }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; }
+        /* CSS EXCLUSIVO DA TELA DE TORNEIOS */
+        body { 
+            background: var(--bg-gradient); 
+            background-size: 400% 400%; 
+            animation: gradientBG 10s ease infinite; 
+        }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { text-transform: uppercase; font-size: 1.3rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; }
 
         .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); overflow-x: auto; }
         .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap;}
@@ -32,10 +33,6 @@
         .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
 
         .info-balloon { border-left: 4px solid var(--theme-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-family: 'Segoe UI'; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.85); transition: border-color 0.5s; background: rgba(0,0,0,0.4);}
-
-        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
-        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
-        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); padding: 10px 20px; }
 
         .torneio-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--theme-primary); position: relative; overflow: hidden; transition: 0.3s;}
         .torneio-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
@@ -49,15 +46,7 @@
         
         .alerta-bloqueio { background: rgba(255,0,85,0.1); border: 1px solid #ff0055; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 0 15px rgba(255,0,85,0.2); }
         .alerta-aviso { background: rgba(255,215,0,0.1); border: 1px solid #ffd700; padding: 10px; border-radius: 8px; margin-top: 15px; }
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
-	<!-- 🛡️ ANTI-FLICKER: Expulsa curiosos do criador de torneios instantaneamente -->
-	    <script>
-	        if (!localStorage.getItem('interclassToken')) {
-	            window.location.replace('/index.html');
-	        }
-	    </script>
 </head>
 <body>
     <div class="arena-container">

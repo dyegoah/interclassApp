@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calendário Automático - InterclassApp</title>
+
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,17 +17,13 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
-        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
-        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); --bg-gradient: linear-gradient(-45deg, #1a0011, #4d0033, #000000, #330022); }
-        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); --bg-gradient: linear-gradient(-45deg, #0a001a, #2a004d, #000000, #1f0033); }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 10s ease infinite; color: #ffffff; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; transition: background 0.5s ease; }
+        /* CSS EXCLUSIVO DO CALENDÁRIO */
+        body { 
+            background: var(--bg-gradient); 
+            background-size: 400% 400%; 
+            animation: gradientBG 10s ease infinite; 
+        }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; }
 
         .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); overflow-x: auto; }
         .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap; }
@@ -31,15 +32,8 @@
         .stepper-line { height: 2px; flex-grow: 1; background: rgba(255,255,255,0.1); margin: 0 10px; min-width: 20px; }
         .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
 
-        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; display: flex; align-items: center; gap: 10px; justify-content: center;}
-        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
-        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
-        .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
-
         .config-section { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .config-section h4 { color: var(--theme-primary); font-family: 'Orbitron'; font-size: 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        
-        .input-dark { width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; transition: 0.3s; margin-bottom: 10px; }
         
         .dias-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .dia-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 8px; font-family: 'Segoe UI'; font-size: 0.9rem; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.6); }
@@ -70,9 +64,6 @@
         .jogo-quadra { color: rgba(255,255,255,0.5); font-size: 0.8rem; display: block;}
         .btn-edit-jogo { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
         .btn-edit-jogo:hover { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); }
-
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: rgba(10,10,20,0.95); border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
 
         .tabs-container { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; gap: 5px; overflow-x: auto; }
         .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; white-space: nowrap; }
@@ -135,18 +126,7 @@
             .mini-team { color: black !important; }
             .mini-bracket-wrapper { background: white !important; }
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-		
-		
-		
     </style>
-	
-	<script>
-	    if (!localStorage.getItem('interclassToken')) {
-	        window.location.replace('/index.html');
-	    }
-	</script>
 </head>
 <body>
     <div class="arena-container">
@@ -312,15 +292,6 @@
     <div id="footbar-placeholder"></div>
 
     <script>
-        const HighTechSecurity = {
-            sanitizar: function(textoCru) {
-                if (!textoCru) return '';
-                const texto = String(textoCru);
-                const mapa = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', "/": '&#x2F;', "`": '&#x60;', "=": '&#x3D;' };
-                return texto.replace(/[&<>"'/`=]/ig, (match) => (mapa[match]));
-            }
-        };
-
         const modalidadeDefs = [
             { id: 1, nome: 'Futsal', icone: '⚽' }, { id: 2, nome: 'Vôlei', icone: '🏐' },
             { id: 3, nome: 'Basquete', icone: '🏀' }, { id: 4, nome: 'Handebol', icone: '🤾' },

@@ -4,29 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portal do Atleta - InterclassApp</title>
+    
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a0a16">
     <style>
-        :root { 
-            --theme-primary: #00f2fe; 
-            --theme-glow: rgba(0, 242, 254, 0.6); 
-            --bg-deep: #05050f;
-            --panel-bg: rgba(15, 15, 30, 0.7);
-            --win-color: #00ff55;
-            --danger-color: #ff0055;
-            --gold: #ffd700;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent;}
-        
+        /* CSS EXCLUSIVO DO PORTAL DO ATLETA (RESUMO) */
         body { 
             background: var(--bg-deep) url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
-            background-size: cover !important; color: #ffffff; min-height: 100vh; padding-bottom: 80px;
+            background-size: cover !important; 
+            min-height: 100vh;
+            padding-bottom: 120px !important; 
         }
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(5,5,15,0.8) 0%, rgba(5,5,15,0.95) 100%); z-index: -1;}
 
-        .glass { background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); border-radius: 16px;}
-        
         /* HEADER DO ALUNO (PUBLICO) */
         #header-aluno { display: none; position: sticky; top: 0; z-index: 100; background: rgba(5, 5, 15, 0.9); backdrop-filter: blur(10px); padding: 15px; border-bottom: 2px solid var(--theme-primary); text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.8);}
         .live-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,0,85,0.15); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; animation: pulse 2s infinite;}
@@ -68,7 +62,7 @@
         .team-name { font-family: 'Segoe UI'; font-weight: bold; font-size: 1rem; color: #ddd; display: flex; align-items: center; gap: 10px;}
         .team-score { font-family: 'Orbitron'; font-size: 1.2rem; font-weight: bold; color: #fff; background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 6px;}
         .winner .team-name { color: #fff; }
-        .winner .team-score { color: var(--win-color); background: rgba(0,255,85,0.1); border: 1px solid var(--win-color); box-shadow: 0 0 10px rgba(0,255,85,0.3);}
+        .winner .team-score { color: var(--gold); background: rgba(255,215,0,0.1); border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(255,215,0,0.3);}
         
         .btn-toggle-partidas { background: rgba(0, 242, 254, 0.1); border: 1px solid var(--theme-primary); color: var(--theme-primary); width: 100%; padding: 15px; border-radius: 12px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; font-weight: bold; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); margin-top: 5px; margin-bottom: 20px;}
         .btn-toggle-partidas:hover { background: var(--theme-primary); color: #000; box-shadow: 0 0 20px var(--theme-glow);}
@@ -79,34 +73,35 @@
         th { background: rgba(255,255,255,0.05); padding: 12px 10px; color: #888; font-family: 'Orbitron'; font-size: 0.7rem; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.1);}
         td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: 'Segoe UI'; font-size: 0.9rem; text-align: center; color: #ccc;}
         .col-left { text-align: left !important;}
-        tr:nth-child(1) td, tr:nth-child(2) td { background: linear-gradient(90deg, rgba(0, 255, 85, 0.05), transparent); border-left: 3px solid var(--win-color); color: #fff; font-weight: bold;}
+        tr:nth-child(1) td, tr:nth-child(2) td { background: linear-gradient(90deg, rgba(255, 215, 0, 0.05), transparent); border-left: 3px solid var(--gold); color: #fff; font-weight: bold;}
 
-        /* CHAVEAMENTOS ULTRA COMPACTOS PARA CABER TODAS AS FASES */
-        .bracket-scroll-area { display: flex; align-items: center; gap: 8px; padding: 15px 5px; overflow-x: auto; scrollbar-width: none; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 100%); border-radius: 12px; margin-top: 15px; -webkit-overflow-scrolling: touch;}
+        /* 🔥 CHAVEAMENTOS (BRACKETS) AMPLIADOS COM O AMARELO LINDO 🔥 */
+        .bracket-scroll-area { display: flex; align-items: center; gap: 12px; padding: 15px 5px 25px 5px; overflow-x: auto; scrollbar-width: none; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 100%); border-radius: 12px; margin-top: 15px; -webkit-overflow-scrolling: touch;}
         .bracket-scroll-area::-webkit-scrollbar { display: none; }
-        .bracket-col { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; justify-content: space-around; position: relative;}
+        .bracket-col { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; justify-content: space-around; position: relative;}
         
-        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; width: 85px; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.6); overflow: hidden; }
-        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.4rem; text-align: center; padding: 2px 1px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 140px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.6); overflow: hidden; }
+        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.6rem; text-align: center; padding: 4px 2px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        .mini-team-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .mini-team-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .mini-team-row:last-child { border-bottom: none; }
         
-        .gamer-avatar { width: 10px; height: 10px; border-radius: 50%; object-fit: cover; margin-right: 3px; }
-        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.5rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
-        .mini-team-score { font-family: 'Orbitron'; font-size: 0.55rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 1px 2px; border-radius: 4px; text-align: center; margin-left: 3px;}
+        .gamer-avatar { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; margin-right: 5px; }
+        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.75rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
+        .mini-team-score { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; text-align: center; margin-left: 5px;}
         
-        .mini-match .vencedor { background: linear-gradient(90deg, rgba(0, 255, 85, 0.1), transparent); border-left: 2px solid var(--win-color); }
+        /* O Amarelo Lindo para os vencedores */
+        .mini-match .vencedor { background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent); border-left: 3px solid #ffd700; }
         .mini-match .vencedor .mini-team-name { color: #fff; }
-        .mini-match .vencedor .mini-team-score { color: #000; background: var(--win-color); box-shadow: 0 0 8px var(--win-color); }
+        .mini-match .vencedor .mini-team-score { color: #000; background: #ffd700; box-shadow: 0 0 10px #ffd700; }
         
-        .mini-match.final { border: 1px solid var(--gold); transform: scale(1.05); box-shadow: 0 0 15px rgba(255,215,0,0.3); margin: 0 5px;}
-        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.15); color: var(--gold); font-weight: bold;}
-        .mini-match.final .vencedor { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent);}
-        .mini-match.final .vencedor .mini-team-score { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+        .mini-match.final { border: 2px solid var(--gold); transform: scale(1.05); box-shadow: 0 0 20px rgba(255,215,0,0.4); margin: 0 8px;}
+        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.2); color: var(--gold); font-weight: bold;}
+        .mini-match.final .vencedor { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), transparent);}
+        .mini-match.final .vencedor .mini-team-score { background: var(--gold); box-shadow: 0 0 15px var(--gold); }
 
-        .bracket-col:not(:last-child) .mini-match::after { content: ''; position: absolute; right: -10px; top: 50%; width: 10px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
-        .bracket-col:not(:first-child) .mini-match::before { content: ''; position: absolute; left: -10px; top: 50%; width: 10px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
+        .bracket-col:not(:last-child) .mini-match::after { content: ''; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
+        .bracket-col:not(:first-child) .mini-match::before { content: ''; position: absolute; left: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
 
         /* CARDS GAMER (ESTATÍSTICAS) */
         .player-card { display: flex; align-items: center; background: rgba(0,0,0,0.5); padding: 10px 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);}
@@ -125,18 +120,14 @@
         .card-danger .player-stat { color: var(--danger-color); }
         .card-danger.rank-1 { background: linear-gradient(90deg, rgba(255, 0, 85, 0.15), rgba(0,0,0,0.5)); border-color: var(--danger-color);}
         .card-danger.rank-1 .player-rank, .card-danger.rank-1 .player-photo { color: var(--danger-color); border-color: var(--danger-color); text-shadow: 0 0 10px var(--danger-color); box-shadow: 0 0 15px var(--danger-color);}
-
-        /* RADAR DE ERROS */
-        .erro-box { background: rgba(255, 0, 85, 0.1); border: 1px solid var(--danger-color); padding: 15px; border-radius: 10px; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); width: 100%; margin-bottom: 15px;}
-        .erro-box h4 { color: var(--danger-color); font-family: 'Orbitron'; margin-bottom: 5px;}
-        .erro-box p { font-family: 'Segoe UI'; font-size: 0.85rem; color: #ffccdd; word-break: break-all;}
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
 
-    <div id="topbar-placeholder"></div>
+    <!-- 🔥 Envolvendo o placeholder na mesma estrutura que usamos nas outras páginas 🔥 -->
+    <div class="arena-container" style="padding-bottom: 0; padding-top: 1.5rem;">
+        <div id="topbar-placeholder"></div>
+    </div>
 
     <!-- HEADER PÚBLICO (ALUNO) -->
     <header class="public-header" id="header-aluno">
@@ -202,6 +193,10 @@
 
     <div id="footbar-placeholder"></div>
 
+    <!-- Gatilho de performance do Topbar -->
+    <img src="data:," style="display:none;" onerror="if(window.initTopbar) window.initTopbar();">
+    <img src="data:," style="display:none;" onerror="if(window.initFootbar) window.initFootbar();">
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let professorIdInterno = localStorage.getItem('profId') || localStorage.getItem('userId');
@@ -210,14 +205,11 @@
         // Verifica se é aluno ou professor acessando a página
         let isModoPublico = !!professorIdPublico;
 
-        // 🔥 CORREÇÃO DA TRAVA DO PROFESSOR: Permite o acesso se estiver logado 🔥
         if (!isModoPublico) {
             if (localStorage.getItem('interclassToken')) {
-                // Professor logado sem ?ref: Usa a própria hash armazenada
                 professorIdPublico = localStorage.getItem('profHash') || localStorage.getItem('hashPublico') || localStorage.getItem('professorHash');
-                if(!professorIdPublico) professorIdPublico = professorIdInterno; // Fallback
+                if(!professorIdPublico) professorIdPublico = professorIdInterno;
             } else {
-                // Nem aluno com link, nem professor logado: Expulsa
                 document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; color:#fff; font-family:\'Orbitron\'; text-align:center; padding: 20px;"><h2>Acesso Inválido.<br>Faça login ou acesse pelo link oficial.</h2></div>';
                 throw new Error("Link sem referência.");
             }
@@ -244,8 +236,16 @@
         window.onload = async () => {
             if (!isModoPublico && localStorage.getItem('interclassToken')) {
                 // Professor Logado (Carrega o Topbar e Footbar)
-                fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
-                fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
+                fetch('/topbar.html').then(r => r.text()).then(h => {
+                    document.getElementById('topbar-placeholder').innerHTML = h;
+                    if(window.initTopbar) window.initTopbar();
+                }).catch(()=>{});
+                
+                fetch('/footbar.html').then(r => r.text()).then(h => {
+                    document.getElementById('footbar-placeholder').innerHTML = h;
+                    if(window.initFootbar) window.initFootbar();
+                }).catch(()=>{});
+                
                 document.getElementById('painel-professor').style.display = 'block';
 
                 let pNome = localStorage.getItem('profNome') || "Professor";
@@ -414,40 +414,27 @@
         }
 
         async function buscarDadosDaAPI() {
-            let jogos = [];
             try {
-                let urlJogos = isModoPublico ? `/api/jogos/public/${professorIdPublico}/lote/${loteAtual}` : `/api/jogos/lote/${loteAtual}`;
-                let headers = isModoPublico ? {} : { 'Authorization': `Bearer ${localStorage.getItem('interclassToken')}` };
-                
-                let res = await fetch(urlJogos, { headers });
+                let res = await fetch(`/api/jogos/public/${professorIdPublico}/lote/${loteAtual}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status} - Falha na API`);
+                let jogos = await res.json(); 
                 
-                jogos = await res.json(); 
                 document.getElementById('radar-erros').innerHTML = ''; 
-            } catch (error) {
-                if (!isModoPublico) {
-                    let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
-                    if (calOffline[loteAtual] && calOffline[loteAtual].jogos) jogos = calOffline[loteAtual].jogos;
-                } else {
-                    document.getElementById('radar-erros').innerHTML += `<div class="erro-box"><h4>🚨 Erro (Jogos)</h4><p>${error.message}</p></div>`;
-                }
-            }
-
-            jogos.forEach(j => {
-                if (j.status === 'FINALIZADO') {
-                    if (!relatoriosSalvos[String(j.id)] || isModoPublico) {
+                
+                jogos.forEach(j => {
+                    if (!relatoriosSalvos[String(j.id)]) {
                         relatoriosSalvos[String(j.id)] = { 
                             placar: { A: j.placarA||0, B: j.placarB||0 }, 
                             timeline: j.eventos || j.timeline || j.sumula || [] 
                         };
                     }
-                } else {
-                    if(isModoPublico && relatoriosSalvos[String(j.id)]) delete relatoriosSalvos[String(j.id)];
-                }
-            });
+                });
 
-            todosJogosGlobais = resolverNomesDinamicos(jogos || []);
-            montarCarrosselDeEsportes();
+                todosJogosGlobais = resolverNomesDinamicos(jogos || []);
+                montarCarrosselDeEsportes();
+            } catch (error) {
+                document.getElementById('radar-erros').innerHTML += `<div class="erro-box"><h4>🚨 Erro (Jogos)</h4><p>${error.message}</p></div>`;
+            }
         }
 
         function montarCarrosselDeEsportes() {
@@ -493,11 +480,11 @@
             const nav = document.getElementById('app-nav');
             let html = `
                 <button class="nav-btn active" onclick="switchTab('tab-partidas', this)">Partidas</button>
-                <button class="nav-btn" onclick="switchTab('tab-tabela', this)">Classificação / Chaves</button>
-                <button class="nav-btn" onclick="switchTab('tab-stats', this)">Ranking / Estatística</button>
+                <button class="nav-btn" onclick="switchTab('tab-tabela', this)">${isEsporteAtualIndividual ? 'Chaves' : 'Classificação'}</button>
+                <button class="nav-btn" onclick="switchTab('tab-stats', this)">${isEsporteAtualIndividual ? '👑 Ranking' : '⚽ Artilharia'}</button>
             `;
             if(!isEsporteAtualIndividual) {
-                html += `<button class="nav-btn" onclick="switchTab('tab-cartoes', this)">Punições</button>`;
+                html += `<button class="nav-btn" onclick="switchTab('tab-cartoes', this)">🟥 Punições</button>`;
             }
             nav.innerHTML = html;
             
@@ -515,6 +502,9 @@
         function renderizarTodasAsAbas() {
             let jogosDoEsporte = todosJogosGlobais.filter(j => extrairEsporteNome(j).toLowerCase() === esporteAtual.toLowerCase());
             
+            // ==========================================
+            // ABA 1: PARTIDAS
+            // ==========================================
             const cPartidas = document.getElementById('container-partidas');
             jogosDoEsporte.sort((a,b) => {
                 let dataA = a.diaId || a.dataJogo || "9999-99-99";
@@ -567,6 +557,9 @@
                 cPartidas.innerHTML = htmlVisiveis || `<p style="text-align:center; color:#888;">Nenhuma partida encontrada.</p>`;
             }
 
+            // ==========================================
+            // ABA 2: CLASSIFICAÇÃO / CHAVES 
+            // ==========================================
             const cTabela = document.getElementById('container-tabela');
             cTabela.innerHTML = '';
             
@@ -600,6 +593,7 @@
                 }
             } 
             
+            // 🔥 CHAVEAMENTO GIGANTE COM FASE INICIAL DE VOLTA E AMARELO LINDO 🔥
             let fases = { 'FASE INICIAL': [], '64 AVOS': [], '32 AVOS': [], '16 AVOS': [], 'OITAVAS': [], 'QUARTAS': [], 'SEMIFINAL': [], 'TERCEIRO': [], 'FINAL': [] };
             
             jogosDoEsporte.forEach(j => {
@@ -614,7 +608,7 @@
                 else if(t.includes('SEMI')) fases['SEMIFINAL'].push(j);
                 else if(t.includes('3º LUGAR') || t.includes('TERCEIRO') || t.includes('3 LUGAR')) fases['TERCEIRO'].push(j);
                 else if(t.includes('FINAL') && !t.includes('SEMI') && !t.includes('QUARTAS') && !t.includes('OITAVAS') && !t.includes('16 AVOS') && !t.includes('32 AVOS') && !t.includes('64 AVOS')) fases['FINAL'].push(j);
-                else fases['FASE INICIAL'].push(j);
+                else fases['FASE INICIAL'].push(j); // A FASE INICIAL ESTÁ AQUI
             });
 
             if (fases['FINAL'].length > 0 || fases['SEMIFINAL'].length > 0 || fases['QUARTAS'].length > 0 || fases['OITAVAS'].length > 0 || fases['16 AVOS'].length > 0 || fases['32 AVOS'].length > 0 || fases['64 AVOS'].length > 0 || fases['FASE INICIAL'].length > 0) {
@@ -671,6 +665,9 @@
                 `;
             }
 
+            // ==========================================
+            // ABA 3 E 4: ESTATÍSTICAS E CARTÕES
+            // ==========================================
             let objPts = {}; let objFaltas = {};
 
             if(isEsporteAtualIndividual) {
@@ -778,7 +775,6 @@
             }
         };
 
-        // 🔥 FUNÇÃO DE COPIAR LINK COM COMPARTILHAMENTO NATIVO (WEB SHARE API) 🔥
         function copiarLinkPublico(inputId) {
             const linkInput = document.getElementById(inputId);
             const linkText = linkInput.value;
@@ -786,7 +782,6 @@
             linkInput.select();
             linkInput.setSelectionRange(0, 99999);
 
-            // Usa o clipboard mais moderno com fallback
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(linkText).then(() => dispararCompartilhamento(linkText));
             } else {
@@ -813,7 +808,7 @@
                         title: 'Portal do Atleta - Interclass Arena',
                         text: 'Acompanhe as tabelas, chaves e artilharia do torneio ao vivo!',
                         url: url
-                    }).catch(console.error); // Ignora erros se o usuário fechar a janela
+                    }).catch(console.error);
                 } else {
                     alert("✅ Link copiado com sucesso! Cole nas suas redes sociais ou WhatsApp para enviar aos alunos.");
                 }

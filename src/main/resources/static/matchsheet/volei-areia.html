@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Súmula Vôlei de Areia - InterclassApp</title>
+    
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,12 +16,11 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
+        /* CSS EXCLUSIVO DA SÚMULA DE VÔLEI DE AREIA */
         :root { --theme-primary: #f4a460; --team-a: #00f2fe; --team-b: #ff00de; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
         
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        body { background: #020111 !important; overflow-x: hidden; }
+        .arena-container { padding: 1.5rem; }
         
         .volei-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid var(--theme-primary);}
         .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
@@ -72,11 +76,11 @@
         .timeline-item { display: flex; align-items: center; gap: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #555;}
         .timeline-item.evt-a { border-left-color: var(--team-a); }
         .timeline-item.evt-b { border-left-color: var(--team-b); }
-        .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
+        .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 80px; font-size: 0.90rem; flex-shrink: 0;}
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
-        .modal-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
+        /* Modal da Súmula */
+        .modal-box-sumula { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
+        .modal-box-sumula img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
         
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-family: 'Segoe UI'; font-size: 0.9rem;}
@@ -84,8 +88,6 @@
         .btn-erro { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
         .btn-card-amarelo { background: rgba(255, 234, 0, 0.2); border: 1px solid #ffea00; color: #ffea00;}
         .btn-card-vermelho { background: rgba(255, 0, 0, 0.5); border: 1px solid #ff0000; color: #fff;}
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
@@ -99,7 +101,7 @@
                 <div class="set-subtitle" id="set-meta-lbl">Vitória a 21 pts (Vantagem de 2)</div>
             </div>
 
-            <button class="btn-finalizar" id="btn-finalizar" onclick="finalizarPartida()">Finalizar ✓</button>
+            <button class="btn-finalizar" id="btn-finalizar" onclick="enviarSumulaParaBanco()">Finalizar ✓</button>
         </div>
 
         <div style="text-align: center; margin-top: 10px; font-family: 'Segoe UI'; color: #aaa; font-size: 0.85rem;" id="match-info">Carregando Jogo...</div>
@@ -110,7 +112,10 @@
                 <div class="sets-won" id="sets-dots-a"></div>
                 <div class="team-score score-a" id="score-a">0</div>
                 <div class="timeouts-area" id="box-timeouts-a">
-                    Tempo Restante (Set) <div class="timeout-dots" id="timeouts-a"></div>
+                    Tempo Restante (Set) <div class="timeout-dots" id="timeouts-a">
+                        <div class="timeout-dot" onclick="pedirTempo('A', 0)"></div>
+                        <div class="timeout-dot" onclick="pedirTempo('A', 1)"></div>
+                    </div>
                 </div>
             </div>
             
@@ -121,7 +126,10 @@
                 <div class="sets-won" id="sets-dots-b"></div>
                 <div class="team-score score-b" id="score-b">0</div>
                 <div class="timeouts-area" id="box-timeouts-b">
-                    Tempo Restante (Set) <div class="timeout-dots" id="timeouts-b"></div>
+                    Tempo Restante (Set) <div class="timeout-dots" id="timeouts-b">
+                        <div class="timeout-dot" onclick="pedirTempo('B', 0)"></div>
+                        <div class="timeout-dot" onclick="pedirTempo('B', 1)"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,8 +150,9 @@
 
     </div>
 
+    <!-- Puxando a classe .modal-overlay do estilo global -->
     <div id="modal-acao" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box-sumula">
             <img id="acao-foto" src="">
             <h3 id="acao-nome" style="color: white; font-family: 'Segoe UI';">Nome</h3>
             <p id="acao-num" style="color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px;">Camisa 10</p>
@@ -171,19 +180,16 @@
     </div>
 
     <script>
-        let jogoId = parseInt(new URLSearchParams(window.location.search).get('jogo'));
-        let lote = new URLSearchParams(window.location.search).get('lote') || 'masculino';
-        let modoLeitura = new URLSearchParams(window.location.search).get('read') === 'true';
+        const urlParams = new URLSearchParams(window.location.search);
+        const idJogo = parseInt(urlParams.get('jogo')) || 999;
+        const lote = urlParams.get('lote') || 'masculino';
+        const isReadOnly = urlParams.get('read') === 'true';
         
         let placarGlobal = { A: 0, B: 0 };
         let pontosAtletas = {}; 
         let faltasAtletas = {};
         let jogadorSelecionado = null;
         let timelineEventos = [];
-
-        let timerInterval = null;
-        let timerSegundos = 0;
-        let isTimerRunning = false;
         
         let setsGanhos = { A: 0, B: 0 };
         let timeoutsUsados = { A: [false], B: [false] }; 
@@ -197,7 +203,6 @@
         window.onload = async () => {
             const token = localStorage.getItem('interclassToken');
 
-            // 🔥 NOVO: BUSCA OS ALUNOS CADASTRADOS PARA INJETAR AUTOMATICAMENTE NAS EQUIPES 🔥
             try {
                 let resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
                 if (resAlunos.ok) {
@@ -219,10 +224,10 @@
             }
 
             if(!matchAtiva) {
-                matchAtiva = { id: idJogo, esporte: 'Vôlei', titulo: 'Partida', quadra: 'Quadra', icone: '🏐' };
+                matchAtiva = { id: idJogo, esporte: 'Vôlei de Areia', titulo: 'Partida', quadra: 'Quadra', icone: '🏐' };
             }
 
-            let nomeEsporte = matchAtiva.esporte || (matchAtiva.modalidade ? matchAtiva.modalidade.nomeEsporte : "Vôlei");
+            let nomeEsporte = matchAtiva.esporte || (matchAtiva.modalidade ? matchAtiva.modalidade.nomeEsporte : "Vôlei de Areia");
             let iconeEsporte = matchAtiva.icone || (matchAtiva.modalidade ? matchAtiva.modalidade.icone : "🏐");
 
             document.getElementById('match-info').innerHTML = `${iconeEsporte} <b>${nomeEsporte}</b> - ${matchAtiva.titulo} | ${matchAtiva.quadra}`;
@@ -241,10 +246,8 @@
                 document.getElementById('btn-finalizar').style.display = 'none';
                 document.getElementById('box-timeouts-a').style.display = 'none';
                 document.getElementById('box-timeouts-b').style.display = 'none';
-                document.getElementById('timeline-container').style.display = 'block';
                 atualizarTimelineDOM(); atualizarPlacarVisual(true);
             } else {
-                // 🔥 CARREGANDO JOGADORES REAIS DA SÚMULA NO BANCO DE DADOS 🔥
                 if (matchAtiva.escalacoes && matchAtiva.escalacoes.length > 0) {
                     matchAtiva.escalacoes.forEach(esc => {
                         let nome = esc.aluno ? esc.aluno.nome : (esc.nomeAluno || "Atleta");
@@ -257,7 +260,6 @@
                         escalacao[eq].push({ id: id, numero: num, nome: nome, foto: fotoUrl, stats: [] });
                     });
                 } else {
-                    // 🔥 BUSCA INTELIGENTE: Puxa os alunos da Turma e Esporte, mesmo se a escala não estiver salva na partida! 🔥
                     let sportName = nomeEsporte.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
                     let rawA = (matchAtiva.equipeANome || "Equipe A").split(' (')[0].trim();
                     let rawB = (matchAtiva.equipeBNome || "Equipe B").split(' (')[0].trim();
@@ -286,11 +288,10 @@
                 atualizarPlacarVisual();
             }
             renderizarListas();
-            renderTimeline();
+            atualizarTimelineDOM();
         };
 
         function escalarMockEquipe(eq, nomeTurma, cor, startNum) {
-            const nomes = ["Lucas", "Pedro", "João", "Gabriel"];
             for(let i=0; i<2; i++) {
                 escalacao[eq].push({ 
                     id: eq + i, 
@@ -309,16 +310,17 @@
 
             if(venceuA || venceuB) {
                 let timeVencedor = venceuA ? 'A' : 'B';
-                timelineEventos.push({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `🏆 FIM DO ${setAtualIndex}º SET! Vitória da Dupla ${timeVencedor} por ${placarGlobal.A} x ${placarGlobal.B}`});
+                timelineEventos.unshift({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `🏆 FIM DO ${setAtualIndex}º SET! Vitória da Dupla ${timeVencedor} por ${placarGlobal.A} x ${placarGlobal.B}`, equipe: timeVencedor});
                 setsGanhos[timeVencedor]++;
                 
                 if(setsGanhos[timeVencedor] === totalSetsParaVencer) {
                     alert(`🏆 FIM DE JOGO! A Dupla ${timeVencedor} venceu a partida.`);
-                    finalizarPartida();
+                    atualizarTimelineDOM();
+                    enviarSumulaParaBanco();
                 } else {
                     alert(`Fim do ${setAtualIndex}º Set! Vitória da Dupla ${timeVencedor}.\nAs duplas trocarão de lado.`);
                     placarGlobal.A = 0; placarGlobal.B = 0; timeoutsUsados = { A: [false], B: [false] };
-                    setAtualIndex++; atualizarPlacarVisual();
+                    setAtualIndex++; atualizarPlacarVisual(); atualizarTimelineDOM();
                 }
                 return true;
             }
@@ -352,15 +354,15 @@
             if(timeoutsUsados[time][index]) return; 
             if(confirm(`Confirmar Pedido de Tempo (30s) para a Dupla ${time}?`)) {
                 timeoutsUsados[time][index] = true;
-                timelineEventos.push({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `⏱️ TEMPO TÉCNICO: Solicitado pela Dupla ${time}.`});
-                atualizarPlacarVisual();
+                timelineEventos.unshift({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `⏱️ TEMPO TÉCNICO: Solicitado pela Dupla ${time}.`, equipe: time});
+                atualizarPlacarVisual(); atualizarTimelineDOM();
             }
         }
 
         function corrigirPlacar(time, valor) {
             placarGlobal[time] += valor; if(placarGlobal[time] < 0) placarGlobal[time] = 0;
-            timelineEventos.push({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `Corretor Manual: Placar Equipa ${time} ajustado.`, equipe: time });
-            atualizarPlacarVisual();
+            timelineEventos.unshift({ set: setAtualIndex, placarStr: `${placarGlobal.A}x${placarGlobal.B}`, txt: `Corretor Manual: Placar ajustado.`, equipe: time });
+            atualizarPlacarVisual(); atualizarTimelineDOM();
         }
 
         function renderizarListas() {
@@ -380,7 +382,6 @@
                     let estiloLinha = tomouVermelho ? 'border-color: #ff0000; background: rgba(255,0,0,0.1); opacity:0.7;' : '';
                     let pointer = isReadOnly || tomouVermelho ? 'readonly' : '';
                     
-                    // 🔥 CORREÇÃO DE CLIQUE 🔥
                     let click = '';
                     if (tomouVermelho) {
                         click = `onclick="alert('Jogador desqualificado.')"`;
@@ -403,7 +404,6 @@
         }
 
         function abrirModalAcoes(id, t) {
-            // 🔥 CORREÇÃO DO BUG: COMPARAÇÃO CONVERTIDA PARA STRING 🔥
             jogadorSelecionado = escalacao[t].find(j => String(j.id) === String(id)); 
             timeAcao = t;
             document.getElementById('acao-foto').src = jogadorSelecionado.foto;
@@ -445,15 +445,18 @@
 
         function atualizarTimelineDOM() {
             const list = document.getElementById('timeline-lista');
-            if(timelineEventos.length === 0) return;
+            if(timelineEventos.length === 0) {
+                list.innerHTML = '<div class="timeline-item" style="color: #aaa; justify-content: center;">A partida ainda não começou.</div>';
+                return;
+            }
             
             list.innerHTML = '';
             timelineEventos.forEach(t => {
                 let eqClass = t.equipe === 'A' ? 'evt-a' : (t.equipe === 'B' ? 'evt-b' : '');
                 list.innerHTML += `
                     <div class="timeline-item ${eqClass}">
-                        <span class="timeline-time">[Set ${t.set} | ${t.placarStr}]</span> 
-                        <div style="flex-grow:1;">${t.txt}</div>
+                        <div class="time-stamp">[Set ${t.set} | ${t.placarStr}]</div> 
+                        <div style="flex-grow:1; font-family:'Segoe UI';">${t.txt}</div>
                     </div>
                 `;
             });
@@ -464,7 +467,7 @@
 
             const btn = document.getElementById('btn-finalizar');
             btn.disabled = true;
-            btn.innerText = "Processando no Servidor...";
+            btn.innerText = "Processando...";
 
             let placarFinalA = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.A : placarGlobal.A;
             let placarFinalB = (setsGanhos.A > 0 || setsGanhos.B > 0) ? setsGanhos.B : placarGlobal.B;
@@ -480,12 +483,12 @@
                 const resposta = await fetch(`/api/sumulas/${idJogo}/finalizar`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ placarA: placarFinalA, placarB: placarFinalB })
+                    body: JSON.stringify({ placarA: placarFinalA, placarB: placarFinalB, placar: {A: placarFinalA, B: placarFinalB}, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timelineEventos })
                 });
 
                 if (resposta.ok) {
                     let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                    relatorios[jogoId] = { placar: { A: placarFinalA, B: placarFinalB }, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timelineEventos };
+                    relatorios[idJogo] = { placar: { A: placarFinalA, B: placarFinalB }, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timelineEventos };
                     localStorage.setItem('relatoriosPartidas', JSON.stringify(relatorios));
 
                     alert("🏆 Súmula processada e gravada com sucesso no Servidor Oficial!");
@@ -494,9 +497,11 @@
                     throw new Error("Erro no servidor Java.");
                 }
             } catch (erro) {
-                alert("Falha de conexão com o banco. Verifique o console do Spring Tools Suite.");
-                btn.disabled = false;
-                btn.innerText = "Tentar Novamente";
+                let relatorios = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+                relatorios[idJogo] = { placar: { A: placarFinalA, B: placarFinalB }, setsGanhos: setsGanhos, setAtualIndex: setAtualIndex, escalacao: escalacao, timeline: timelineEventos };
+                localStorage.setItem('relatoriosPartidas', JSON.stringify(relatorios));
+                alert("🚨 Salvo Offline. Verifique a conexão com o servidor.");
+                window.location.href = '/tabelas.html';
             }
         }
     </script>

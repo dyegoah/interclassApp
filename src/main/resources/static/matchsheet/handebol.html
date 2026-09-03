@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Súmula Handebol - InterclassApp</title>
+    
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,12 +16,11 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
+        /* CSS EXCLUSIVO DA SÚMULA DE HANDEBOL */
         :root { --theme-primary: #ff7300; --team-a: #00f2fe; --team-b: #ff00de; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
         
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        body { background: #020111 !important; overflow-x: hidden; }
+        .arena-container { padding: 1.5rem; }
         
         .handebol-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid var(--theme-primary);}
         .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
@@ -71,8 +75,8 @@
         .timeline-item.evt-b { border-left-color: var(--team-b); }
         .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
+        /* Modal específico da Súmula */
+        .modal-box-sumula { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
         
         .input-dark { width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'Segoe UI'; outline: none; margin-bottom: 15px;}
         
@@ -85,8 +89,6 @@
         .btn-amarelo { background: rgba(255, 234, 0, 0.2); border: 1px solid #ffea00; color: #ffea00;}
         .btn-vermelho { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
         .btn-acao-generico { background: transparent; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 15px; width: 100%;}
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
@@ -152,7 +154,7 @@
     </div>
 
     <div id="modal-config-tempo" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box-sumula">
             <h3 style="color: #ff7300; font-family: 'Orbitron'; margin-bottom: 20px;">⚙️ Configurar Relógio</h3>
             <label style="display:block; text-align:left; color:#aaa; font-family:'Segoe UI'; font-size:0.85rem; margin-bottom:5px;">Formato de Disputa</label>
             <select id="config-tipo-periodo" class="input-dark">
@@ -169,8 +171,9 @@
         </div>
     </div>
 
+    <!-- Puxando a classe .modal-overlay do estilo global -->
     <div id="modal-acao" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box-sumula">
             <img id="acao-foto" src="" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px;">
             <h3 id="acao-nome" style="color: white; font-family: 'Segoe UI'; margin-bottom: 5px;">Nome</h3>
             <p id="acao-num" style="color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px;">Camisola 10</p>
@@ -218,7 +221,6 @@
         window.onload = async () => {
             const token = localStorage.getItem('interclassToken');
 
-            // 🔥 NOVO: BUSCA OS ALUNOS CADASTRADOS PARA INJETAR AUTOMATICAMENTE NAS EQUIPES 🔥
             try {
                 let resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
                 if (resAlunos.ok) {
@@ -262,7 +264,6 @@
                 document.getElementById('box-timeouts-a').style.display = 'none';
                 document.getElementById('box-timeouts-b').style.display = 'none';
             } else {
-                // 🔥 CARREGANDO JOGADORES REAIS DA SÚMULA NO BANCO DE DADOS 🔥
                 if (matchAtiva.escalacoes && matchAtiva.escalacoes.length > 0) {
                     matchAtiva.escalacoes.forEach(esc => {
                         let nome = esc.aluno ? esc.aluno.nome : (esc.nomeAluno || "Atleta");
@@ -275,7 +276,6 @@
                         escalacao[eq].push({ id: id, numero: num, nome: nome, foto: fotoUrl, stats: [] });
                     });
                 } else {
-                    // 🔥 BUSCA INTELIGENTE: Puxa os alunos da Turma e Esporte, mesmo se a escala não estiver salva na partida! 🔥
                     let sportName = nomeEsporte.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
                     let rawA = (matchAtiva.equipeANome || "Equipe A").split(' (')[0].trim();
                     let rawB = (matchAtiva.equipeBNome || "Equipe B").split(' (')[0].trim();
@@ -383,12 +383,11 @@
                     let estiloLinha = tomouVermelho ? 'border-color: #ff0000; background: rgba(255,0,0,0.1); opacity:0.7;' : '';
                     let pointer = isReadOnly || tomouVermelho ? 'readonly' : '';
                     
-                    // 🔥 CORREÇÃO DE CLIQUE 🔥
                     let click = '';
                     if (tomouVermelho) {
                         click = `onclick="alert('Jogador desqualificado.')"`;
                     } else if (!isReadOnly) {
-                        click = `onclick="abrirModal('${j.id}', '${t}')"`;
+                        click = `onclick="abrirModalAcao('${j.id}', '${t}')"`;
                     }
                     
                     html += `
@@ -406,7 +405,6 @@
         }
 
         function abrirModalAcao(id, t) {
-            // 🔥 CORREÇÃO DO BUG: COMPARAÇÃO CONVERTIDA PARA STRING 🔥
             jogadorAcao = escalacao[t].find(j => String(j.id) === String(id)); 
             timeAcao = t;
             document.getElementById('acao-foto').src = jogadorAcao.foto;
@@ -474,7 +472,7 @@
 
         function addTimeline(txt, eq = null) {
             let tempoStr = document.getElementById('crono-display').textContent;
-            timeline.push({ tempo: tStr, periodo: periodosLista[periodoIndex], txt: txt, equipe: eq });
+            timeline.push({ tempo: tempoStr, periodo: periodosLista[periodoIndex], txt: txt, equipe: eq });
             renderTimeline();
         }
 

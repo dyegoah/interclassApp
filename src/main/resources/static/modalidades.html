@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Setup Modalidades - InterclassApp</title>
     
-    <!-- 🛡️ ANTI-FLICKER: Expulsa curiosos do criador de torneios instantaneamente -->
-    <script>
-        if (!localStorage.getItem('interclassToken')) {
-            window.location.replace('/index.html');
-        }
-    </script>
-    
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,33 +15,7 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
     
     <style>
-        /* 1. VARIÁVEIS GLOBAIS E CORES (MASCULINO PADRÃO) */
-        :root { 
-            --theme-primary: #00f2fe; 
-            --theme-glow: rgba(0, 242, 254, 0.5); 
-            --bg-deep: #05050f;
-            --grid-color: rgba(0, 242, 254, 0.05);
-            --glow-color: rgba(0, 242, 254, 0.15);
-        }
-        
-        /* 2. REGRAS MUTANTES: FEMININO */
-        body.theme-fem { 
-            --theme-primary: #ff00de; 
-            --theme-glow: rgba(255, 0, 222, 0.5); 
-            --grid-color: rgba(255, 0, 222, 0.05);
-            --glow-color: rgba(255, 0, 222, 0.15);
-        }
-        
-        /* 3. REGRAS MUTANTES: MISTO */
-        body.theme-misto { 
-            --theme-primary: #b200ff; 
-            --theme-glow: rgba(178, 0, 255, 0.5); 
-            --grid-color: rgba(178, 0, 255, 0.05);
-            --glow-color: rgba(178, 0, 255, 0.15);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        
+        /* CSS EXCLUSIVO DA TELA DE MODALIDADES (BACKGROUND E GRID MUTANTE) */
         body { 
             background-color: var(--bg-deep) !important;
             background-image: 
@@ -54,11 +24,6 @@
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px) !important;
             background-size: 100% 100%, 40px 40px, 40px 40px !important;
             animation: moveGrid 20s linear infinite;
-            
-            color: #ffffff;
-            min-height: 100vh; 
-            padding-bottom: 100px; 
-            overflow-x: hidden; 
             transition: background-image 0.5s ease-in-out;
         }
 
@@ -66,10 +31,6 @@
             0% { background-position: center center, 0 0, 0 0; }
             100% { background-position: center center, 40px 40px, 40px 40px; }
         }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { text-transform: uppercase; font-size: 1.3rem; letter-spacing: 1px; margin-bottom: 1rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; transition: color 0.5s, text-shadow 0.5s; }
 
         .stepper-container { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--theme-primary); overflow-x: auto; }
         .stepper-step { display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI'; font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.4); white-space: nowrap; transition: 0.3s; }
@@ -79,12 +40,7 @@
         .stepper-line.active { background: var(--theme-primary); box-shadow: 0 0 8px var(--theme-glow); }
 
         .info-balloon { border-left: 4px solid var(--theme-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-family: 'Segoe UI'; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.85); transition: border-color 0.5s; }
-        .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; }
-        .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); transform: translateY(-2px); color: #fff; background: transparent; border: 1px solid var(--theme-primary); }
-        .btn-acao:disabled { background: #555; color: #888; cursor: not-allowed; }
-        .btn-secundario { background: transparent; border: 1px solid var(--theme-primary); color: var(--theme-primary); }
-        .btn-secundario:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px var(--theme-glow); }
-
+        
         .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .config-card { border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 2px solid transparent; position: relative;}
         
@@ -98,8 +54,6 @@
         .config-card.selected { border-color: var(--theme-primary) !important; background: rgba(255, 255, 255, 0.05) !important; box-shadow: 0 0 25px var(--theme-glow) !important; opacity: 1 !important; filter: none !important;}
         
         .status-badge { font-family: 'Segoe UI'; font-size: 0.8rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 12px; border-radius: 20px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 
@@ -296,11 +250,9 @@
                 return { id: parseInt(card.getAttribute('data-id')), configurado: false };
             });
 
-            // 🔥 A MÁGICA FINAL: Salva no Setup Real que o Passo 2 ('torneios.html') vai ler
             const setupData = { genero: generoSelecionado, esportes: esportesArray };
             localStorage.setItem('arenaSetup', JSON.stringify(setupData));
             
-            // Limpa o temporário da Etapa 1
             localStorage.removeItem('arenaSetupTemp');
             
             window.location.href = '/torneios.html';
@@ -310,4 +262,4 @@
         document.addEventListener('click', () => { const d = document.getElementById('user-dropdown'); if(d && d.style.display === 'block') d.style.display = 'none'; });
     </script>
 </body>
-</html>´	
+</html>

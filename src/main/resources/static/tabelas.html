@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PlayHub - InterclassApp</title>
 
-    <script>
-        if (!localStorage.getItem('interclassToken')) {
-            window.location.replace('/index.html'); 
-        }
-    </script>
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
   
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
@@ -18,29 +15,15 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
-        :root { --theme-primary: #00f2fe; --theme-glow: rgba(0, 242, 254, 0.5); --bg-gradient: linear-gradient(-45deg, #020111, #191970, #000000, #4b0082); }
-        body.theme-fem { --theme-primary: #ff00de; --theme-glow: rgba(255, 0, 222, 0.5); }
-        body.theme-misto { --theme-primary: #b200ff; --theme-glow: rgba(178, 0, 255, 0.5); }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-		body { 
+        /* CSS EXCLUSIVO DO PLAYHUB (TABELAS) E FUNDO DA TELA */
+        body { 
             background: 
                 radial-gradient(circle at 50% 0%, var(--theme-glow, rgba(0, 242, 254, 0.15)) 0%, transparent 60%),
                 linear-gradient(to bottom, rgba(2, 1, 15, 0.85), rgba(2, 1, 15, 0.98)), 
                 url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
             background-size: cover !important; 
-            color: #ffffff; 
-            min-height: 100vh; 
-            margin: 0;
-            padding-bottom: 100px;
-            overflow-x: hidden;
-            transition: background 0.5s ease;
         }
-        
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
-        .section-title { text-transform: uppercase; font-size: 1.2rem; color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;}
-        
+
         .torneio-grupo { margin-bottom: 20px; background: rgba(0,0,0,0.4); border-radius: 15px; border-left: 5px solid var(--theme-primary); overflow: hidden; transition: 0.5s ease; }
         .torneio-header { padding: 15px 20px; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
         .torneio-header:hover { background: rgba(255,255,255,0.1); }
@@ -82,17 +65,12 @@
         .campeao-banner { background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); padding: 30px 20px; border-radius: 15px; text-align: center; margin-top: 30px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4); border: 2px solid #fff; position: relative; overflow: hidden; }
         .campeao-banner h2 { font-family: 'Orbitron'; color: #000; margin: 0; text-transform: uppercase; font-size: 1.4rem; font-weight: bold; }
         .campeao-banner p { font-family: 'Segoe UI'; font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px; text-shadow: 2px 2px 4px #000; }
-        
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 3000; justify-content: center; align-items: center; }
-        .modal-box { background: #05050f; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
 
         @media (max-width: 768px) {
             .playhub-card { grid-template-columns: 1fr; text-align: center; gap: 10px; }
             .play-hora { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 10px; }
             .play-info > div { flex-direction: column; gap: 10px; }
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
@@ -240,7 +218,6 @@
             buscarJogosDoBanco(genero);
         }
 
-        // 🔥 CORREÇÃO DE VAZAMENTO: Inteligência para amarrar a chave vencedora ao Esporte 🔥
         function resolverNomesDinamicos(jogos, generoCorrente) {
             let mapVencedores = {};
 
@@ -250,7 +227,7 @@
                 
                 if (numMatch) {
                     let idJogoStr = numMatch[1];
-                    let chaveVencedor = `${espNome}_${idJogoStr}`; // ✅ Chave agora é 100% isolada por esporte
+                    let chaveVencedor = `${espNome}_${idJogoStr}`;
                     let rel = relatoriosSalvos[String(j.id)];
                     
                     if (rel || j.status === 'FINALIZADO') {
@@ -290,7 +267,7 @@
                 let mudouA = false;
                 let matchA = nomeA.match(regexVencedor);
                 if (matchA) {
-                    let chaveA = `${espNome}_${matchA[1]}`; // ✅ Busca vencedores apenas do mesmo esporte
+                    let chaveA = `${espNome}_${matchA[1]}`; 
                     if (mapVencedores[chaveA]) {
                         j.equipeANome = mapVencedores[chaveA].nome;
                         j.equipeAId = mapVencedores[chaveA].id;
@@ -302,7 +279,7 @@
                 let mudouB = false;
                 let matchB = nomeB.match(regexVencedor);
                 if (matchB) {
-                    let chaveB = `${espNome}_${matchB[1]}`; // ✅ Busca vencedores apenas do mesmo esporte
+                    let chaveB = `${espNome}_${matchB[1]}`; 
                     if (mapVencedores[chaveB]) {
                         j.equipeBNome = mapVencedores[chaveB].nome;
                         j.equipeBId = mapVencedores[chaveB].id;
@@ -410,7 +387,6 @@
                 let eNome = extrairEsporteNomeSeguro(jogo);
                 let eIcon = extrairEsporteIconeSeguro(jogo);
                 
-                // Agrupando rigorosamente pelo GÊNERO e ESPORTE para não misturar chaves
                 let chaveUnica = `${genero}_${eNome}`;
 
                 if(!torneios[chaveUnica]) torneios[chaveUnica] = { nomeReal: eNome, icone: eIcon, jogos: [] };
@@ -419,10 +395,9 @@
 
             let corTemaDefault = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
 
-            // Itera sobre as chaves blindadas
             for (let chaveUnica in torneios) {
                 let dados = torneios[chaveUnica];
-                let esporteNome = dados.nomeReal; // Pega o nome correto de volta
+                let esporteNome = dados.nomeReal; 
                 let domId = chaveUnica.replace(/\s+/g, '-').toLowerCase();
                 
                 let formato = 'eliminatoria'; 
@@ -456,7 +431,6 @@
 				                    let tituloOriginalSeguro = jogo.titulo || "Aguardando";
 				                    let partesTitulo = tituloOriginalSeguro.split(' | ');
 				                    
-				                    // Lê perfeitamente se o título tem 2 ou 3 divisões
 				                    let faseTagOriginal = "";
 				                    let confrontoStr = "";
 
@@ -474,17 +448,14 @@
 				                    let faseTagSemTrofeu = faseTagOriginal.replace('🏆', '').trim();
 				                    let fUpper = faseTagSemTrofeu.toUpperCase();
 				                    
-				                    // SEPARAÇÃO INTELIGENTE DO "(Jogo X)" DA FASE
 				                    let matchJogo = faseTagSemTrofeu.match(/(\(Jogo \d+\))/i);
 				                    let numJogoStr = matchJogo ? matchJogo[1] : '';
 				                    let nomeFaseLimpa = matchJogo ? faseTagSemTrofeu.replace(matchJogo[0], '').trim() : faseTagSemTrofeu;
 				                    
-				                    // Recoloca o troféu para as finais
 				                    if (faseTagOriginal.includes('🏆')) {
 				                        nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
 				                    }
 				                    
-				                    // AQUI ESTÁ O SEU LAYOUT: Junta o Número do Jogo com o nome das equipes
 				                    let textoConfrontoCompleto = numJogoStr ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${numJogoStr}</span> ${confrontoStr}` : confrontoStr;
 
 				                    if (temFaseDeGrupos && !entrouNaFaseFinal && (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('QUARTAS') || fUpper.includes('SEMI') || fUpper.includes('FINAL'))) {
@@ -621,9 +592,6 @@
             }
         }
 
-        // ==========================================
-        // EXCLUSÃO E CAMPEÃO
-        // ==========================================
         function confirmarExclusaoTorneio(event, genero, esporteNome) {
             event.stopPropagation(); 
             torneioParaExcluir = { genero: genero, esporte: esporteNome };
@@ -798,7 +766,7 @@
             let arquivo = 'geral'; 
             
             if (nomeNormalizado.includes('futsal')) arquivo = 'futsal';
-            else if (nomeNormalizado.includes('handebol')) arquivo = 'handebol';
+           else if (nomeNormalizado.includes('handebol') || nomeNormalizado.includes('queimada')) arquivo = 'handebol';	
             else if (nomeNormalizado.includes('volei de areia')) arquivo = 'volei-areia';
             else if (nomeNormalizado.includes('volei')) arquivo = 'volei';
             else if (nomeNormalizado.includes('basquete')) arquivo = 'basquete';
@@ -809,6 +777,7 @@
                      nomeNormalizado.includes('esport') || 
                      nomeNormalizado.includes('natacao') || 
                      nomeNormalizado.includes('atletismo')) {
+						
                 arquivo = 'individual';
             }
 

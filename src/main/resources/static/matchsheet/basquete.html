@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Súmula Basquetebol - InterclassApp</title>
-	<link rel="manifest" href="/manifest.json">
-	<meta name="theme-color" content="#05050f">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
-	
+    
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#05050f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/img/icon-192x192.png">
+    
     <style>
+        /* CSS EXCLUSIVO DA SÚMULA DE BASQUETE */
         :root { --theme-primary: #ff8c00; --team-a: #00f2fe; --team-b: #ff00de; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
         
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .arena-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
         
         .basquete-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid var(--theme-primary);}
         .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
@@ -77,9 +80,9 @@
         .timeline-item.evt-b { border-left-color: var(--team-b); }
         .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
-        .modal-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
+        /* Modal da Súmula (Ligeiramente diferente do Global por causa dos botões internos) */
+        .modal-box-sumula { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 450px; text-align: center; }
+        .modal-box-sumula img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
         
         .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
         .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 15px 5px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-family: 'Segoe UI'; font-size: 0.85rem;}
@@ -88,8 +91,6 @@
         .btn-falta { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; color: #ff5555;}
         
         .btn-acao-generico { background: transparent; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 10px; width: 100%;}
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     </style>
 </head>
 <body>
@@ -167,8 +168,9 @@
 
     </div>
 
+    <!-- Puxando a classe .modal-overlay do estilo global -->
     <div id="modal-acao" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box-sumula">
             <img id="acao-foto" src="">
             <h3 id="acao-nome" style="color: white; font-family: 'Segoe UI';">Nome</h3>
             <p id="acao-num" style="color: var(--theme-primary); font-family: 'Orbitron'; font-weight: bold; margin-bottom: 15px;">Camisa 10</p>

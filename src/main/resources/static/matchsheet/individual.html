@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Súmula Individual - InterclassApp</title>
+    
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
+    <link rel="stylesheet" href="/estilo-global.css">
+    <script src="/seguranca.js"></script>
+
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#05050f">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,11 +16,10 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
+        /* CSS EXCLUSIVO DA SÚMULA INDIVIDUAL (1 VS 1) */
         :root { --theme-primary: #ffd700; --team-a: #00f2fe; --team-b: #ff00de; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Orbitron', 'Segoe UI', sans-serif; }
-        body { background: #020111; color: #ffffff; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px; }
         
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        body { background: #020111 !important; overflow-x: hidden; padding-bottom: 100px; }
         
         .header-especial { background: rgba(0,0,0,0.8); padding: 20px 10px; border-bottom: 2px solid var(--theme-primary); text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.8);}
         .header-info-esporte { font-size: 0.85rem; color: #aaa; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 2px; }
@@ -36,19 +40,8 @@
         .btn-timer.running { background: #ff0000; color: #fff; border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.4);}
 
         /* 🔥 LAYOUT DE ARENA CENTRALIZADO E EXCLUSIVO (1v1) 🔥 */
-        .arena-prancheta { 
-            display: flex; 
-            width: 95%; 
-            max-width: 1200px; 
-            margin: 25px auto; 
-            gap: 20px; 
-            align-items: flex-start; 
-            justify-content: center;
-        }
-        
-        @media (max-width: 900px) {
-            .arena-prancheta { flex-direction: column; }
-        }
+        .arena-prancheta { display: flex; width: 95%; max-width: 1200px; margin: 25px auto; gap: 20px; align-items: flex-start; justify-content: center; }
+        @media (max-width: 900px) { .arena-prancheta { flex-direction: column; } }
 
         .coluna-time { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 280px; width: 100%; }
         
@@ -69,18 +62,7 @@
         
         .gols-destaque { font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
 
-        .timeline-container { 
-            flex: 1.2; 
-            min-width: 300px; 
-            width: 100%;
-            background: rgba(0,0,0,0.6); 
-            border-radius: 15px; 
-            padding: 20px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            display: flex; 
-            flex-direction: column;
-            min-height: 250px;
-        }
+        .timeline-container { flex: 1.2; min-width: 300px; width: 100%; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; min-height: 250px; }
         .timeline-titulo { font-size: 1rem; color: var(--theme-primary); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;}
         .timeline-list { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; overflow-y: auto; max-height: 350px; padding-right: 5px;}
         .timeline-item { display: flex; align-items: center; gap: 12px; font-family: 'Segoe UI'; font-size: 0.85rem; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #555;}
@@ -88,13 +70,12 @@
         .timeline-item.evt-b { border-left-color: var(--team-b); }
         .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--theme-primary); border-radius: 20px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
-        
+        /* Modal Específico da Súmula */
+        .modal-box-sumula { background: #111; border: 1px solid var(--theme-primary); border-radius: 20px; padding: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
         .modal-header { margin-bottom: 20px; }
         .modal-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #fff; }
-        .modal-box h3 { font-family: 'Segoe UI'; font-size: 1.3rem; color: #fff; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .modal-box p { font-size: 0.9rem; color: #aaa; font-family: 'Orbitron'; }
+        .modal-box-sumula h3 { font-family: 'Segoe UI'; font-size: 1.3rem; color: #fff; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .modal-box-sumula p { font-size: 0.9rem; color: #aaa; font-family: 'Orbitron'; }
         
         .grid-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .btn-acao-modal { padding: 15px; border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; font-size: 0.95rem; cursor: pointer; border: none; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -155,7 +136,7 @@
     </div>
 
     <div id="modal-acoes" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box-sumula">
             <div class="modal-header">
                 <img src="" alt="Avatar" class="modal-avatar" id="modal-img-jogador">
                 <h3 id="modal-nome-jogador">Nome do Jogador</h3>
@@ -201,6 +182,8 @@
         let timerSegundos = 0;
         let isTimerRunning = false;
 
+        const normalizar = (txt) => (txt || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+
         window.onload = async () => {
             if (!jogoId) { alert("Partida não encontrada."); return; }
             
@@ -221,6 +204,7 @@
                 
             } catch (err) {
                 console.error("Erro na busca segura da Súmula:", err);
+                
                 let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
                 if (calOffline[lote] && calOffline[lote].jogos) {
                     jogoEncontrado = calOffline[lote].jogos.find(j => j.id === jogoId);
@@ -309,13 +293,12 @@
                 }
             }
 
-            let idA = jogo.equipeAId || "ID_A_" + Math.random();
-            let idB = jogo.equipeBId || "ID_B_" + Math.random();
+            let idA = jogo.equipeAId || "ID_FANTASMA_A";
+            let idB = jogo.equipeBId || "ID_FANTASMA_B";
             
-            let dadosA = extrairNomeTurma(rawA);
-            let dadosB = extrairNomeTurma(rawB);
+            let dadosA = extrairNomeTurma(rawA || "Atleta A");
+            let dadosB = extrairNomeTurma(rawB || "Atleta B");
 
-            // Injeta nos Placar do Topo
             document.getElementById('lbl-turma-a').innerText = dadosA.turma;
             document.getElementById('lbl-equipa-a').innerText = dadosA.nome;
             document.getElementById('lbl-turma-b').innerText = dadosB.turma;
@@ -326,7 +309,6 @@
             colA.innerHTML = ''; colB.innerHTML = '';
 
             // 🔥 A MÁGICA DESTA TELA: ELA É EXCLUSIVA PARA 1x1. APENAS 1 CARD DESENHADO!
-            // Não faz laços FOR. Desenha apenas o Competidor A na esquerda, e o B na direita.
             colA.innerHTML = criarCardJogador('A', dadosA.nome, idA);
             colB.innerHTML = criarCardJogador('B', dadosB.nome, idB);
 
