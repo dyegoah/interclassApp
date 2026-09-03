@@ -11,6 +11,8 @@ import br.com.higitech.interclasseApp.model.Professor;
 public interface ProfessorRepository extends JpaRepository<Professor, Long> {
     Optional<Professor> findByEmail(String email);
     
+    boolean existsByEmail(String email);
+    
     // 🛡️ Busca pelo Link Criptografado
     Optional<Professor> findByHashPublico(String hashPublico);
 }

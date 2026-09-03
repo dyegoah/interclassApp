@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict; // 🔥 INJEÇÃO DE PERFORMANCE
+import org.springframework.cache.annotation.Cacheable; // 🔥 INJEÇÃO DE PERFORMANCE
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +28,9 @@ public class JogoController {
     @Autowired
     private JogoService jogoService;
 
+    // 🔥 CACHEEVICT: Quando o professor salvar um calendário novo, o sistema "apaga" a memória antiga e renova o cache!
     @PostMapping("/calendario")
+    @CacheEvict(value = "jogosPublicos", allEntries = true)
     public ResponseEntity<Void> salvarCalendarioOficial(@RequestBody Map<String, Object> payload, @AuthenticationPrincipal Professor professorLogado) {
         jogoService.salvarCalendario(payload, professorLogado);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -53,8 +57,9 @@ public class JogoController {
         return ResponseEntity.ok(jogoService.buscarJogosPorProfessor(professorLogado));
     }
     
-    // 🌐 ROTA PÚBLICA CORRIGIDA: Agora aceita o Hash (String) ao invés do ID (Long)
+    // 🌐 ROTA PÚBLICA BLINDADA: Cache ativo. Quando 1.000 alunos derem F5 para ver quem vai jogar, o banco só será chamado 1 vez!
     @GetMapping("/public/{hashPublico}/lote/{genero}")
+    @Cacheable(value = "jogosPublicos", key = "#hashPublico + '-' + #genero")
     public ResponseEntity<List<Jogo>> getJogosPublicoLote(@PathVariable String hashPublico, @PathVariable String genero) {
         List<Jogo> todos = jogoService.buscarJogosPorProfessorHash(hashPublico);
         

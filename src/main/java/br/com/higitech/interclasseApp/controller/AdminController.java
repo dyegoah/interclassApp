@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page; // 🔥 IMPORT CORRETO (Spring Data, não Hibernate)
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,10 +44,16 @@ public class AdminController {
                "dyego@master.com".equals(email);
     }
 
+    // 🔥 CORREÇÃO: Listagem segura, bloqueada apenas para Super Admin e com Paginação para não travar a RAM
     @GetMapping("/professores")
-    public ResponseEntity<?> listarTodos(@AuthenticationPrincipal Professor adminLogado) {
+    public ResponseEntity<?> listarProfessores(
+            @PageableDefault(size = 50, sort = "id") Pageable pageable, 
+            @AuthenticationPrincipal Professor adminLogado) {
+        
         if (!isSuperAdmin(adminLogado)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
-        return ResponseEntity.ok(professorRepository.findAll());
+        
+        Page<Professor> paginaProfessores = professorRepository.findAll(pageable);
+        return ResponseEntity.ok(paginaProfessores);
     }
 
     @DeleteMapping("/professores/{id}")

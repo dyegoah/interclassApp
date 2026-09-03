@@ -46,8 +46,9 @@ public class InterfaceTest {
         context = browser.newContext();
         page = context.newPage();
         
+        // Manipulador automático para clicar em "OK" nos Alerts e Confirms do Javascript!
         page.onDialog(dialog -> {
-            System.out.println("   [SISTEMA ALERT] " + dialog.message());
+            System.out.println("   [SISTEMA ALERT/CONFIRM] " + dialog.message());
             dialog.accept();
         });
     }
@@ -77,13 +78,10 @@ public class InterfaceTest {
         page.click("button:has-text('Criar Minha Conta')");
 
         try {
-            // Espera até 5 segundos pelo redirecionamento de sucesso
             page.waitForURL("**/index.html", new Page.WaitForURLOptions().setTimeout(5000));
             assertTrue(page.url().contains("index.html"));
             System.out.println("✅ TESTE 1 CONCLUÍDO: Cadastro realizado com sucesso!");
-            
         } catch (Exception e) {
-            // Se falhar, captura a mensagem vermelha do seu HTML e imprime no Console
             String erroNaTela = page.locator("#mensagem-alerta").innerText();
             System.out.println("   🚨 O CADASTRO FALHOU! Motivo apontado pelo sistema: " + erroNaTela);
             assertTrue(false, "O teste falhou porque o sistema recusou o cadastro.");
@@ -97,7 +95,6 @@ public class InterfaceTest {
         System.out.println("👉 INICIANDO TESTE 2: Login com a Conta Oficial...");
         page.navigate("http://localhost:8015/index.html");
 
-        // Usando a conta fixa para garantir independência do teste
         page.fill("#email", "dyegoah@hotmail.com");
         page.fill("#senha", "123");
         page.click("#btn-etapa1");
@@ -120,8 +117,7 @@ public class InterfaceTest {
         System.out.println("✅ TESTE 3 CONCLUÍDO: O sistema bloqueou a rota protegida com sucesso.");
     }
     
-    
- // =========================================================================
+    // =========================================================================
     // SUÍTE DE TESTES: MÓDULO 2 (INJEÇÃO DE ATLETAS E GESTÃO)
     // =========================================================================
 
@@ -131,21 +127,18 @@ public class InterfaceTest {
     public void testarInjecaoEmMassa() {
         System.out.println("👉 INICIANDO TESTE 4: Populando o banco com 25 Atletas...");
         
-        // 1. Loga para pegar o link da Arena
         page.navigate("http://localhost:8015/index.html");
         page.fill("#email", "dyegoah@hotmail.com");
         page.fill("#senha", "123");
         page.click("#btn-etapa1");
         page.waitForURL("**/dashboard.html");
 
-        // 2. Gera o Link
         page.click("a:has-text('Link Inscrição do Aluno')");
         page.click(".mod-block:has-text('Futsal')");
         page.click("button:has-text('Copiar e Compartilhar')");
         String linkPublico = page.inputValue("#link-publico");
         page.click("button:has-text('Fechar')");
 
-        // 3. Cadastra os 25 alunos rapidamente
         String[] turmas = {"6º Ano A", "6º Ano B", "7º Ano A", "7º Ano B", "8º Ano A"};
         
         for (String turma : turmas) {
@@ -160,8 +153,6 @@ public class InterfaceTest {
                 page.selectOption("#turmaAluno", turma);
                 
                 page.click("#btn-submit");
-                
-                // Espera a caixa verde de sucesso do seu sistema aparecer
                 page.locator(".alert-success").waitFor();
             }
         }
@@ -174,7 +165,6 @@ public class InterfaceTest {
     public void testarPainelAlunosEPdf() {
         System.out.println("👉 INICIANDO TESTE 5: Validando a tela de Gestão de Atletas...");
         
-        // Loga e vai direto para a tela de Alunos
         page.navigate("http://localhost:8015/index.html");
         page.fill("#email", "dyegoah@hotmail.com");
         page.fill("#senha", "123");
@@ -184,20 +174,16 @@ public class InterfaceTest {
         page.navigate("http://localhost:8015/alunos.html");
         page.waitForURL("**/alunos.html");
 
-        // Valida se o contador do topo reconheceu os atletas
         String totalAtletas = page.locator("#valor-total-geral").innerText();
         System.out.println("   - Total de atletas lidos no painel: " + totalAtletas);
 
-        // Teste de Busca
         System.out.println("   - Testando o filtro de busca...");
         page.fill("#input-busca", "Atleta 1 - 6º Ano A");
         page.waitForTimeout(1000); 
         
-        // Limpeza de busca natural (apagando o texto em vez de clicar no X oculto)
         page.fill("#input-busca", "");
         page.waitForTimeout(1000);
 
-        // Teste de Geração de PDF (Abre a nova aba e fecha com segurança)
         System.out.println("   - Testando a geração do PDF...");
         Page novaAbaPdf = page.waitForPopup(() -> {
             page.click("button:has-text('Gerar PDF')");
@@ -209,7 +195,7 @@ public class InterfaceTest {
         System.out.println("✅ TESTE 5 CONCLUÍDO: Filtros e PDF funcionando!");
     }
     
- // =========================================================================
+    // =========================================================================
     // SUÍTE DE TESTES: MÓDULO 3 (TORNEIOS E PLAYHUB)
     // =========================================================================
 
@@ -219,13 +205,15 @@ public class InterfaceTest {
     public void testarCriacaoDeTorneio() {
         System.out.println("👉 INICIANDO TESTE 6: Passando pelo Assistente de Torneio...");
         
-        // Setup inicial (Loga e vai para a tela de torneios)
         page.navigate("http://localhost:8015/index.html");
         page.fill("#email", "dyegoah@hotmail.com");
         page.fill("#senha", "123");
         page.click("#btn-etapa1");
         page.waitForURL("**/dashboard.html");
         
+        // 🔥 CORREÇÃO: Força o navegador do robô a lembrar que escolhemos "futsal"
+        page.evaluate("localStorage.setItem('modalidadesAtivas', JSON.stringify(['futsal']));");
+
         page.navigate("http://localhost:8015/torneios.html");
         page.waitForURL("**/torneios.html");
 
@@ -236,8 +224,6 @@ public class InterfaceTest {
         
         System.out.println("   - Acionando a IA de Agendamento...");
         page.click("button:has-text('Gerar Calendário Inteligente')");
-        
-        // Espera a IA do sistema carregar os cálculos
         page.waitForTimeout(2500); 
         
         System.out.println("   - Salvando a Tabela Oficial...");
@@ -262,7 +248,7 @@ public class InterfaceTest {
 
         page.navigate("http://localhost:8015/tabelas.html");
         page.waitForURL("**/tabelas.html");
-        page.waitForTimeout(2000); // Aguarda o banco desenhar as chaves na tela
+        page.waitForTimeout(2000); 
 
         int sumulasAbertas = page.locator("button:has-text('▶️ SÚMULA')").count();
         assertTrue(sumulasAbertas > 0, "Nenhuma súmula aberta foi encontrada no PlayHub!");
@@ -272,13 +258,11 @@ public class InterfaceTest {
         page.waitForURL("**/matchsheet/futsal.html**");
         page.waitForTimeout(1500); 
 
-        // Equipe A faz 1 gol
         System.out.println("   - Marcando gol para a Equipe A...");
         page.locator("#lista-a .player-row").first().click();
         page.click("button:has-text('⚽ Marcar Gol')");
         page.waitForTimeout(500);
 
-        // Equipe B faz 2 gols (Garante a vitória de B)
         System.out.println("   - Marcando gols para a Equipe B...");
         page.locator("#lista-b .player-row").first().click();
         page.click("button:has-text('⚽ Marcar Gol')");
@@ -288,11 +272,82 @@ public class InterfaceTest {
         page.click("button:has-text('⚽ Marcar Gol')");
         page.waitForTimeout(500);
 
-        // Finaliza a partida
         System.out.println("   - Encerrando a partida e gravando no banco...");
         page.click("#btn-finalizar");
         page.waitForURL("**/tabelas.html");
 
         System.out.println("✅ TESTE 7 CONCLUÍDO: Súmula preenchida e campeonato avançou de chave!");
+    }
+
+    // =========================================================================
+    // SUÍTE DE TESTES: MÓDULO 4 (NOVAS ARQUITETURAS DE SÚMULA)
+    // =========================================================================
+
+    @Test
+    @Order(8)
+    @DisplayName("Teste 8: Validação Dinâmica Súmula Handebol (Cronômetro e Exclusão)")
+    public void testarSumulaHandebol() {
+        System.out.println("👉 INICIANDO TESTE 8: Simulando partida de Handebol...");
+        
+        // 🔥 CORREÇÃO: Faz o Login antes para não ser expulso pelo seguranca.js
+        page.navigate("http://localhost:8015/index.html");
+        page.fill("#email", "dyegoah@hotmail.com");
+        page.fill("#senha", "123");
+        page.click("#btn-etapa1");
+        page.waitForURL("**/dashboard.html");
+
+        // Simula a entrada direta em um jogo na tela recém-refatorada (usando ID falso 999 que o JS converte num jogo mock)
+        page.navigate("http://localhost:8015/matchsheet/handebol.html?jogo=999&lote=masculino");
+        page.waitForTimeout(1500);
+
+        System.out.println("   - Testando Cronômetro...");
+        page.click("#btn-start-crono");
+        page.waitForTimeout(1500);
+        page.click("#btn-start-crono"); // Pausa
+        
+        System.out.println("   - Aplicando gol...");
+        page.locator("#lista-a .player-row").first().click();
+        page.click("button:has-text('Golo Normal')");
+        page.waitForTimeout(500);
+
+        System.out.println("   - Aplicando Exclusão (2 Minutos)...");
+        page.locator("#lista-b .player-row").first().click();
+        page.click("button:has-text('2 Min.')");
+        page.waitForTimeout(500);
+
+        System.out.println("   - Encerrando a partida...");
+        page.click("#btn-finalizar");
+        
+        page.waitForURL("**/tabelas.html");
+        System.out.println("✅ TESTE 8 CONCLUÍDO: Súmula de Handebol testada e validada com sucesso!");
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("Teste 9: Validação Dinâmica Súmula Individual (1x1)")
+    public void testarSumulaIndividual() {
+        System.out.println("👉 INICIANDO TESTE 9: Simulando confronto Individual (Ex: Tênis de Mesa)...");
+        
+        // 🔥 CORREÇÃO: Faz o Login antes para não ser expulso pelo seguranca.js
+        page.navigate("http://localhost:8015/index.html");
+        page.fill("#email", "dyegoah@hotmail.com");
+        page.fill("#senha", "123");
+        page.click("#btn-etapa1");
+        page.waitForURL("**/dashboard.html");
+
+        page.navigate("http://localhost:8015/matchsheet/individual.html?jogo=888&lote=misto");
+        page.waitForTimeout(1500);
+
+        System.out.println("   - Aplicando Ponto para o Atleta A...");
+        // Clica no card do jogador da coluna A
+        page.locator("#coluna-a .jogador-card").first().click();
+        page.click("button:has-text('+1 PONTO')");
+        page.waitForTimeout(500);
+
+        System.out.println("   - Encerrando a partida 1v1...");
+        page.click("#btn-enviar"); // Note que no Individual o ID é btn-enviar
+        
+        page.waitForURL("**/tabelas.html");
+        System.out.println("✅ TESTE 9 CONCLUÍDO: Súmula Individual testada e validada com sucesso!");
     }
 }

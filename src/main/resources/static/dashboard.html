@@ -63,6 +63,24 @@
 	        .mod-grid::-webkit-scrollbar { width: 6px; }
 	        .mod-grid::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 4px; }
 
+            /* Estilos do Modal de Tutorial Gamer */
+            .tutorial-lista { margin-left: 20px; color: #ddd; font-family: 'Segoe UI'; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+            .tutorial-lista li { margin-bottom: 10px; }
+            .tutorial-lista b { color: var(--theme-primary); font-family: 'Orbitron'; font-size: 0.85rem;}
+
+            /* 🔥 EFEITO DE GUIA VISUAL (PULSO) 🔥 */
+            @keyframes pulso-guia {
+                0% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.8); border-color: #00f2fe; }
+                70% { box-shadow: 0 0 0 25px rgba(0, 242, 254, 0); border-color: #fff; }
+                100% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); border-color: #00f2fe; }
+            }
+            .piscar-guia {
+                animation: pulso-guia 2s infinite !important;
+                background: linear-gradient(135deg, rgba(0,242,254,0.3) 0%, rgba(0,0,0,0.8) 100%) !important;
+                z-index: 10;
+                position: relative;
+            }
+
 	        @media (max-width: 900px) {
 	            .metrics-grid, .action-grid { grid-template-columns: 1fr; }
 	            .dashboard-header { flex-direction: column; align-items: flex-start; }
@@ -102,19 +120,19 @@
         </div>
 
         <div class="action-grid">
-            <a href="javascript:void(0)" onclick="abrirPainelInscricoes()" class="action-card">
+            <a href="javascript:void(0)" onclick="abrirPainelInscricoes()" class="action-card" id="btn-tutorial-passo1">
                 <div class="action-icon">🔗</div>
-                <div class="action-title">Link Inscrição do Aluno</div>
+                <div class="action-title">1. Link Inscrição do Aluno</div>
                 <div class="action-desc">Selecione os esportes nos blocos e gere o link de convite.</div>
             </a>
             <a href="/alunos.html" class="action-card">
                 <div class="action-icon">📋</div>
-                <div class="action-title">Gestão de Atletas</div>
+                <div class="action-title">2. Gestão de Atletas</div>
                 <div class="action-desc">Verifique as inscrições dos alunos e crie os torneios.</div>
             </a>
             <a href="/tabelas.html" class="action-card">
                 <div class="action-icon">▶️</div>
-                <div class="action-title">PlayHub (Partidas)</div>
+                <div class="action-title">3. PlayHub (Partidas)</div>
                 <div class="action-desc">Inicie as súmulas e gerencie os resultados e chaves.</div>
             </a>
         </div>
@@ -124,10 +142,40 @@
                 <h3 class="section-title" style="margin: 0; text-shadow: none;">📂 Lotes e Chaves Ativas</h3>
             </div>
             <div id="lista-lotes-ativos">
-                <p style="text-align: center; color: #888; padding: 20px; font-family: 'Segoe UI';">Buscando informações do servidor...</p>
+                <p style="text-align: center; color: #888; padding: 20px; font-family: 'Segoe UI';">Buscando informações...</p>
             </div>
         </div>
 
+    </div>
+
+    <!-- 🔥 MODAL DE BOAS VINDAS (TUTORIAL GAMER DE ALTA PRECISÃO) 🔥 -->
+    <div id="modal-tutorial" class="modal-overlay" style="display: none; z-index: 9999;">
+        <div class="modal-box glass" style="max-width: 650px; text-align: left; position: relative;">
+            
+            <button onclick="fecharTutorial()" style="position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; transition: 0.3s;">&times;</button>
+            
+            <h2 style="color: var(--theme-primary); font-family: 'Orbitron'; margin-bottom: 10px; font-size: 1.4rem;">🎮 MISSÕES DA ARENA</h2>
+            <p style="color: #aaa; margin-bottom: 20px; font-size: 0.95rem; font-family: 'Segoe UI';">
+                Bem-vindo ao Interclass! Como Gestor Master, este é o seu caminho para criar os torneios:
+            </p>
+            
+            <ol class="tutorial-lista">
+                <li><b>GERAR CONVITE:</b> Clique no botão <span style="color:#00f2fe; font-weight:bold;">"1. Link Inscrição do Aluno"</span> logo abaixo. Ative as modalidades clicando nos blocos, copie o link gerado e mande no grupo dos alunos!</li>
+                <li><b>AGUARDAR E IMPRIMIR:</b> No menu inferior do aplicativo, clique em <span style="color:#00f2fe; font-weight:bold;">📋 Alunos</span>. Lá você acompanha quem se inscreveu e pode gerar PDFs das listas.</li>
+                <li><b>CRIAR TORNEIOS:</b> Ainda na aba 📋 Alunos, clique no botão azul <i>"Gerar Torneio e Tabelas"</i>. A nossa Inteligência Artificial fará os cruzamentos sozinha!</li>
+                <li><b>APITAR SÚMULAS:</b> No menu inferior, clique em <span style="color:#00f2fe; font-weight:bold;">▶ PlayHub</span>. Para apitar um jogo pelo celular, clique em <i>"▶ SÚMULA"</i> e marque os gols e cartões ao vivo.</li>
+                <li><b>MOSTRAR PARA A ESCOLA:</b> Volte ao Dashboard inicial, clique em <i>"Central de Links"</i> (menu escondido no topo) e compartilhe o "Portal do Atleta" para todos verem as chaves em tempo real.</li>
+            </ol>
+
+            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 3px solid #00ff55;">
+                <label style="display: flex; align-items: center; gap: 10px; color: #fff; font-size: 0.9rem; cursor: pointer; font-family: 'Segoe UI'; user-select: none;">
+                    <input type="checkbox" id="chk-nunca-mais" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--theme-primary);">
+                    Não mostrar este guia novamente neste navegador
+                </label>
+            </div>
+
+            <button class="btn-acao" onclick="fecharTutorial()" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">🚀 ENTENDIDO! COMEÇAR O JOGO.</button>
+        </div>
     </div>
 
     <!-- Modal Blocos de Esportes para o Link -->
@@ -147,7 +195,7 @@
             <input type="text" id="link-publico" readonly style="width: 100%; padding: 15px; border-radius: 8px; border: 1px dashed var(--theme-primary); background: #000; color: #fff; font-family: 'Segoe UI'; margin-bottom: 20px; text-align: center;">
             
             <div style="display: flex; gap: 10px;">
-                <button class="btn-acao" style="background: #333; color: #fff; flex: 1;" onclick="document.getElementById('modal-link').style.display = 'none';">Fechar</button>
+                <button class="btn-acao" style="background: #333; color: #fff; flex: 1;" onclick="fecharPainelInscricoes()">Fechar</button>
                 <button class="btn-acao" style="flex: 1;" onclick="copiarLink()">Copiar e Compartilhar</button>
             </div>
         </div>
@@ -189,7 +237,6 @@
             fetch('/topbar.html').then(r => r.text()).then(h => document.getElementById('topbar-placeholder').innerHTML = h).catch(()=>{});
             fetch('/footbar.html').then(r => r.text()).then(h => document.getElementById('footbar-placeholder').innerHTML = h).catch(()=>{});
             
-            // Coloca o nome do professor da tela (DASHBOARD)
             let profName = localStorage.getItem('profNome');
             if (profName) {
                 document.getElementById('dash-prof-nome').innerText = profName.replace(/"/g, '');
@@ -197,7 +244,25 @@
 
             atualizarLinkDinamico();
             carregarMetricasDaAPI();
+            verificarTutorial(); 
         };
+
+        function verificarTutorial() {
+            const tutorialVisto = localStorage.getItem('tutorialInterclassVisto');
+            if (!tutorialVisto || tutorialVisto !== 'true') {
+                document.getElementById('modal-tutorial').style.display = 'flex';
+            }
+        }
+
+        function fecharTutorial() {
+            const checkbox = document.getElementById('chk-nunca-mais');
+            if (checkbox && checkbox.checked) {
+                localStorage.setItem('tutorialInterclassVisto', 'true');
+            } else {
+                document.getElementById('btn-tutorial-passo1').classList.add('piscar-guia');
+            }
+            document.getElementById('modal-tutorial').style.display = 'none';
+        }
 
         function atualizarLinkDinamico() {
             if (!profHash) return; 
@@ -211,31 +276,72 @@
             document.getElementById('link-publico').value = linkStr;
         }
 
+        // 🔥 FUNÇÃO EXTRATORA DE ESPORTE DE ALTA PRECISÃO 🔥
+        function extrairEsporteParaDash(j) {
+            let valor = j.esporte || j.nomeEsporte;
+            if (typeof valor === 'object' && valor !== null) valor = valor.nomeEsporte || valor.esporte || valor.nome;
+            if (valor && typeof valor === 'string' && valor.trim() !== '') return valor.trim();
+            if (j.titulo) {
+                const lista = ['Futsal', 'Vôlei de Areia', 'Vôlei', 'Basquete', 'Handebol', 'Queimada', 'Natação', 'Atletismo', 'Tênis de Mesa', 'Xadrez', 'Dama', 'E-Sports'];
+                for (let m of lista) {
+                    if (j.titulo.toLowerCase().includes(m.toLowerCase())) return m;
+                }
+            }
+            return "Desconhecido"; // Se chegar aqui, é porque não foi identificado
+        }
+
         async function carregarMetricasDaAPI() {
             const token = localStorage.getItem('interclassToken');
+            let totalInscritos = 0;
+            let todosJogos = [];
+
             try {
                 const resAlunos = await fetch('/api/alunos', { headers: { 'Authorization': `Bearer ${token}` } });
                 if(resAlunos.ok) {
                     let alunos = await resAlunos.json();
-                    document.getElementById('val-inscritos').innerText = alunos.length;
+                    totalInscritos = alunos.length;
                 }
+            } catch(e) { console.warn("Erro ao buscar alunos."); }
+            document.getElementById('val-inscritos').innerText = totalInscritos;
 
+            try {
                 const resJogos = await fetch('/api/jogos', { headers: { 'Authorization': `Bearer ${token}` } });
                 if(resJogos.ok) {
-                    let jogos = await resJogos.json();
-                    
-                    let countEsportes = new Set(jogos.map(j => j.esporte || (j.modalidade ? j.modalidade.nomeEsporte : ''))).size;
-                    document.getElementById('val-torneios').innerText = countEsportes;
-                    
-                    let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
-                    let encerrados = jogos.filter(j => j.status === 'FINALIZADO' || rels[String(j.id)]).length;
-                    document.getElementById('val-partidas').innerText = encerrados;
-
-                    renderizarLotesDashboard(jogos);
+                    todosJogos = await resJogos.json();
                 }
-            } catch (error) {
-                console.warn("Modo offline: ", error);
-                document.getElementById('lista-lotes-ativos').innerHTML = `<p style="color: #ff0055; text-align: center;">Modo Offline. Impossível carregar lotes do banco de dados.</p>`;
+            } catch (e) { console.warn("Modo offline para jogos."); }
+
+            if (todosJogos.length === 0) {
+                let calOffline = JSON.parse(localStorage.getItem('calendariosOficiais')) || {};
+                for (let lote in calOffline) {
+                    if (calOffline[lote] && calOffline[lote].jogos) {
+                        calOffline[lote].jogos.forEach(j => {
+                            j.genero = j.genero || lote; 
+                            todosJogos.push(j);
+                        });
+                    }
+                }
+            }
+
+            // Conta os Torneios/Chaves de forma Exata (Lê o nome do Esporte do Título do Jogo)
+            let torneiosUnicos = new Set();
+            todosJogos.forEach(j => {
+                let eNome = extrairEsporteParaDash(j);
+                if (eNome !== "Desconhecido") {
+                    let gen = j.genero || j.lote || 'geral';
+                    torneiosUnicos.add(`${eNome.trim().toLowerCase()}-${gen.trim().toLowerCase()}`);
+                }
+            });
+            document.getElementById('val-torneios').innerText = torneiosUnicos.size;
+
+            let rels = JSON.parse(localStorage.getItem('relatoriosPartidas')) || {};
+            let encerrados = todosJogos.filter(j => j.status === 'FINALIZADO' || rels[String(j.id)]).length;
+            document.getElementById('val-partidas').innerText = encerrados;
+
+            if(todosJogos.length > 0) {
+                renderizarLotesDashboard(todosJogos);
+            } else {
+                document.getElementById('lista-lotes-ativos').innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5);">Você ainda não criou nenhum torneio.</p>`;
             }
         }
 
@@ -244,19 +350,18 @@
             let lotesDict = {};
             
             todosJogos.forEach(j => {
-                let gen = (j.genero || 'geral').toLowerCase();
+                let gen = (j.genero || j.lote || 'geral').toLowerCase();
                 if(!lotesDict[gen]) lotesDict[gen] = { count: 0, encerrados: 0, esportes: new Set() };
                 
                 lotesDict[gen].count++;
                 if (j.status === 'FINALIZADO') lotesDict[gen].encerrados++;
-                let eNome = j.esporte || (j.modalidade ? j.modalidade.nomeEsporte : 'Esporte');
-                lotesDict[gen].esportes.add(eNome);
+                
+                // Puxa o nome real do esporte em vez de retornar "Esporte"
+                let eNome = extrairEsporteParaDash(j);
+                if (eNome !== "Desconhecido") {
+                    lotesDict[gen].esportes.add(eNome);
+                }
             });
-
-            if (Object.keys(lotesDict).length === 0) {
-                container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5);">Você ainda não criou nenhum torneio.</p>`;
-                return;
-            }
 
             container.innerHTML = '';
             for (let gen in lotesDict) {
@@ -308,6 +413,11 @@
             atualizarLinkDinamico();
         }
 
+        function fecharPainelInscricoes() {
+            document.getElementById('modal-link').style.display = 'none';
+            document.getElementById('btn-tutorial-passo1').classList.remove('piscar-guia');
+        }
+
         window.toggleModBlock = function(elemento) {
             elemento.classList.toggle('selected');
             
@@ -320,7 +430,6 @@
             atualizarLinkDinamico();
         }
 
-        // 🔥 FUNÇÃO COPIAR LINK COM COMPARTILHAMENTO NATIVO (WEB SHARE API) 🔥
         function copiarLink() {
             const linkInput = document.getElementById('link-publico');
             const linkText = linkInput.value;
@@ -329,11 +438,9 @@
                 alert("⚠️ Nenhum link disponível para copiar. Por favor, faça login novamente."); return;
             }
 
-            // Deixa o texto selecionado visualmente
             linkInput.select();
             linkInput.setSelectionRange(0, 99999); 
 
-            // Usa o clipboard mais moderno com fallback
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(linkText).then(() => dispararCompartilhamento(linkText));
             } else {
@@ -358,13 +465,33 @@
                         title: 'Inscrição - Interclass Arena',
                         text: 'Faça sua inscrição no torneio através deste link!',
                         url: url
-                    }).catch(console.error); // Ignora erros se o usuário fechar a janela
+                    }).catch(console.error); 
                 } else {
                     alert("✅ Link copiado com sucesso! Cole nas suas redes sociais ou WhatsApp para enviar.");
                 }
             }
         }
+		
+		// 🔥 FUNÇÕES DO TUTORIAL E GUIA VISUAL (AGORA BLINDADAS COM COOKIES) 🔥
+		        function verificarTutorial() {
+		            // O sistema procura no navegador se existe o Cookie "tutorialVisto=true"
+		            if (document.cookie.indexOf('tutorialVisto=true') === -1) {
+		                document.getElementById('modal-tutorial').style.display = 'flex';
+		            }
+		        }
 
+		        function fecharTutorial() {
+		            const checkbox = document.getElementById('chk-nunca-mais');
+		            if (checkbox && checkbox.checked) {
+		                // Grava a decisão em um Cookie que dura 1 ano (31.536.000 segundos).
+		                // O Cookie sobrevive ao localStorage.clear() do seu botão de Logout!
+		                document.cookie = "tutorialVisto=true; max-age=31536000; path=/";
+		            } else {
+		                // Se não marcou a caixa, o botão 1 pisca para guiar o professor
+		                document.getElementById('btn-tutorial-passo1').classList.add('piscar-guia');
+		            }
+		            document.getElementById('modal-tutorial').style.display = 'none';
+		        }
     </script>
 </body>
 </html>
