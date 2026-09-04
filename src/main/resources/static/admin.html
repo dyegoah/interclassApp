@@ -152,6 +152,9 @@
                     </tbody>
             </table>
         </div>
+        
+        <!-- 🔥 NOVA BARRA DE PAGINAÇÃO ADICIONADA AQUI 🔥 -->
+        <div id="paginacao-admin" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 1.5rem; flex-wrap: wrap;"></div>
 
         <div id="view-config" class="config-panel">
             <div class="config-item glass">
@@ -212,6 +215,8 @@
         // Lógica Integral Mantida Exatamente como Solicitado
         let professores = [];
         let profSelecionadoId = null;
+        let paginaAtualGlobal = 0;
+        const itensPorPagina = 10;
 
         window.onload = async () => {
             await carregarProfessores();
@@ -248,12 +253,53 @@
             }
         }
 
-        async function carregarProfessores() {
-            const res = await apiAdmin('/api/admin/professores');
+        // 🔥 FUNÇÃO ATUALIZADA: Puxa 10 contas e inverte a ordem (desc) 🔥
+        async function carregarProfessores(pagina = 0) {
+            paginaAtualGlobal = pagina;
+            
+            // Enviamos os parâmetros ?page=X&size=10&sort=id,desc diretamente na URL
+            const res = await apiAdmin(`/api/admin/professores?page=${pagina}&size=${itensPorPagina}&sort=id,desc`);
+            
             if (res && res.ok) {
-                professores = await res.json();
+                const dados = await res.json();
+                
+                // O Spring devolve a lista em .content quando há paginação
+                professores = dados.content ? dados.content : dados; 
+                
                 renderizarTabela();
+                
+                // Só renderiza os botões se o servidor mandar os dados da página
+                if (dados.totalPages !== undefined) {
+                    renderizarControlesPaginacao(dados.totalPages, dados.number);
+                }
             }
+        }
+
+        // 🔥 NOVA FUNÇÃO: Desenha os botões << Anterior 1 2 3 Próximo >> 🔥
+        function renderizarControlesPaginacao(totalPaginas, paginaAtualIndex) {
+            const container = document.getElementById('paginacao-admin');
+            container.innerHTML = '';
+            
+            if (totalPaginas <= 1) return; // Se só tem 1 página, não mostra os botões
+
+            // Botão Anterior
+            let html = `<button class="tab-btn" style="padding: 8px 15px;" 
+                        ${paginaAtualIndex === 0 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} 
+                        onclick="carregarProfessores(${paginaAtualIndex - 1})">« Ant</button>`;
+            
+            // Números das Páginas
+            for (let i = 0; i < totalPaginas; i++) {
+                let activeClass = (i === paginaAtualIndex) ? 'active' : '';
+                html += `<button class="tab-btn ${activeClass}" style="padding: 8px 15px;" 
+                         onclick="carregarProfessores(${i})">${i + 1}</button>`;
+            }
+            
+            // Botão Próximo
+            html += `<button class="tab-btn" style="padding: 8px 15px;" 
+                     ${paginaAtualIndex === (totalPaginas - 1) ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} 
+                     onclick="carregarProfessores(${paginaAtualIndex + 1})">Próx »</button>`;
+            
+            container.innerHTML = html;
         }
 
         function renderizarTabela() {
@@ -289,7 +335,7 @@
                 `;
             });
 
-            document.getElementById('count-total').textContent = professores.length;
+            document.getElementById('count-total').textContent = professores.length; // Este número refletirá a página atual. Opcionalmente, pode-se ler 'dados.totalElements' na função principal para o total global.
             document.getElementById('count-ativos').textContent = countAtivos;
             document.getElementById('count-bloqueados').textContent = countBlock;
         }
@@ -343,7 +389,7 @@
             const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/status`, 'PUT', { status: novoStatus });
             
             if (res && res.ok) {
-                await carregarProfessores(); 
+                await carregarProfessores(paginaAtualGlobal); 
                 fecharModais();
             } else {
                 alert("Falha ao atualizar o status no servidor.");
@@ -358,7 +404,7 @@
                     const res = await apiAdmin(`/api/admin/professores/${id}`, 'DELETE');
                     if (res && res.ok) {
                         alert("✅ Registro removido com sucesso do banco de dados!");
-                        await carregarProfessores();
+                        await carregarProfessores(paginaAtualGlobal);
                     } else {
                         alert("Erro ao remover. Verifique as dependências do usuário.");
                     }

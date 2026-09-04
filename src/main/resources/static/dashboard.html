@@ -63,7 +63,7 @@
 	        .mod-grid::-webkit-scrollbar { width: 6px; }
 	        .mod-grid::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 4px; }
 
-            /* 🔥 ESTILOS MELHORADOS DO MODAL TUTORIAL (COM ROLAGEM) 🔥 */
+            /* 🔥 ESTILOS DO MODAL TUTORIAL MANTIDOS (COM ROLAGEM) 🔥 */
             .tutorial-box { 
                 max-width: 600px !important; 
                 max-height: 80vh; /* Trava a altura em 80% da tela */
@@ -72,7 +72,6 @@
                 text-align: left !important; 
                 position: relative; 
             }
-            /* Estilização da barra de rolagem interna */
             .tutorial-box::-webkit-scrollbar { width: 6px; }
             .tutorial-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
             .tutorial-box::-webkit-scrollbar-thumb { background: var(--theme-primary); border-radius: 4px; }
@@ -101,7 +100,7 @@
 	            .lote-item button { width: 100%; }
 	        }
 
-            /* 🔥 RESPONSIVIDADE EXTREMA PARA O TUTORIAL NO CELULAR 🔥 */
+            /* 🔥 RESPONSIVIDADE PARA O TUTORIAL NO CELULAR MANTIDA 🔥 */
             @media (max-width: 600px) {
                 .tutorial-box { 
                     padding: 20px 15px !important; 
@@ -174,9 +173,9 @@
 
     </div>
 
-    <!-- 🔥 MODAL DE BOAS VINDAS (AGORA COM SCROLL E TAMANHO REDUZIDO) 🔥 -->
+    <!-- 🔥 MODAL DE BOAS VINDAS (COM SCROLL E TAMANHO REDUZIDO MANTIDOS) 🔥 -->
     <div id="modal-tutorial" class="modal-overlay" style="display: none; z-index: 9999;">
-        <div class="modal-box glass tutorial-box"> <!-- ADICIONADO A CLASSE tutorial-box AQUI -->
+        <div class="modal-box glass tutorial-box"> 
             
             <button onclick="fecharTutorial()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; transition: 0.3s; z-index: 10;">&times;</button>
             
@@ -479,17 +478,24 @@
             }
         }
 		
-		// 🔥 FUNÇÕES DO TUTORIAL E GUIA VISUAL (BLINDADAS COM COOKIES) 🔥
+		// 🔥 FUNÇÕES DO TUTORIAL E GUIA VISUAL (AGORA SALVAS POR USUÁRIO) 🔥
         function verificarTutorial() {
-            if (document.cookie.indexOf('tutorialVisto=true') === -1) {
+            // Pegamos o ID único do usuário logado
+            let idProf = localStorage.getItem('profHash') || 'novo_usuario';
+            
+            // Verificamos o cookie que possui o ID ESPECÍFICO deste professor
+            if (document.cookie.indexOf('tutorialVisto_' + idProf + '=true') === -1) {
                 document.getElementById('modal-tutorial').style.display = 'flex';
             }
         }
 
         function fecharTutorial() {
             const checkbox = document.getElementById('chk-nunca-mais');
+            let idProf = localStorage.getItem('profHash') || 'novo_usuario';
+            
             if (checkbox && checkbox.checked) {
-                document.cookie = "tutorialVisto=true; max-age=31536000; path=/";
+                // Criamos o cookie usando a "assinatura" do professor, durando 1 ano
+                document.cookie = "tutorialVisto_" + idProf + "=true; max-age=31536000; path=/";
             } else {
                 document.getElementById('btn-tutorial-passo1').classList.add('piscar-guia');
             }
