@@ -27,7 +27,19 @@ public class ProfessorController {
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarProfessor(@RequestBody Professor novoProfessor) {
         
-        // 1. Verifica se o e-mail já está cadastrado no banco
+    	// 🔥 0. NOVA VALIDAÇÃO DE FORMATO DE E-MAIL (REGEX) 🔥
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+        if (novoProfessor.getEmail() == null || !novoProfessor.getEmail().matches(emailRegex)) {
+            return ResponseEntity.badRequest().body("Formato de e-mail inválido. Digite um e-mail válido.");
+        }
+        
+     // 🔥 2. NOVA VALIDAÇÃO: BLACKLIST DE E-MAILS FAKES 🔥
+        String emailLower = novoProfessor.getEmail().toLowerCase();
+        if (emailLower.contains("@teste") || emailLower.startsWith("teste") || emailLower.contains("@fake") || emailLower.contains("123456")) {
+            return ResponseEntity.badRequest().body("Por favor, utilize o seu e-mail corporativo ou pessoal real. E-mails de teste não são permitidos.");
+        }
+    	    	
+    	// 1. Verifica se o e-mail já está cadastrado no banco
         Optional<Professor> professorExistente = professorRepository.findByEmail(novoProfessor.getEmail());
         if (professorExistente.isPresent()) {
             // Retorna erro 400 (Bad Request) se já existir

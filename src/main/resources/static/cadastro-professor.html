@@ -134,6 +134,28 @@
                 }
             }
         }
+		
+		function realizarCadastro() {
+		        const email = document.getElementById('input-email-cadastro').value;
+		        const senha = document.getElementById('input-senha-cadastro').value;
+		        const nome = document.getElementById('input-nome-cadastro').value;
+
+		        // 🔥 VALIDAÇÃO VISUAL DO E-MAIL (REGEX FRONTEND) 🔥
+		        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		        if (!regexEmail.test(email)) {
+		            alert("⚠️ Por favor, digite um endereço de e-mail válido (exemplo: seu.nome@escola.com).");
+		            // Se você tiver uma div de erro na tela, melhor ainda usar ela em vez do alert!
+		            return; // O "return" para a função aqui e não deixa ir para o servidor
+		        }
+
+				// 🔥 NOVA VALIDAÇÃO VISUAL: BLACKLIST 🔥
+				        const emailLower = email.toLowerCase();
+				        if (emailLower.includes("@teste") || emailLower.startsWith("teste") || emailLower.includes("@fake") || emailLower.includes("123456")) {
+				            alert("⚠️ E-mails de teste não são aceitos pelo sistema. Por favor, insira o seu e-mail real.");
+				            return;
+				        }
+				
+		    }
     </script>
 </body>
 </html>
