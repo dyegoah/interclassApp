@@ -41,7 +41,7 @@
         .btn-voltar:hover { background: rgba(255,255,255,0.1); }
 
         .links-rodape { margin-top: 25px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 10px; }
-        .links-rodape a { color: var(--theme-primary); text-decoration: none; transition: 0.3s; }
+        .links-rodape a { color: var(--theme-primary); text-decoration: none; transition: 0.3s; cursor: pointer; }
         .links-rodape a:hover { text-shadow: 0 0 10px var(--theme-glow); text-decoration: underline; }
     </style>
 </head>
@@ -67,8 +67,8 @@
             </form>
 
             <div class="links-rodape">
-                <a href="#">Esqueceu a sua senha?</a>
-                <!-- Como você mudou para index, o link para cadastro se mantém -->
+                <!-- 🔥 Ação do WhatsApp adicionada aqui 🔥 -->
+                <a onclick="recuperarSenha(event)">Esqueceu a sua senha?</a>
                 <a href="/cadastro-professor.html" style="background: rgba(255, 0, 222, 0.1); border: 1px solid #ff00de; color: #ff00de !important; padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; text-transform: uppercase;">Nova Escola? Cadastre-se</a>
             </div>
         </div>
@@ -186,6 +186,22 @@
             document.getElementById('etapa-2').style.display = 'none';
             document.getElementById('etapa-1').style.display = 'block';
             document.getElementById('codigo2fa').value = ""; 
+        }
+
+        // 🔥 FUNÇÃO DE REDIRECIONAMENTO PARA WHATSAPP 🔥
+        function recuperarSenha(event) {
+            event.preventDefault(); // Impede que a página recarregue
+            
+            // Pop-up informativo
+            alert("🔒 Por motivos de segurança, a redefinição de senha é realizada através da nossa central de atendimento.\n\nClique em OK para falar com nossa equipe no WhatsApp.");
+            
+            // Mensagem pronta e link do WhatsApp (Substitua o 5511999999999 pelo número real)
+            const numeroWhatsApp = "5588996312358"; 
+            const mensagem = "Olá, esqueci minha senha no Interclass Arena e preciso de ajuda para recuperar meu acesso.";
+            const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+            
+            // Abre o WhatsApp em uma nova aba
+            window.open(linkWhatsApp, "_blank");
         }
     </script>
 </body>
