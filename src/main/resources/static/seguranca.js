@@ -19,6 +19,9 @@
     if (!token && !isPublicRoute) {
         window.location.replace('/index.html');
     }
+	
+	
+	
 })();
 
 // 2. PROTEÇÃO CONTRA XSS (Higienização de Texto da API)
@@ -145,3 +148,62 @@ window.initFootbar = function() {
         }
     });
 })();
+
+
+
+// =========================================================================
+// 🔥 PROTEÇÃO CONTRA INATIVIDADE (SESSÃO DE 20 MINUTOS) 🔥
+// =========================================================================
+
+let timerInatividade;
+// 20 minutos = 20 * 60 segundos * 1000 milissegundos = 1.200.000 ms
+const TEMPO_MAXIMO_INATIVIDADE = 1200000; 
+
+function resetarTimerInatividade() {
+    // Se o timer já estava rodando, cancela ele
+    clearTimeout(timerInatividade);
+    
+    // Inicia a contagem de 20 minutos novamente
+    timerInatividade = setTimeout(executarLogoutPorInatividade, TEMPO_MAXIMO_INATIVIDADE); 
+}
+
+function executarLogoutPorInatividade() {
+    // Só executa a expulsão se a pessoa tiver um token de login
+    const token = localStorage.getItem('interclassToken');
+    
+    // Ignora a regra se for uma página pública (Login ou Portal do Aluno/Cadastro)
+    const urlAtual = window.location.pathname.toLowerCase();
+    const ehPaginaPublica = urlAtual.includes('index.html') || 
+                            urlAtual.includes('cadastro-aluno') || 
+                            window.location.search.includes('ref=');
+    
+    if (token && !ehPaginaPublica) {
+        // Remove a memória de login
+        localStorage.removeItem('interclassToken');
+        // Você pode usar localStorage.clear() se quiser apagar TUDO, mas remover o token já bloqueia o acesso.
+        
+        alert("⏳ Sessão expirada por inatividade de 20 minutos. Por segurança, faça login novamente.");
+        window.location.href = '/index.html';
+    }
+}
+
+// Liga os "radares" de movimento assim que a página carregar
+window.addEventListener('load', () => {
+    const urlAtual = window.location.pathname.toLowerCase();
+    const ehPaginaPublica = urlAtual.includes('index.html') || 
+                            urlAtual.includes('cadastro-aluno') || 
+                            window.location.search.includes('ref=');
+    
+    // Se NÃO for a tela de login, liga o monitoramento
+    if (!ehPaginaPublica) {
+        // Radares de ação (qualquer uma dessas ações zera o relógio)
+        document.addEventListener('mousemove', resetarTimerInatividade);   // Mexeu o mouse
+        document.addEventListener('keypress', resetarTimerInatividade);    // Digitou no teclado
+        document.addEventListener('click', resetarTimerInatividade);       // Clicou
+        document.addEventListener('scroll', resetarTimerInatividade);      // Rolou a página
+        document.addEventListener('touchstart', resetarTimerInatividade);  // Tocou na tela (Celular)
+        
+        // Dá o start inicial no relógio assim que entra
+        resetarTimerInatividade();
+    }
+});
