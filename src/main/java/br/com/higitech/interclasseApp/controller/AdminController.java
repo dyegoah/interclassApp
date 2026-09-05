@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page; // 🔥 IMPORT CORRETO (Spring Data, não Hibernate)
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.higitech.interclasseApp.model.LogAcesso;
 import br.com.higitech.interclasseApp.model.Professor;
+import br.com.higitech.interclasseApp.repositories.LogAcessoRepository;
 import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
 
 @RestController
@@ -32,7 +34,10 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // 🛡️ O CADEADO MASTER: Sincronizado com o AuthController
+    @Autowired
+    private LogAcessoRepository logAcessoRepository;
+
+    // 🛡️ O CADEADO MASTER
     private boolean isSuperAdmin(Professor professor) {
         if (professor == null || professor.getEmail() == null) return false;
         
@@ -44,7 +49,6 @@ public class AdminController {
                "dyego@master.com".equals(email);
     }
 
-    // 🔥 CORREÇÃO: Listagem segura, bloqueada apenas para Super Admin e com Paginação para não travar a RAM
     @GetMapping("/professores")
     public ResponseEntity<?> listarProfessores(
             @PageableDefault(size = 50, sort = "id") Pageable pageable, 
@@ -54,6 +58,34 @@ public class AdminController {
         
         Page<Professor> paginaProfessores = professorRepository.findAll(pageable);
         return ResponseEntity.ok(paginaProfessores);
+    }
+
+    @GetMapping("/logs")
+    public ResponseEntity<?> listarLogs(
+            @PageableDefault(size = 50, sort = "dataHora") Pageable pageable, 
+            @AuthenticationPrincipal Professor adminLogado) {
+        
+        if (!isSuperAdmin(adminLogado)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+        
+        Page<LogAcesso> paginaLogs = logAcessoRepository.findAll(pageable);
+        return ResponseEntity.ok(paginaLogs);
+    }
+
+    @DeleteMapping("/logs")
+    public ResponseEntity<?> limparTodosLogs(@AuthenticationPrincipal Professor adminLogado) {
+        if (!isSuperAdmin(adminLogado)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+        
+        logAcessoRepository.deleteAll(); 
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔥 NOVA ROTA: Exclusão INDIVIDUAL do Log 🔥
+    @DeleteMapping("/logs/{id}")
+    public ResponseEntity<?> excluirLogIndividual(@PathVariable Long id, @AuthenticationPrincipal Professor adminLogado) {
+        if (!isSuperAdmin(adminLogado)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+        
+        logAcessoRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/professores/{id}")

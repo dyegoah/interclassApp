@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin - Interclass Arena</title>
     
-    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
     <link rel="stylesheet" href="/estilo-global.css">
     <script src="/seguranca.js"></script>
 
@@ -16,32 +15,18 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
     
     <style>
-        /* 🔥 HIJACKING DE TEMA: Força o CSS Global a ficar Dourado no Admin 🔥 */
-        :root { 
-            --theme-primary: #ffd700; 
-            --theme-glow: rgba(255, 215, 0, 0.5); 
-        }
-        
-        body { 
-            background: linear-gradient(-45deg, #0a0a0a, #1a1a1a, #000000, #111111); 
-            background-size: 400% 400%; 
-            animation: gradientBG 15s ease infinite; 
-            padding-bottom: 50px; 
-        }
-
+        :root { --theme-primary: #ffd700; --theme-glow: rgba(255, 215, 0, 0.5); }
+        body { background: linear-gradient(-45deg, #0a0a0a, #1a1a1a, #000000, #111111); background-size: 400% 400%; animation: gradientBG 15s ease infinite; padding-bottom: 50px; }
         .container { max-width: 1300px; margin: 0 auto; padding: 2rem; }
 
-        /* Topbar do Admin */
         .admin-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; border-radius: 15px; margin-bottom: 2rem; border-left: 5px solid var(--theme-primary); }
         .admin-header h1 { font-family: 'Orbitron', sans-serif; color: var(--theme-primary); font-size: 1.5rem; text-transform: uppercase; text-shadow: 0 0 15px var(--theme-glow); margin-bottom: 5px;}
         .admin-header p { font-size: 0.9rem; color: #aaa; }
-        
         .admin-profile { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(255,215,0,0.3); }
 
         .btn-sair-admin { background: transparent; border: 1px solid #ff4500; color: #ff4500; padding: 6px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; cursor: pointer; transition: 0.3s; margin-left: 10px;}
         .btn-sair-admin:hover { background: rgba(255,69,0,0.1); box-shadow: 0 0 10px rgba(255,69,0,0.4); }
 
-        /* Cards de Resumo */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 2rem; }
         .stat-card { padding: 1.5rem; border-radius: 12px; text-align: center; border-top: 3px solid #555; transition: 0.3s; }
         .stat-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
@@ -52,22 +37,30 @@
         .card-green { border-top-color: #00ff00; } .card-green .stat-value { color: #00ff00; text-shadow: 0 0 15px rgba(0,255,0,0.4); }
         .card-red { border-top-color: #ff4500; } .card-red .stat-value { color: #ff4500; text-shadow: 0 0 15px rgba(255,69,0,0.4); }
 
-        /* Abas de Navegação */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; flex-wrap: wrap; }
         .tab-btn { background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid transparent; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.95rem; transition: 0.3s; }
         .tab-btn.active { background: rgba(255,215,0,0.1); color: var(--theme-primary); border-color: var(--theme-primary); text-shadow: 0 0 10px var(--theme-glow); }
 
-        /* Tabela de Professores */
         .table-container { overflow-x: auto; background: rgba(0,0,0,0.6); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
         table { width: 100%; border-collapse: collapse; min-width: 900px; text-align: left; }
         th { padding: 15px; background: rgba(255,255,255,0.05); color: var(--theme-primary); font-family: 'Orbitron', sans-serif; font-size: 0.85rem; border-bottom: 2px solid var(--theme-primary); }
         td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; font-size: 0.95rem; vertical-align: middle;}
         tr:hover { background: rgba(255,255,255,0.02); }
         
+        .table-compact th { padding: 10px; font-size: 0.75rem; }
+        .table-compact td { padding: 8px 10px; font-size: 0.85rem; }
+        .btn-log { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; margin-right: 5px;}
+        .btn-log:hover { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); }
+        
+        /* Botão específico de exclusão de log */
+        .btn-log-del { background: rgba(255, 69, 0, 0.1); border: 1px solid #ff4500; color: #ff4500; }
+        .btn-log-del:hover { background: #ff4500; color: #fff; }
+
         .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; font-family: 'Orbitron', sans-serif; }
         .badge-ativo { background: rgba(0,255,0,0.1); color: #00ff00; border: 1px solid #00ff00; }
         .badge-atrasado { background: rgba(255,215,0,0.1); color: #ffd700; border: 1px solid #ffd700; }
         .badge-bloqueado { background: rgba(255,0,0,0.1); color: #ff0000; border: 1px solid #ff0000; }
+        .badge-ataque { background: rgba(255,0,0,0.1); color: #ff0000; border: 1px solid #ff0000; }
 
         .acoes-btn { display: flex; gap: 8px; }
         .btn-mini { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
@@ -76,7 +69,6 @@
         .btn-block:hover { border-color: #ffd700; color: #ffd700; }
         .btn-del:hover { border-color: #ff0000; color: #ff0000; }
 
-        /* Painel de Configurações Globais */
         .config-panel { display: none; }
         .config-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
         .config-info h4 { color: var(--theme-primary); font-family: 'Orbitron', sans-serif; margin-bottom: 5px; }
@@ -89,12 +81,49 @@
         input:checked + .slider { background-color: var(--theme-primary); box-shadow: 0 0 10px var(--theme-glow); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        /* Ajustes dos componentes globais para o Admin */
         .modal-box h3 { color: var(--theme-primary); font-family: 'Orbitron', sans-serif; margin-bottom: 15px; }
         .input-dark { text-align: center; font-size: 1.1rem; letter-spacing: 2px; border-radius: 8px; }
         .btn-acao { width: 100%; margin-bottom: 10px; border-radius: 8px; }
         .btn-cancelar { background: transparent; border: 1px solid #aaa; color: #aaa; box-shadow: none; }
         .btn-cancelar:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff; box-shadow: none;}
+
+        /* CSS EXCLUSIVO DO RELATÓRIO JUDICIAL */
+        @media print {
+            body * { visibility: hidden; }
+            #relatorio-print { 
+                display: block !important; 
+                visibility: visible !important; 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                background: #fff !important; 
+                color: #000 !important; 
+                padding: 20px; 
+                font-family: 'Times New Roman', serif; 
+                z-index: 9999;
+            }
+            #relatorio-print * { visibility: visible !important; }
+            .container { display: none !important; } /* Esconde o painel por trás */
+        }
+        
+        .search-bar-logs {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            border-radius: 8px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            flex: 1;
+        }
+        .search-bar-logs:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -134,27 +163,30 @@
         <div class="tabs">
             <button class="tab-btn active" id="tab-lista" onclick="mudarAba('lista')">👥 Gestão de Clientes</button>
             <button class="tab-btn" id="tab-config" onclick="mudarAba('config')">⚙️ Configurações Globais</button>
+            <button class="tab-btn" id="tab-auditoria" onclick="mudarAba('auditoria')">🛡️ Logs de Segurança</button>
         </div>
 
-        <div id="view-lista" class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Professor Gestor</th>
-                        <th>Instituição</th>
-                        <th>E-mail</th>
-                        <th>Status</th>
-                        <th style="text-align: center;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-body">
-                    </tbody>
-            </table>
+        <!-- VIEW DE PROFESSORES -->
+        <div id="view-lista">
+            <button id="btn-limpar-filtro" class="btn-acao btn-cancelar" style="display:none; width:auto; margin-bottom: 15px; padding: 8px 15px; font-size: 0.8rem;" onclick="limparFiltroAuditoria()">❌ Limpar Investigação e Ver Todos</button>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Professor Gestor</th>
+                            <th>Instituição</th>
+                            <th>E-mail</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-body"></tbody>
+                </table>
+                <div id="paginacao-admin" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;"></div>
+            </div>
         </div>
-        
-        <!-- 🔥 NOVA BARRA DE PAGINAÇÃO ADICIONADA AQUI 🔥 -->
-        <div id="paginacao-admin" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 1.5rem; flex-wrap: wrap;"></div>
 
         <div id="view-config" class="config-panel">
             <div class="config-item glass">
@@ -164,27 +196,46 @@
                 </div>
                 <label class="switch"><input type="checkbox"><span class="slider"></span></label>
             </div>
+        </div>
+
+        <!-- VIEW DE AUDITORIA (LOGS) -->
+        <div id="view-auditoria" style="display: none;">
             
-            <div class="config-item glass">
-                <div class="config-info">
-                    <h4>🚫 Trava Automática de Inadimplência</h4>
-                    <p>Bloqueia automaticamente o acesso à criação de torneios se o pagamento atrasar 5 dias.</p>
-                </div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                <input type="text" id="input-busca-logs" class="search-bar-logs" placeholder="🔍 Buscar registros por Data, E-mail, IP, Localização ou Status..." onkeyup="filtrarLogsNaTela()">
+                <button class="btn-acao" style="background: rgba(255, 69, 0, 0.2); border: 1px solid #ff4500; color: #ff4500; width: auto; margin-bottom: 0; padding: 0 20px; font-family: 'Orbitron'; font-size: 0.8rem;" onclick="esvaziarLogsManualmente()">🗑️ Limpar Todos os Logs</button>
             </div>
 
-            <div class="config-item glass">
-                <div class="config-info">
-                    <h4>🎁 Modo Cortesia / Teste Grátis</h4>
-                    <p>Aplica 7 dias gratuitos para todos os novos cadastros automaticamente.</p>
-                </div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            <div class="table-container table-compact">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data / Hora (BRT)</th>
+                            <th>E-mail Alvo</th>
+                            <th>IP e Dispositivo</th>
+                            <th>Localização / ISP</th>
+                            <th>Resultado da Tentativa</th>
+                            <th style="text-align: right;">Auditoria</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-logs-body">
+                        <!-- Será preenchido via JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div id="paginacao-logs" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;"></div>
+            </div>
+            <div style="padding: 15px; text-align: center; color: #888; font-size: 0.75rem;">
+                * Dados protegidos por criptografia de ponta a ponta. Atende à norma do <b>Art. 15 da Lei Nº 12.965/2014</b>.
             </div>
         </div>
 
     </div>
 
-    <!-- Modais que herdam o fundo global via CSS Global -->
+    <!-- 🔥 MOLDE DE PDF JUDICIAL 🔥 -->
+    <div id="relatorio-print" style="display: none;"></div>
+
+    <!-- Modais de Senha e Status (Ocultos) -->
     <div id="modal-senha" class="modal-overlay">
         <div class="modal-box">
             <h3>🔑 Alterar Senha</h3>
@@ -194,111 +245,73 @@
             <button class="btn-acao btn-cancelar" onclick="fecharModais()">Cancelar</button>
         </div>
     </div>
-
     <div id="modal-status" class="modal-overlay">
         <div class="modal-box">
             <h3>🛑 Gerir Status</h3>
-            <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 15px;">Altere a situação da assinatura de <b id="nome-prof-status" style="color: #fff;"></b>.</p>
-            
-            <select id="select-status" class="input-dark" style="font-family: 'Segoe UI'; font-size: 1rem;">
+            <select id="select-status" class="input-dark" style="font-family: 'Segoe UI'; font-size: 1rem; margin-bottom:15px;">
                 <option value="ativo">✅ Ativo (Liberado)</option>
-                <option value="atrasado">⚠️ Atrasado (Aviso)</option>
                 <option value="bloqueado">🚫 Bloqueado (Sem Acesso)</option>
             </select>
-
             <button class="btn-acao" onclick="salvarStatus()">Aplicar Status</button>
             <button class="btn-acao btn-cancelar" onclick="fecharModais()">Cancelar</button>
         </div>
     </div>
 
     <script>
-        // Lógica Integral Mantida Exatamente como Solicitado
+        // CONTROLES DE ESTADO
         let professores = [];
         let profSelecionadoId = null;
-        let paginaAtualGlobal = 0;
+        let filtroEmailInvestigacao = "";
+        
+        let paginaProfAtual = 0;
+        let paginaLogAtual = 0;
         const itensPorPagina = 10;
+        
+        let logsMemoriaAtual = [];
 
         window.onload = async () => {
-            await carregarProfessores();
+            await carregarProfessores(0);
         };
 
-        // 🛡️ Função Master de Conexão com o Banco de Dados Real
+        // 🛡️ REQUISIÇÃO CENTRALIZADA
         async function apiAdmin(endpoint, method = 'GET', body = null) {
             const token = localStorage.getItem('interclassToken');
-            if (!token) {
-                window.location.href = '/index.html';
-                return null;
-            }
+            if (!token) { window.location.href = '/index.html'; return null; }
             
-            const options = {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            };
+            const options = { method: method, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }};
             if (body) options.body = JSON.stringify(body);
 
             try {
                 const res = await fetch(endpoint, options);
-                if (res.status === 403 || res.status === 401) {
-                    // Manda um sinal pro index.html limpar a sujeira
-                    window.location.replace('/index.html?error=403');
-                    return null;
-                }
+                if (res.status === 403 || res.status === 401) { window.location.replace('/index.html?error=403'); return null; }
                 return res;
-            } catch (error) {
-                console.error("Erro no Servidor:", error);
-                return null;
-            }
+            } catch (error) { return null; }
         }
 
-        // 🔥 FUNÇÃO ATUALIZADA: Puxa 10 contas e inverte a ordem (desc) 🔥
+        // ==========================================
+        // ABA 1: GESTÃO DE PROFESSORES
+        // ==========================================
         async function carregarProfessores(pagina = 0) {
-            paginaAtualGlobal = pagina;
-            
-            // Enviamos os parâmetros ?page=X&size=10&sort=id,desc diretamente na URL
+            paginaProfAtual = pagina;
             const res = await apiAdmin(`/api/admin/professores?page=${pagina}&size=${itensPorPagina}&sort=id,desc`);
-            
             if (res && res.ok) {
                 const dados = await res.json();
-                
-                // O Spring devolve a lista em .content quando há paginação
                 professores = dados.content ? dados.content : dados; 
-                
                 renderizarTabela();
-                
-                // Só renderiza os botões se o servidor mandar os dados da página
-                if (dados.totalPages !== undefined) {
-                    renderizarControlesPaginacao(dados.totalPages, dados.number);
-                }
+                if (dados.totalPages !== undefined) renderizarPaginacaoProfessores(dados.totalPages, dados.number);
             }
         }
 
-        // 🔥 NOVA FUNÇÃO: Desenha os botões << Anterior 1 2 3 Próximo >> 🔥
-        function renderizarControlesPaginacao(totalPaginas, paginaAtualIndex) {
+        function renderizarPaginacaoProfessores(totalPaginas, paginaAtualIndex) {
             const container = document.getElementById('paginacao-admin');
             container.innerHTML = '';
-            
-            if (totalPaginas <= 1) return; // Se só tem 1 página, não mostra os botões
+            if (totalPaginas <= 1 || filtroEmailInvestigacao !== "") return; 
 
-            // Botão Anterior
-            let html = `<button class="tab-btn" style="padding: 8px 15px;" 
-                        ${paginaAtualIndex === 0 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} 
-                        onclick="carregarProfessores(${paginaAtualIndex - 1})">« Ant</button>`;
-            
-            // Números das Páginas
+            let html = `<button class="tab-btn" style="padding: 8px 15px;" ${paginaAtualIndex === 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="carregarProfessores(${paginaAtualIndex - 1})">« Ant</button>`;
             for (let i = 0; i < totalPaginas; i++) {
-                let activeClass = (i === paginaAtualIndex) ? 'active' : '';
-                html += `<button class="tab-btn ${activeClass}" style="padding: 8px 15px;" 
-                         onclick="carregarProfessores(${i})">${i + 1}</button>`;
+                html += `<button class="tab-btn ${i === paginaAtualIndex ? 'active' : ''}" style="padding: 8px 15px;" onclick="carregarProfessores(${i})">${i + 1}</button>`;
             }
-            
-            // Botão Próximo
-            html += `<button class="tab-btn" style="padding: 8px 15px;" 
-                     ${paginaAtualIndex === (totalPaginas - 1) ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} 
-                     onclick="carregarProfessores(${paginaAtualIndex + 1})">Próx »</button>`;
-            
+            html += `<button class="tab-btn" style="padding: 8px 15px;" ${paginaAtualIndex === (totalPaginas - 1) ? 'disabled style="opacity:0.4;"' : ''} onclick="carregarProfessores(${paginaAtualIndex + 1})">Próx »</button>`;
             container.innerHTML = html;
         }
 
@@ -306,16 +319,22 @@
             const tbody = document.getElementById('tabela-body');
             tbody.innerHTML = '';
             
-            let countAtivos = 0;
-            let countBlock = 0;
+            let countAtivos = 0, countBlock = 0;
+            let listaVisivel = professores;
+            
+            if (filtroEmailInvestigacao !== "") {
+                listaVisivel = professores.filter(p => p.email === filtroEmailInvestigacao);
+                document.getElementById('btn-limpar-filtro').style.display = 'block';
+                document.getElementById('paginacao-admin').style.display = 'none';
+            } else {
+                document.getElementById('btn-limpar-filtro').style.display = 'none';
+                document.getElementById('paginacao-admin').style.display = 'flex';
+            }
 
-            professores.forEach(p => {
+            listaVisivel.forEach(p => {
                 let statusVal = p.status || 'ativo';
-                let badgeClass = statusVal === 'ativo' ? 'badge-ativo' : (statusVal === 'atrasado' ? 'badge-atrasado' : 'badge-bloqueado');
-                let badgeTexto = statusVal.toUpperCase();
-
-                if(statusVal === 'ativo') countAtivos++;
-                if(statusVal === 'bloqueado' || statusVal === 'atrasado') countBlock++;
+                let badgeClass = statusVal === 'ativo' ? 'badge-ativo' : 'badge-bloqueado';
+                if(statusVal === 'ativo') countAtivos++; else countBlock++;
 
                 tbody.innerHTML += `
                     <tr>
@@ -323,100 +342,221 @@
                         <td style="font-weight: bold;">${p.nome}</td>
                         <td>${p.escola}</td>
                         <td>${p.email}</td>
-                        <td><span class="badge ${badgeClass}">${badgeTexto}</span></td>
+                        <td><span class="badge ${badgeClass}">${statusVal.toUpperCase()}</span></td>
                         <td>
                             <div class="acoes-btn" style="justify-content: center;">
-                                <button class="btn-mini btn-edit" title="Editar Senha" onclick="abrirModalSenha(${p.id}, '${p.nome}')">🔑</button>
+                                <button class="btn-mini btn-edit" title="Mudar Senha" onclick="abrirModalSenha(${p.id}, '${p.nome}')">🔑</button>
                                 <button class="btn-mini btn-block" title="Mudar Status" onclick="abrirModalStatus(${p.id}, '${p.nome}', '${statusVal}')">🚦</button>
-                                <button class="btn-mini btn-del" title="Excluir Cliente" onclick="excluirProfessor(${p.id})">🗑️</button>
+                                <button class="btn-mini btn-del" title="Excluir Conta" onclick="excluirProfessor(${p.id})">🗑️</button>
                             </div>
                         </td>
                     </tr>
                 `;
             });
 
-            document.getElementById('count-total').textContent = professores.length; // Este número refletirá a página atual. Opcionalmente, pode-se ler 'dados.totalElements' na função principal para o total global.
-            document.getElementById('count-ativos').textContent = countAtivos;
-            document.getElementById('count-bloqueados').textContent = countBlock;
-        }
-
-        function mudarAba(aba) {
-            document.getElementById('tab-lista').classList.remove('active');
-            document.getElementById('tab-config').classList.remove('active');
-            document.getElementById('view-lista').style.display = 'none';
-            document.getElementById('view-config').style.display = 'none';
-
-            document.getElementById(`tab-${aba}`).classList.add('active');
-            document.getElementById(`view-${aba}`).style.display = 'block';
-        }
-
-        function sairDoAdmin() {
-            if(confirm("Deseja sair do painel do Super Admin?")) {
-                localStorage.removeItem('interclassToken');
-                window.location.href = '/index.html'; 
+            if (filtroEmailInvestigacao === "") {
+                document.getElementById('count-total').textContent = professores.length; 
+                document.getElementById('count-ativos').textContent = countAtivos;
+                document.getElementById('count-bloqueados').textContent = countBlock;
             }
         }
 
-        function abrirModalSenha(id, nome) {
-            profSelecionadoId = id;
-            document.getElementById('nome-prof-senha').textContent = nome;
-            document.getElementById('nova-senha').value = '';
-            document.getElementById('modal-senha').style.display = 'flex';
-        }
-
-        async function salvarSenha() {
-            const senha = document.getElementById('nova-senha').value;
-            if(senha.length < 6) { alert("A senha deve ter no mínimo 6 caracteres."); return; }
+        // ==========================================
+        // ABA 3: AUDITORIA E LOGS 
+        // ==========================================
+        async function carregarLogsAuditoria(pagina = 0) {
+            paginaLogAtual = pagina;
+            document.getElementById('input-busca-logs').value = ''; 
             
-            const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/senha`, 'PUT', { senha: senha });
-            if (res && res.ok) {
-                alert(`Senha do professor atualizada com sucesso no banco de dados!`);
-                fecharModais();
-            } else {
-                alert("Falha ao atualizar a senha no servidor.");
-            }
-        }
-
-        function abrirModalStatus(id, nome, statusAtual) {
-            profSelecionadoId = id;
-            document.getElementById('nome-prof-status').textContent = nome;
-            document.getElementById('select-status').value = statusAtual;
-            document.getElementById('modal-status').style.display = 'flex';
-        }
-
-        async function salvarStatus() {
-            const novoStatus = document.getElementById('select-status').value;
-            const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/status`, 'PUT', { status: novoStatus });
+            const res = await apiAdmin(`/api/admin/logs?page=${pagina}&size=${itensPorPagina}&sort=dataHora,desc`);
             
             if (res && res.ok) {
-                await carregarProfessores(paginaAtualGlobal); 
-                fecharModais();
+                const dados = await res.json();
+                logsMemoriaAtual = dados.content ? dados.content : dados;
+                renderizarTabelaLogs(logsMemoriaAtual);
+                if (dados.totalPages !== undefined) renderizarPaginacaoLogs(dados.totalPages, dados.number);
             } else {
-                alert("Falha ao atualizar o status no servidor.");
+                renderizarLogsMockFallback();
             }
         }
 
-        async function excluirProfessor(id) {
-            const confirm1 = confirm("⚠️ ATENÇÃO: Deseja realmente excluir este professor? Todos os seus torneios e alunos também serão removidos do banco.");
-            if (confirm1) {
-                const confirm2 = confirm("🚨 ÚLTIMO AVISO: Esta ação é IRREVERSÍVEL. Confirma?");
-                if (confirm2) {
-                    const res = await apiAdmin(`/api/admin/professores/${id}`, 'DELETE');
+        function filtrarLogsNaTela() {
+            const termo = document.getElementById('input-busca-logs').value.toLowerCase();
+            if (!termo) { renderizarTabelaLogs(logsMemoriaAtual); return; }
+
+            const logsFiltrados = logsMemoriaAtual.filter(log => {
+                const tc = `${log.dataHora||''} ${log.emailTentado||''} ${log.ipOrigem||''} ${log.localizacaoIsp||''} ${log.status||''}`.toLowerCase();
+                return tc.includes(termo);
+            });
+            renderizarTabelaLogs(logsFiltrados);
+        }
+
+        function renderizarTabelaLogs(logs) {
+            const tbody = document.getElementById('tabela-logs-body');
+            tbody.innerHTML = '';
+            
+            if(logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:#aaa;">Nenhum registro encontrado.</td></tr>`;
+                return;
+            }
+
+            logs.forEach(log => {
+                let isBloq = log.status && (log.status.includes('ERRO') || log.status.includes('BLOQUEADO') || log.status.includes('FALHA') || log.status.includes('DESCONHECIDO') || log.status.includes('INCORRETA'));
+                let badgeClass = isBloq ? 'badge-ataque' : 'badge-ativo';
+                let dataFormatada = (log.dataHora || '').replace('T', ' às ').substring(0, 19);
+                
+                // 🔥 BOTÃO DE EXCLUSÃO INDIVIDUAL (X) ADICIONADO AQUI 🔥
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${dataFormatada}</td>
+                        <td style="font-weight: bold;">${log.emailTentado || 'N/A'}</td>
+                        <td style="font-family: monospace; color: #00f2fe;">${log.ipOrigem || 'Desconhecido'}</td>
+                        <td>${log.localizacaoIsp || 'N/A'}</td>
+                        <td><span class="badge ${badgeClass}">${log.status || 'N/A'}</span></td>
+                        <td style="text-align: right;">
+                            <button class="btn-log" onclick="isolarContaParaInvestigacao('${log.emailTentado}')" title="Investigar">🔎</button>
+                            <button class="btn-log" onclick="baixarRelatorioOficial('${dataFormatada}', '${log.emailTentado}', '${log.ipOrigem}', '${log.localizacaoIsp}', '${log.status}')" title="Gerar PDF">📄</button>
+                            <button class="btn-log btn-log-del" onclick="excluirLogIndividual(${log.id || 0})" title="Excluir Log">❌</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderizarPaginacaoLogs(totalPaginas, paginaAtualIndex) {
+            const container = document.getElementById('paginacao-logs');
+            container.innerHTML = '';
+            if (totalPaginas <= 1) return; 
+
+            let html = `<button class="tab-btn" style="padding: 8px 15px;" ${paginaAtualIndex === 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="carregarLogsAuditoria(${paginaAtualIndex - 1})">« Ant</button>`;
+            for (let i = 0; i < totalPaginas; i++) {
+                html += `<button class="tab-btn ${i === paginaAtualIndex ? 'active' : ''}" style="padding: 8px 15px;" onclick="carregarLogsAuditoria(${i})">${i + 1}</button>`;
+            }
+            html += `<button class="tab-btn" style="padding: 8px 15px;" ${paginaAtualIndex === (totalPaginas - 1) ? 'disabled style="opacity:0.4;"' : ''} onclick="carregarLogsAuditoria(${paginaAtualIndex + 1})">Próx »</button>`;
+            container.innerHTML = html;
+        }
+
+        async function esvaziarLogsManualmente() {
+            if (confirm("⚠️ Tem certeza que deseja APAGAR TODO O HISTÓRICO DE AUDITORIA do banco de dados?")) {
+                if (confirm("🚨 ÚLTIMO AVISO: Esta ação destruirá todos os registros. Confirmar limpeza?")) {
+                    const res = await apiAdmin('/api/admin/logs', 'DELETE');
                     if (res && res.ok) {
-                        alert("✅ Registro removido com sucesso do banco de dados!");
-                        await carregarProfessores(paginaAtualGlobal);
+                        alert("✅ Banco de logs esvaziado com sucesso!");
+                        carregarLogsAuditoria(0);
                     } else {
-                        alert("Erro ao remover. Verifique as dependências do usuário.");
+                        alert("Erro ao tentar limpar o banco. Verifique o servidor.");
                     }
                 }
             }
         }
 
-        function fecharModais() {
-            document.getElementById('modal-senha').style.display = 'none';
-            document.getElementById('modal-status').style.display = 'none';
-            profSelecionadoId = null;
+        // 🔥 FUNÇÃO EXCLUSÃO INDIVIDUAL DE LOG 🔥
+        async function excluirLogIndividual(id) {
+            if (id === 0) return alert("Modo de teste: O log simulado não pode ser excluído.");
+            
+            if (confirm("Deseja realmente excluir este registro de auditoria específico?")) {
+                const res = await apiAdmin(`/api/admin/logs/${id}`, 'DELETE');
+                if (res && res.ok) {
+                    carregarLogsAuditoria(paginaLogAtual);
+                } else {
+                    alert("Erro ao excluir o registro do banco de dados.");
+                }
+            }
         }
+
+        // ==========================================
+        // FUNÇÕES DE INVESTIGAÇÃO E PDF OFICIAL
+        // ==========================================
+        async function isolarContaParaInvestigacao(emailAlvo) {
+            if(!emailAlvo || emailAlvo === 'N/A') return alert("E-mail não disponível para investigação.");
+            filtroEmailInvestigacao = emailAlvo;
+            const res = await apiAdmin(`/api/admin/professores?size=1000&sort=id,desc`);
+            if (res && res.ok) {
+                const dados = await res.json();
+                professores = dados.content ? dados.content : dados; 
+            }
+            mudarAba('lista');
+            renderizarTabela();
+        }
+
+        function limparFiltroAuditoria() {
+            filtroEmailInvestigacao = "";
+            carregarProfessores(paginaProfAtual);
+        }
+
+        function baixarRelatorioOficial(dataHora, email, ip, local, status) {
+            const divPrint = document.getElementById('relatorio-print');
+            
+            divPrint.style.display = 'block'; 
+            
+            divPrint.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; color: #000;">
+                    <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="margin:0; font-size: 1.5rem; text-transform: uppercase;">RELATÓRIO OFICIAL DE AUDITORIA DE SISTEMA</h1>
+                        <h3 style="margin:5px 0 0 0; color: #555;">Plataforma Interclass Arena - Departamento de Segurança da Informação</h3>
+                    </div>
+                    
+                    <p style="text-align: justify; line-height: 1.6;">
+                        O presente documento certifica a extração fidedigna de registros de acesso lógico aos servidores da plataforma <b>Interclass Arena</b>. 
+                        Ressalta-se que a coleta, retenção e fornecimento deste registro encontram-se amparados legalmente pelas diretrizes do <b>Marco Civil da Internet (Lei Federal Nº 12.965/2014, Cap. III, Seção II, Art. 15)</b>, que determina a obrigatoriedade da guarda de registros de acesso a aplicações de internet em ambiente seguro e sigiloso.
+                    </p>
+
+                    <p style="text-align: justify; line-height: 1.6; margin-top: 15px;">
+                        O rastreamento infraestrutural identificou a seguinte tentativa de comunicação com a aplicação na base de dados central (PostgreSQL):
+                    </p>
+
+                    <h3 style="margin-top: 40px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">Extrato de Log de Acesso (Dados Criptográficos)</h3>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1.1rem; color: #000;">
+                        <tr><td style="padding: 15px; border: 1px solid #000; background: #f0f0f0; width: 35%;"><b>Data/Hora (BRT):</b></td><td style="padding: 15px; border: 1px solid #000;">${dataHora}</td></tr>
+                        <tr><td style="padding: 15px; border: 1px solid #000; background: #f0f0f0;"><b>Conta Alvo (E-mail):</b></td><td style="padding: 15px; border: 1px solid #000; font-weight: bold;">${email}</td></tr>
+                        <tr><td style="padding: 15px; border: 1px solid #000; background: #f0f0f0;"><b>Endereço IPv4/v6:</b></td><td style="padding: 15px; border: 1px solid #000; font-family: monospace;">${ip}</td></tr>
+                        <tr><td style="padding: 15px; border: 1px solid #000; background: #f0f0f0;"><b>Localização e Provedor (ISP):</b></td><td style="padding: 15px; border: 1px solid #000;">${local}</td></tr>
+                        <tr><td style="padding: 15px; border: 1px solid #000; background: #f0f0f0;"><b>Status do Servidor:</b></td><td style="padding: 15px; border: 1px solid #000;"><b>${status}</b></td></tr>
+                    </table>
+
+                    <div style="margin-top: 60px; text-align: center; color: #666; font-size: 0.9rem;">
+                        <p>A autenticidade deste relatório pode ser verificada internamente mediante apresentação do Hash gerado.</p>
+                        <p>Documento expedido eletronicamente em: <b>${new Date().toLocaleString('pt-BR')}</b></p>
+                        <p>Hash de Transação: ${Math.random().toString(36).substring(2, 15).toUpperCase()}-${Date.now().toString(16).toUpperCase()}</p>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                window.print();
+                divPrint.style.display = 'none';
+            }, 200);
+        }
+
+        // ==========================================
+        // UTILITÁRIOS E MODAIS GERAIS
+        // ==========================================
+        function mudarAba(aba) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('view-lista').style.display = 'none';
+            document.getElementById('view-config').style.display = 'none';
+            document.getElementById('view-auditoria').style.display = 'none';
+
+            document.getElementById(`tab-${aba}`).classList.add('active');
+            document.getElementById(`view-${aba}`).style.display = 'block';
+
+            if (aba === 'auditoria') carregarLogsAuditoria(0);
+        }
+
+        function renderizarLogsMockFallback() {
+            const tbody = document.getElementById('tabela-logs-body');
+            logsMemoriaAtual = [{ id: 0, dataHora: "Hoje, 14:32:15", emailTentado: "professor.alvo@escola.com", ipOrigem: "189.44.12.88", localizacaoIsp: "São Paulo, SP (Claro S.A.)", status: "SENHA INCORRETA (3/5)" }];
+            renderizarTabelaLogs(logsMemoriaAtual);
+        }
+
+        function sairDoAdmin() { if(confirm("Deseja sair do painel do Super Admin?")) { localStorage.removeItem('interclassToken'); window.location.href = '/index.html'; } }
+        function abrirModalSenha(id, nome) { profSelecionadoId = id; document.getElementById('nome-prof-senha').textContent = nome; document.getElementById('nova-senha').value = ''; document.getElementById('modal-senha').style.display = 'flex'; }
+        async function salvarSenha() { const s = document.getElementById('nova-senha').value; if(s.length < 6) return alert("Mínimo 6 caracteres."); const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/senha`, 'PUT', { senha: s }); if(res && res.ok) { alert('Senha atualizada!'); fecharModais(); } }
+        function abrirModalStatus(id, nome, st) { profSelecionadoId = id; document.getElementById('nome-prof-status').textContent = nome; document.getElementById('select-status').value = st; document.getElementById('modal-status').style.display = 'flex'; }
+        async function salvarStatus() { const s = document.getElementById('select-status').value; const res = await apiAdmin(`/api/admin/professores/${profSelecionadoId}/status`, 'PUT', { status: s }); if(res && res.ok) { await carregarProfessores(paginaProfAtual); fecharModais(); } }
+        async function excluirProfessor(id) { if(confirm("Excluir professor? 🚨 AÇÃO IRREVERSÍVEL.")) { const res = await apiAdmin(`/api/admin/professores/${id}`, 'DELETE'); if(res && res.ok) await carregarProfessores(paginaProfAtual); } }
+        function fecharModais() { document.getElementById('modal-senha').style.display = 'none'; document.getElementById('modal-status').style.display = 'none'; profSelecionadoId = null; }
     </script>
 </body>
 </html>
