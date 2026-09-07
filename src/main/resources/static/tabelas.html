@@ -71,6 +71,37 @@
             .play-hora { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 10px; }
             .play-info > div { flex-direction: column; gap: 10px; }
         }
+
+        .bracket-scroll-area { display: flex; align-items: center; gap: 12px; padding: 15px 5px 25px 5px; overflow-x: auto; scrollbar-width: none; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 100%); border-radius: 12px; margin-top: 15px; -webkit-overflow-scrolling: touch;}
+        .bracket-scroll-area::-webkit-scrollbar { display: none; }
+        .bracket-col { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; justify-content: space-around; position: relative;}
+        
+        .mini-match { background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 140px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.6); overflow: hidden; }
+        .mini-match-header { background: rgba(255,255,255,0.05); font-size: 0.6rem; text-align: center; padding: 4px 2px; color: #aaa; font-family: 'Orbitron'; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        .mini-team-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .mini-team-row:last-child { border-bottom: none; }
+        
+        .gamer-avatar { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; margin-right: 5px; }
+        .mini-team-name { font-family: 'Segoe UI'; font-size: 0.75rem; font-weight: bold; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1;}
+        .mini-team-score { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: bold; color: #888; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; text-align: center; margin-left: 5px;}
+        
+        .mini-match .vencedor { background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent); border-left: 3px solid #ffd700; }
+        .mini-match .vencedor .mini-team-name { color: #fff; }
+        .mini-match .vencedor .mini-team-score { color: #000; background: #ffd700; box-shadow: 0 0 10px #ffd700; }
+        
+        .mini-match.final { border: 2px solid var(--gold); transform: scale(1.05); box-shadow: 0 0 20px rgba(255,215,0,0.4); margin: 0 8px;}
+        .mini-match.final .mini-match-header { background: rgba(255,215,0,0.2); color: var(--gold); font-weight: bold;}
+        .mini-match.final .vencedor { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), transparent);}
+        .mini-match.final .vencedor .mini-team-score { background: var(--gold); box-shadow: 0 0 15px var(--gold); }
+
+        /* 🔥 ATUALIZADO: Rodapé da Chave permitindo a quebra de linha 🔥 */
+        .mini-match-footer { background: rgba(0,0,0,0.5); font-size: 0.55rem; text-align: center; padding: 6px 4px; color: #aaa; font-family: 'Segoe UI'; border-top: 1px solid rgba(255,255,255,0.05); overflow: hidden; line-height: 1.3; }
+        .mini-match.final .mini-match-footer { background: rgba(255,215,0,0.1); color: #ffd700; border-top-color: rgba(255,215,0,0.3); }
+
+        .bracket-col:not(:last-child) .mini-match::after { content: ''; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
+        .bracket-col:not(:first-child) .mini-match::before { content: ''; position: absolute; left: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
+
     </style>
 </head>
 <body>
@@ -421,7 +452,7 @@
 				dados.jogos.forEach(jogo => {
 				                    let relatorio = relatoriosSalvos[String(jogo.id)]; 
 				                    
-				                    let dataDoJogo = jogo.diaId || jogo.dataJogo || "Data Indefinida";
+				                    let dataDoJogo = jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia || "Data Indefinida";
 				                    let dataCurta = dataDoJogo;
 				                    if(dataCurta.includes('-')) {
 				                        let p = dataCurta.split('-');
@@ -490,6 +521,7 @@
 				                    let placarBExibicao = placares.B;
 				                    let hor = jogo.hora || jogo.horario || '--:--';
 
+                                    // 🔥 CORREÇÃO: Local da quadra deslocado para baixo nas agendas (PlayHub) 🔥
 				                    if (relatorio || jogo.status === 'FINALIZADO') {
 				                        jogosConcluidos++;
 				                        htmlJogosAgenda += `
@@ -497,7 +529,8 @@
 				                                <div class="play-hora" style="border-right-color: #555;">
 				                                    <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
 				                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
-				                                    <span style="font-size:0.75rem; color: #888;">${dataCurta}</span>
+				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: #888; margin-bottom: 3px;">${dataCurta}</span>
+                                                    <span style="font-size:0.65rem; font-family:'Segoe UI'; color: rgba(255,255,255,0.5);">📍 ${jogo.quadra || 'A Definir'}</span>
 				                                </div>
 				                                <div class="play-info">
 				                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -528,12 +561,12 @@
 				                            <div class="playhub-card" style="border-left: 4px solid ${corBorda}; background: ${corBg}; opacity: ${opacity}; ${brilhoBox}">
 				                                <div class="play-hora" style="border-right-color: ${corBorda};">
 				                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
-				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda};">${dataCurta}</span>
+				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda}; margin-bottom: 3px;">${dataCurta}</span>
+                                                    <span style="font-size:0.65rem; font-family:'Segoe UI'; color: rgba(255,255,255,0.5);">📍 ${jogo.quadra || 'A Definir'}</span>
 				                                </div>
 				                                <div class="play-info">
 				                                    <h3 style="color: ${corTextoFase}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 8px ${corBg.replace('0.08', '0.6')};">${nomeFaseLimpa}</h3>
 				                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${textoConfrontoCompleto}</p>
-				                                    <p style="font-family: 'Segoe UI'; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">📍 ${jogo.quadra || 'A Definir'}</p>
 				                                </div>
 				                                <button class="btn-play" style="${estiloBotao}" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">${textoBotao}</button>
 				                            </div>

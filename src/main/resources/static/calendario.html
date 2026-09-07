@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calendário Automático - InterclassApp</title>
 
-    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
     <link rel="stylesheet" href="/estilo-global.css">
     <script src="/seguranca.js"></script>
 
@@ -17,7 +16,6 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
-        /* CSS EXCLUSIVO DO CALENDÁRIO */
         body { 
             background: var(--bg-gradient); 
             background-size: 400% 400%; 
@@ -69,7 +67,6 @@
         .tab-btn { background: rgba(0,0,0,0.4); border: 1px solid transparent; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; color: rgba(255,255,255,0.6); cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.9rem; white-space: nowrap; }
         .tab-btn.active { background: rgba(0, 242, 254, 0.1); color: var(--theme-primary); border-color: rgba(0, 242, 254, 0.3); border-bottom: 2px solid var(--theme-primary); text-shadow: 0 0 5px var(--theme-glow); }
 
-        /* 🔥 CSS DA VISÃO MINI-BRACKET SIMBÓLICO (CARROSSEL) 🔥 */
         .mini-bracket-wrapper { display: flex; justify-content: flex-start; align-items: center; gap: 15px; padding: 15px 5px 25px 5px; overflow-x: auto; scroll-snap-type: x mandatory; background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%); border-radius: 12px; }
         .mini-col { display: flex; flex-direction: column; justify-content: space-around; gap: 15px; position: relative; scroll-snap-align: start; flex-shrink: 0; min-width: 145px;}
         .mini-match { background: linear-gradient(180deg, rgba(30,30,30,0.95) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; width: 100%; position: relative; z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
@@ -712,10 +709,15 @@
 		                    let espSetup = setupData.esportes.find(e => e.id === partida.espObj.id);
 		                    let tipoDisputa = espSetup ? (espSetup.tipoDisputa || 'coletiva') : 'coletiva';
 
+		                    // 🔥 CORREÇÃO: ENVIANDO DATAJOGO E HORARIO PARA O BACKEND 🔥
 		                    jogosGeradosGlobais.push({
 		                        id: idJogoGlobal++, 
 		                        diaId: dia.idStr, 
+		                        dataJogo: dia.idStr, // Variável que o Java espera
+                                data: dia.idStr, // 🔥 ADICIONADO POR SEGURANÇA
+                                dia: dia.idStr,  // 🔥 ADICIONADO POR SEGURANÇA
 		                        hora: horaDoJogo, 
+		                        horario: horaDoJogo, // Variável que o Java espera
 		                        esporte: partida.espObj.nome,
 		                        icone: partida.espObj.icone, 
 		                        genero: setupData.genero, 
@@ -747,7 +749,7 @@
             let mapaDias = {};
             
             todosOsJogosParaRender.forEach(j => {
-                let dId = j.diaId || j.dataJogo;
+                let dId = j.diaId || j.dataJogo || j.data || j.dia; // 🔥 CORREÇÃO: Lê todas variações
                 if (!mapaDias[dId]) {
                     let dObj = diasGeradosGlobais.find(d => d.idStr === dId);
                     mapaDias[dId] = dObj ? dObj.titulo : dId;
@@ -757,12 +759,11 @@
             let diasOrdenados = Object.keys(mapaDias).sort();
 
             diasOrdenados.forEach(diaId => {
-                let jogosDoDia = todosOsJogosParaRender.filter(j => (j.diaId || j.dataJogo) === diaId);
+                let jogosDoDia = todosOsJogosParaRender.filter(j => (j.diaId || j.dataJogo || j.data || j.dia) === diaId); // 🔥 CORREÇÃO
                 
-                // 🔥 PROTEÇÃO ABSOLUTA DA ORDENAÇÃO NA ABA GERAL 🔥
                 jogosDoDia.sort((a, b) => {
-                    let horaA = a.hora || "";
-                    let horaB = b.hora || "";
+                    let horaA = a.hora || a.horario || "";
+                    let horaB = b.hora || b.horario || "";
                     if(horaA !== horaB) return horaA.localeCompare(horaB);
                     return (a.id || 0) - (b.id || 0);
                 });
@@ -778,7 +779,7 @@
                     
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-${jogo.id}">
-                            <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora || "--:--")}</div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora || jogo.horario || "--:--")}</div>
                             <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo || "")}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
@@ -810,13 +811,12 @@
             esportesNomes.forEach(nomeEsp => {
                 let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
                 
-                // 🔥 PROTEÇÃO ABSOLUTA DA ORDENAÇÃO NA ABA POR ESPORTE 🔥
                 jogosDoEsporte.sort((a, b) => {
-                    let diaA = a.diaId || a.dataJogo || ""; 
-                    let diaB = b.diaId || b.dataJogo || "";
+                    let diaA = a.diaId || a.dataJogo || a.data || a.dia || ""; // 🔥 CORREÇÃO
+                    let diaB = b.diaId || b.dataJogo || b.data || b.dia || "";
                     if (diaA === diaB) {
-                        let horaA = a.hora || "";
-                        let horaB = b.hora || "";
+                        let horaA = a.hora || a.horario || "";
+                        let horaB = b.hora || b.horario || "";
                         if(horaA !== horaB) return horaA.localeCompare(horaB);
                         return (a.id || 0) - (b.id || 0);
                     }
@@ -826,8 +826,9 @@
 
                 let jogosHtml = '';
                 jogosDoEsporte.forEach(jogo => {
-                    let dataObj = diasGeradosGlobais.find(d => d.idStr === (jogo.diaId || jogo.dataJogo));
-                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : ((jogo.diaId || jogo.dataJogo) || "").split('-').reverse().slice(0,2).join('/');
+                    let dIdStr = jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia; // 🔥 CORREÇÃO
+                    let dataObj = diasGeradosGlobais.find(d => d.idStr === dIdStr);
+                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : (dIdStr || "").split('-').reverse().slice(0,2).join('/');
                     
                     let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
                     let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
@@ -836,7 +837,7 @@
 
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-esp-${jogo.id}">
-                            <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora || "--:--")}</span></div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora || jogo.horario || "--:--")}</span></div>
                             <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.titulo || "")}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
@@ -994,7 +995,7 @@
 
             document.getElementById('edit-jogo-id').value = jogo.id;
             document.getElementById('edit-jogo-nome').innerHTML = `${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)} - ${HighTechSecurity.sanitizar(jogo.titulo)}`;
-            document.getElementById('edit-hora').value = jogo.hora;
+            document.getElementById('edit-hora').value = jogo.hora || jogo.horario || "";
 
             const selectDia = document.getElementById('edit-dia');
             selectDia.innerHTML = '';
@@ -1002,12 +1003,13 @@
             let mapaDiasDropdown = {};
             diasGeradosGlobais.forEach(d => { mapaDiasDropdown[d.idStr] = d.titulo; });
             jogosExistentesGlobais.forEach(j => {
-                let dId = j.diaId || j.dataJogo;
+                let dId = j.diaId || j.dataJogo || j.data || j.dia; // 🔥 CORREÇÃO
                 if (dId && !mapaDiasDropdown[dId]) { mapaDiasDropdown[dId] = dId; }
             });
 
+            let jogoDataAtual = jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia; // 🔥 CORREÇÃO
             Object.keys(mapaDiasDropdown).forEach(dId => {
-                let isSelected = (dId === jogo.diaId || dId === jogo.dataJogo) ? "selected" : "";
+                let isSelected = (dId === jogoDataAtual) ? "selected" : "";
                 selectDia.innerHTML += `<option value="${dId}" ${isSelected}>${HighTechSecurity.sanitizar(mapaDiasDropdown[dId])}</option>`;
             });
 
@@ -1024,13 +1026,20 @@
 
         function fecharModal() { document.getElementById('modal-edicao').style.display = 'none'; }
 
+        // 🔥 CORREÇÃO: MODAL DE EDIÇÃO AGORA TAMBÉM INJETA AS VARIÁVEIS DO JAVA 🔥
         function salvarEdicaoJogo() {
             const id = parseInt(document.getElementById('edit-jogo-id').value);
             let jogo = jogosGeradosGlobais.find(j => j.id === id) || jogosExistentesGlobais.find(j => j.id === id);
             
             if(jogo) {
                 jogo.diaId = document.getElementById('edit-dia').value;
+                jogo.dataJogo = document.getElementById('edit-dia').value; 
+                jogo.data = document.getElementById('edit-dia').value; // 🔥 ADICIONADO POR SEGURANÇA
+                jogo.dia = document.getElementById('edit-dia').value;  // 🔥 ADICIONADO POR SEGURANÇA
+                
                 jogo.hora = document.getElementById('edit-hora').value;
+                jogo.horario = document.getElementById('edit-hora').value; 
+                
                 jogo.quadra = document.getElementById('edit-quadra').value;
             }
 
@@ -1052,7 +1061,7 @@
             let mapaDias = {};
             diasGeradosGlobais.forEach(d => { mapaDias[d.idStr] = d; });
             jogosExistentesGlobais.forEach(j => {
-                let dId = j.diaId || j.dataJogo;
+                let dId = j.diaId || j.dataJogo || j.data || j.dia; // 🔥 CORREÇÃO
                 if (dId && !mapaDias[dId]) { mapaDias[dId] = { idStr: dId, titulo: dId, partidasPendentes: [] }; }
             });
             diasFinais = Object.values(mapaDias);

@@ -46,6 +46,10 @@ public class JogoService {
 
                 String generoJogo = jData.get("genero") != null ? jData.get("genero").toString() : generoDefault;
                 String diaId = jData.get("diaId") != null ? jData.get("diaId").toString() : (jData.get("dataJogo") != null ? jData.get("dataJogo").toString() : "");
+                
+                // 🔥 CORREÇÃO 1: Extraindo a variável 'hora' ou 'horario' enviada pelo front-end
+                String horaStr = jData.get("hora") != null ? jData.get("hora").toString() : (jData.get("horario") != null ? jData.get("horario").toString() : "");
+
                 String icone = jData.get("icone") != null ? jData.get("icone").toString() : "🏅";
                 String quadra = jData.get("quadra") != null ? jData.get("quadra").toString() : "";
                 String eqA = jData.get("equipeANome") != null ? jData.get("equipeANome").toString() : "";
@@ -54,8 +58,6 @@ public class JogoService {
                 String titulo = jData.get("titulo") != null ? jData.get("titulo").toString() : "";
 
                 injetarDado(jogo, "setGenero", generoJogo);
-                injetarDado(jogo, "setDataJogo", diaId);
-                injetarDado(jogo, "setDiaId", diaId);
                 injetarDado(jogo, "setIcone", icone);
                 injetarDado(jogo, "setIconeEsporte", icone);
                 injetarDado(jogo, "setQuadra", quadra);
@@ -63,6 +65,19 @@ public class JogoService {
                 injetarDado(jogo, "setEquipeBNome", eqB);
                 injetarDado(jogo, "setEsporte", esporte);
                 injetarDado(jogo, "setTitulo", titulo);
+
+                // 🔥 CORREÇÃO 2: Convertendo String do JavaScript para os tipos LocalDate e LocalTime exigidos pela Entidade Jogo.java 🔥
+                try {
+                    if (diaId != null && !diaId.isEmpty()) {
+                        jogo.setDataJogo(java.time.LocalDate.parse(diaId.split("T")[0])); 
+                    }
+                } catch (Exception e) { System.out.println("Aviso: Falha ao formatar Data."); }
+
+                try {
+                    if (horaStr != null && !horaStr.isEmpty()) {
+                        jogo.setHorario(java.time.LocalTime.parse(horaStr));
+                    }
+                } catch (Exception e) { System.out.println("Aviso: Falha ao formatar Hora."); }
 
                 jogoRepository.save(jogo);
             }
