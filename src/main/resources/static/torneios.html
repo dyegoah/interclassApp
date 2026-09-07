@@ -46,6 +46,30 @@
         
         .alerta-bloqueio { background: rgba(255,0,85,0.1); border: 1px solid #ff0055; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 0 15px rgba(255,0,85,0.2); }
         .alerta-aviso { background: rgba(255,215,0,0.1); border: 1px solid #ffd700; padding: 10px; border-radius: 8px; margin-top: 15px; }
+
+        /* 🔥 REGRAS DE RESPONSIVIDADE EXTREMA PARA TORNEIOS.HTML 🔥 */
+        @media (max-width: 850px) {
+            .grid-2 { grid-template-columns: 1fr !important; gap: 15px !important; }
+            .glass { padding: 15px 5px !important; border-radius: 12px !important; }
+            .torneio-card { padding: 15px 10px !important; border-radius: 10px !important; margin-bottom: 15px !important; }
+            .stepper-container { padding: 15px 5px !important; margin-bottom: 15px !important; }
+            .info-balloon { padding: 15px 10px !important; font-size: 0.9rem !important; }
+            
+            /* Ajuste de Botões de Rodapé */
+            .botoes-rodape { flex-direction: column !important; gap: 15px !important; width: 100%; padding-bottom: 90px !important; }
+            .botoes-rodape button { width: 100% !important; margin: 0 !important; }
+            
+            /* Força a barra de rolagem a criar espaço no fundo */
+            .arena-container { padding-bottom: 100px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .glass { padding: 15px 0px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+            /* Afastamento leve da borda (8px) para o texto não colar nas paredes da tela */
+            .torneio-card { padding: 15px 8px !important; border-left: none !important; border-right: none !important; border-radius: 8px !important; }
+            .info-balloon { padding: 15px 8px !important; border-radius: 8px !important; border-left: none !important; border-right: none !important; }
+            .arena-container { padding-left: 0 !important; padding-right: 0 !important; }
+        }
     </style>
 </head>
 <body>
@@ -65,7 +89,7 @@
         </div>
 
         <div class="glass" style="padding: 2rem; border-radius: 15px; border-top: 4px solid var(--theme-primary);">
-            <h2 class="section-title">⚙️ Passo 3: Regras e Chaveamento</h2>
+            <h2 class="section-title" style="padding: 0 8px;">⚙️ Passo 3: Regras e Chaveamento</h2>
             
             <div class="info-balloon">
                 <strong>💡 Inteligência de Escalação e Disputa:</strong><br>
@@ -78,7 +102,8 @@
                 <p style="text-align: center; color: var(--theme-primary);">⏳ Carregando modalidades e sincronizando alunos inscritos...</p>
             </div>
 
-            <div style="display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
+            <!-- 🔥 Classe botoes-rodape e padding-bottom injetados para salvar o footbar 🔥 -->
+            <div class="botoes-rodape" style="display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; padding-bottom: 90px; padding-left: 8px; padding-right: 8px;">
                 <button class="btn-acao btn-secundario" onclick="window.location.href='/modalidades.html'">🡨 Voltar para Esportes</button>
                 <button class="btn-acao" id="btn-avancar" onclick="salvarConfiguracoes()">Gravar e Avançar para Calendário ➔</button>
             </div>
@@ -291,7 +316,6 @@
                     esp.tipoDisputa = document.getElementById(`tipoDisputa-${esp.id}`).value;
                     esp.configurado = true;
                     
-                    // 🔥 CORREÇÃO: Injetando o nome correto e o ícone para não dar "Modalidade Desconhecida"
                     let modBase = modalidadeDefs.find(m => m.id === esp.id);
                     if (modBase) {
                         esp.nome = modBase.nome;

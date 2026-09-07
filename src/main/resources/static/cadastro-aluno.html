@@ -12,7 +12,6 @@
    <meta name="theme-color" content="#05050f">
    <link rel="apple-touch-icon" href="/img/icon-192x192.png">
    <style>
-   /* CSS EXCLUSIVO DA FOTO DO ALUNO */
    .profile-pic-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
    .profile-pic-wrapper { position: relative; width: 100px; height: 100px; border-radius: 50%; padding: 4px; background: #333; cursor: pointer; transition: 0.3s; }
    .profile-pic-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #05050f; }
@@ -60,6 +59,10 @@
                <label>3. Seu Nome Completo</label>
                <input type="text" id="nomeAluno" required minlength="2" maxlength="50" placeholder="Ex: João da Silva">
            </div>
+           
+           <!-- 🍯 A ARMADILHA HONEYPOT: Invisível para o humano, visível para o robô. -->
+           <input type="text" id="telefone_secundario" name="telefone_secundario" style="opacity: 0; position: absolute; top: 0; left: -9999px; z-index: -1;" autocomplete="off" tabindex="-1">
+           
            <div class="form-group">
                <label>4. Sua Turma / Equipe</label>
                <select id="turmaAluno" required>
@@ -98,6 +101,13 @@
                    </optgroup>
                </select>
            </div>
+
+           <!-- 🧠 CAPTCHA MATEMÁTICO: Bloqueia 90% dos robôs simples de spam -->
+           <div class="form-group" style="background: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 8px; border: 1px dashed #ffd700; margin-bottom: 20px;">
+               <label id="captcha-question" style="color: #ffd700; font-family: 'Orbitron'; font-size: 0.85rem;">🛡️ Desafio Anti-Spam: Quanto é ? + ?</label>
+               <input type="number" id="captcha-answer" required placeholder="Digite a resposta" style="margin-top: 5px; text-align: center; font-size: 1.2rem; font-weight: bold; font-family: 'Orbitron';">
+           </div>
+
            <button type="submit" class="btn-submit" id="btn-submit">Confirmar Inscrição</button>
        </form>
    </div>
@@ -115,6 +125,12 @@
    ];
 
    window.onload = async () => {
+       // 🔥 GERA O DESAFIO MATEMÁTICO DO CAPTCHA 🔥
+       let n1 = Math.floor(Math.random() * 10) + 1;
+       let n2 = Math.floor(Math.random() * 10) + 1;
+       window.captchaResposta = n1 + n2;
+       document.getElementById('captcha-question').innerHTML = `🛡️ Verificação: Quanto é <b>${n1} + ${n2}</b>?`;
+
        if (!professorHashPublico) {
            document.getElementById('loading-esportes').innerText = "❌ Link de inscrição inválido.";
            return;
@@ -204,9 +220,19 @@
 
    async function inscreverAluno(event) {
        event.preventDefault();
+       
+       // 🔥 VALIDAÇÃO DO CAPTCHA 🔥
+       const captchaDigitado = parseInt(document.getElementById('captcha-answer').value);
+       if (captchaDigitado !== window.captchaResposta) {
+           mostrarAlerta("⚠ Resposta de segurança (Soma) incorreta! Tente novamente.", "danger");
+           document.getElementById('captcha-answer').value = '';
+           return;
+       }
+
        const generoEscolhido = document.getElementById('generoAluno').value;
        const esporteEscolhido = document.getElementById('esporteAluno').value;
        const turmaEscolhida = document.getElementById('turmaAluno').value;
+       const iscaHoneypot = document.getElementById('telefone_secundario').value; // Pega o que o robô digitou
 
        if(!generoEscolhido) { mostrarAlerta("⚠ Selecione a sua categoria.", "danger"); return; }
        if(!esporteEscolhido) { mostrarAlerta("⚠ Selecione uma Modalidade válida (disponível).", "danger"); return; }
@@ -225,7 +251,8 @@
            fotoUrl: fotoBase64,
            esporte: modalidadeObj.esporte,
            iconeEsporte: modalidadeObj.icone,
-           genero: generoEscolhido
+           genero: generoEscolhido,
+           honeypot: iscaHoneypot // 🍯 Envia a isca junto!
        };
 
        try {
@@ -242,6 +269,13 @@
                mudarCorDaBorda("");
                fotoBase64 = "";
                btnSubmit.innerHTML = "Inscrição Concluída! ✔";
+               
+               // Reseta o CAPTCHA
+               let n1 = Math.floor(Math.random() * 10) + 1;
+               let n2 = Math.floor(Math.random() * 10) + 1;
+               window.captchaResposta = n1 + n2;
+               document.getElementById('captcha-question').innerHTML = `🛡️ Verificação: Quanto é <b>${n1} + ${n2}</b>?`;
+               
            } else {
                const msgErro = await response.text();
                mostrarAlerta("❌ " + msgErro, "danger");

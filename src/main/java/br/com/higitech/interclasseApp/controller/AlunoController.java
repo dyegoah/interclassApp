@@ -20,6 +20,9 @@ import br.com.higitech.interclasseApp.model.Aluno;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.AlunoRepository;
 import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
+// 🔥 IMPORTS DE SEGURANÇA ADICIONADOS AQUI 🔥
+import br.com.higitech.interclasseApp.service.LoginAttemptService;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/alunos")
@@ -31,6 +34,10 @@ public class AlunoController {
     @Autowired
     private ProfessorRepository professorRepository;
 
+    // 🔥 SERVIÇO DE LOGS DE AUDITORIA INJETADO AQUI 🔥
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
     public static class InscricaoRequestDTO {
         public String nome;
         public String turma;
@@ -38,13 +45,24 @@ public class AlunoController {
         public String esporte;
         public String iconeEsporte;
         public String genero;
+        public String honeypot; // 🍯 O Pote de Mel (Campo Invisível)
     }
 
     // ==========================================
     // ROTAS DE INSCRIÇÃO DOS ALUNOS
     // ==========================================
+    // 🔥 Capturamos o HttpServletRequest para saber a Cidade e a Internet (IP) do Atacante 🔥
     @PostMapping("/public/{professorHash}")
-    public ResponseEntity<?> inscreverAluno(@PathVariable String professorHash, @RequestBody InscricaoRequestDTO dto) {
+    public ResponseEntity<?> inscreverAluno(@PathVariable String professorHash, @RequestBody InscricaoRequestDTO dto, HttpServletRequest request) {
+        
+        // 🚨 O GOLPE DO HONEYPOT: Se o robô preencheu o campo invisível
+        if (dto.honeypot != null && !dto.honeypot.trim().isEmpty()) {
+            // Registra silenciosamente no painel do Diretor
+            loginAttemptService.registrarLog("SPAM: " + dto.nome, "ATAQUE SPAM BLOQUEADO (HONEYPOT)", request);
+            // Devolve o "Sorriso Irônico" (Finge que cadastrou com sucesso)
+            return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição confirmada na Modalidade!");
+        }
+
         Optional<Professor> profOpt = professorRepository.findByHashPublico(professorHash);
         if (profOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Escola não encontrada. Link inválido.");
@@ -59,11 +77,9 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
         }
 
-        // 🔥 ALTERAÇÃO AQUI: Verifica o limite GERAL de alunos do professor no banco
         long totalAlunos = alunoRepository.countByProfessorId(professor.getId());
 
-        // Trava fixada em 200 (futuramente será dinâmica via SaaS)
-        if (totalAlunos >= 200) {
+        if (totalAlunos >= 250) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O limite total de alunos inscritos para esta instituição foi atingido.");
         }
 

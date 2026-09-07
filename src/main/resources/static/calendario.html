@@ -123,6 +123,36 @@
             .mini-team { color: black !important; }
             .mini-bracket-wrapper { background: white !important; }
         }
+
+        /* 🔥 REGRAS DE RESPONSIVIDADE EXTREMA (CELULARES MODERNOS E DESCOMPRESSÃO DO FOOTBAR) 🔥 */
+        @media (max-width: 850px) {
+            /* Força os blocos que estavam lado a lado a caírem um abaixo do outro */
+            .grid-2 { grid-template-columns: 1fr !important; gap: 15px !important; }
+            
+            /* Encurta o padding do vidro para expandir quase até as bordas da tela */
+            .glass { padding: 15px 5px !important; border-radius: 12px !important; }
+            .config-section { padding: 15px 10px !important; border-radius: 10px !important; margin-bottom: 15px !important; }
+            .stepper-container { padding: 15px 5px !important; margin-bottom: 15px !important; }
+            
+            .dias-group { gap: 5px !important; }
+            .dia-btn { flex: 1 1 30%; text-align: center; padding: 10px 5px !important; font-size: 0.8rem !important; }
+            .switch-container { flex-direction: column; align-items: flex-start; gap: 12px !important; }
+            .switch-container span { line-height: 1.4; display: block; width: 100%; }
+            
+            /* Garante que os botões embaixo se adequem também */
+            .impressao-botoes { flex-direction: column !important; gap: 15px !important; width: 100%; }
+            .impressao-botoes button { width: 100% !important; margin: 0 !important; }
+            
+            /* 🔥 Joga um preenchimento extra no fundo da página para que o Footbar não cubra nada 🔥 */
+            .arena-container { padding-bottom: 100px !important; }
+        }
+
+        @media (max-width: 480px) {
+            /* Zero bordas em celulares pequenos, aproveitamento 100% total */
+            .glass { padding: 15px 0px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+            .config-section { padding: 15px 8px !important; border-left: none !important; border-right: none !important; border-radius: 8px !important; }
+            .arena-container { padding-left: 0 !important; padding-right: 0 !important; }
+        }
     </style>
 </head>
 <body>
@@ -216,7 +246,8 @@
                     </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 2rem;">
+                <!-- 🔥 Adicionado padding-bottom no bloco de botões para não sobrepor o Footbar 🔥 -->
+                <div style="text-align: center; margin-top: 2rem; padding-bottom: 90px;">
                     <button class="btn-acao" style="width: 100%; font-size: 1.2rem; padding: 1.2rem;" onclick="processarAlgoritmo()">✨ Gerar Calendário Inteligente</button>
                     <button class="btn-secundario" style="margin-top: 15px; padding: 10px 20px; border-radius: 20px; border:none; cursor:pointer;" onclick="window.location.href='/torneios.html'">🡨 Voltar e Alterar Torneios</button>
                 </div>
@@ -252,7 +283,8 @@
                 <div id="calendario-esportes-container" style="display: none;"></div>
                 <div id="calendario-tabela-container" style="display: none;"></div>
 
-                <div style="display: flex; justify-content: space-between; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;" class="impressao-botoes">
+                <!-- 🔥 Adicionado padding-bottom extra nos botões finais 🔥 -->
+                <div style="display: flex; justify-content: space-between; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; padding-bottom: 90px; flex-wrap: wrap; gap: 15px;" class="impressao-botoes">
                     <button class="btn-acao btn-secundario" onclick="refazerCalendario()">🡨 Refazer Parâmetros</button>
                     <button class="btn-acao" onclick="finalizarSetupInteiro()">Salvar Tabela Oficial e Abrir Inscrições ➔</button>
                 </div>
