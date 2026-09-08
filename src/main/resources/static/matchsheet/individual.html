@@ -95,6 +95,11 @@
 <body>
 
     <div class="header-especial glass">
+        <!-- 🔥 BOTÃO DE GIRAR TELA 🔥 -->
+        <div style="position: absolute; right: 15px; top: 15px; display: flex; gap: 8px;">
+            <button style="background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;" onclick="girarTela()" title="Girar Tela (Horizontal)">🔄</button>
+        </div>
+
         <div class="header-info-esporte" id="lbl-esporte">SÚMULA 1 VS 1</div>
         
         <div class="placar-board">
@@ -168,6 +173,26 @@
     </div>
 
     <script>
+        // 🔥 FUNÇÃO DE GIRAR TELA 🔥
+        function girarTela() {
+            let elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock("landscape").catch(function(error) {
+                            console.log("Orientação automática não suportada nativamente: " + error);
+                        });
+                    }
+                }).catch(err => {
+                    alert(`Não foi possível entrar em tela cheia: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
         let jogoId = parseInt(new URLSearchParams(window.location.search).get('jogo'));
         let lote = new URLSearchParams(window.location.search).get('lote') || 'masculino';
         let modoLeitura = new URLSearchParams(window.location.search).get('read') === 'true';

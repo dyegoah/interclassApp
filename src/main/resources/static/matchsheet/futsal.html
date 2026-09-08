@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Súmula Futsal - InterclassApp</title>
     
-    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
     <link rel="stylesheet" href="/estilo-global.css">
     <script src="/seguranca.js"></script>
 
@@ -16,11 +15,10 @@
 	<link rel="apple-touch-icon" href="/img/icon-192x192.png">
 	
     <style>
-        /* CSS EXCLUSIVO DA SÚMULA DE FUTSAL */
         :root { --theme-primary: #00f2fe; --team-a: #00f2fe; --team-b: #ff00de; }
         
         body { background: #020111 !important; overflow-x: hidden; }
-        .arena-container { padding: 1.5rem; } /* Ajuste fino de borda da súmula */
+        .arena-container { padding: 1.5rem; } 
         
         .futsal-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 15px 20px; border-radius: 15px; border-bottom: 2px solid #00f2fe;}
         .btn-voltar { background: transparent; border: 1px solid #fff; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Segoe UI'; font-weight: bold;}
@@ -43,7 +41,6 @@
         .faltas-dots span.active { background: #ffea00; box-shadow: 0 0 5px #ffea00; }
         .faltas-dots.estourado span.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        /* 🔥 LAYOUT ARENA COLETIVA (LINHA DO TEMPO NO MEIO) 🔥 */
         .arena-prancheta { display: flex; width: 100%; margin: 25px auto; gap: 20px; align-items: flex-start; justify-content: center; }
         @media (max-width: 900px) { .arena-prancheta { flex-direction: column; } }
 
@@ -73,7 +70,6 @@
         .timeline-item.evt-b { border-left-color: var(--team-b); }
         .time-stamp { color: #00ff00; font-family: 'Orbitron'; font-weight: bold; width: 55px; font-size: 0.95rem; flex-shrink: 0;}
 
-        /* Modal da Súmula (diferente do Global por causa dos botões internos) */
         .modal-box-sumula { background: #111; border: 1px solid var(--theme-primary); border-radius: 15px; padding: 2rem; width: 90%; max-width: 400px; text-align: center; }
         .modal-box-sumula img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--theme-primary); margin-bottom: 10px; }
         
@@ -90,7 +86,11 @@
     <div class="arena-container">
         
         <div class="futsal-header">
-            <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar PlayHub</button>
+            <!-- 🔥 BOTÃO DE GIRAR TELA INJETADO AQUI 🔥 -->
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar</button>
+                <button class="btn-voltar" style="padding: 8px 12px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;" onclick="girarTela()" title="Girar Tela (Horizontal)">🔄</button>
+            </div>
             
             <div class="crono-box" id="crono-area">
                 <div class="crono-periodo" id="periodo-lbl" onclick="trocarPeriodo()">1º TEMPO (Trocar)</div>
@@ -132,7 +132,6 @@
             </div>
         </div>
 
-        <!-- 🔥 LINHA DO TEMPO CENTRALIZADA 🔥 -->
         <div class="arena-prancheta">
             <div class="coluna-time a" id="lista-a"></div>
             
@@ -148,7 +147,6 @@
 
     </div>
 
-    <!-- Puxando a classe .modal-overlay do estilo global -->
     <div id="modal-acao" class="modal-overlay">
         <div class="modal-box-sumula">
             <img id="acao-foto" src="">
@@ -167,6 +165,26 @@
     </div>
 
     <script>
+        // 🔥 FUNÇÃO DE GIRAR TELA 🔥
+        function girarTela() {
+            let elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock("landscape").catch(function(error) {
+                            console.log("Orientação automática não suportada nativamente: " + error);
+                        });
+                    }
+                }).catch(err => {
+                    alert(`Não foi possível entrar em tela cheia: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const idJogo = parseInt(urlParams.get('jogo'));
         const lote = urlParams.get('lote') || 'masculino';
@@ -312,7 +330,6 @@
                     let estiloLinha = tomouVermelho ? 'border-color: #ff0000; background: rgba(255,0,0,0.1); opacity:0.7;' : '';
                     let pointer = isReadOnly || tomouVermelho ? 'readonly' : '';
                     
-                    // 🔥 CORREÇÃO DE CLIQUE E MUDANÇA VISUAL 🔥
                     let click = '';
                     if (tomouVermelho) {
                         click = `onclick="alert('Jogador expulso.')"`;
@@ -335,7 +352,6 @@
         }
 
         function abrirModal(id, t) {
-            // 🔥 CORREÇÃO DO BUG: COMPARAÇÃO CONVERTIDA PARA STRING 🔥
             jogadorAcao = escalacao[t].find(j => String(j.id) === String(id)); 
             timeAcao = t;
             document.getElementById('acao-foto').src = jogadorAcao.foto;

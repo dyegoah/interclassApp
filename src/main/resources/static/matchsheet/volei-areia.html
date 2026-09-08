@@ -94,7 +94,11 @@
     <div class="arena-container">
         
         <div class="volei-header">
-            <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar PlayHub</button>
+            <!-- 🔥 BOTÃO DE GIRAR TELA 🔥 -->
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-voltar" onclick="window.location.href='/tabelas.html'">🡨 Voltar</button>
+                <button class="btn-voltar" style="padding: 8px 12px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;" onclick="girarTela()" title="Girar Tela (Horizontal)">🔄</button>
+            </div>
             
             <div class="set-display">
                 <div class="set-title" id="set-atual-lbl">1º SET</div>
@@ -180,6 +184,26 @@
     </div>
 
     <script>
+        // 🔥 FUNÇÃO DE GIRAR TELA 🔥
+        function girarTela() {
+            let elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock("landscape").catch(function(error) {
+                            console.log("Orientação automática não suportada nativamente: " + error);
+                        });
+                    }
+                }).catch(err => {
+                    alert(`Não foi possível entrar em tela cheia: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const idJogo = parseInt(urlParams.get('jogo')) || 999;
         const lote = urlParams.get('lote') || 'masculino';

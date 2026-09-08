@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calendário Automático - InterclassApp</title>
 
+    <!-- INJEÇÃO DO CSS E JS GLOBAIS DE ALTA PERFORMANCE -->
     <link rel="stylesheet" href="/estilo-global.css">
     <script src="/seguranca.js"></script>
 
@@ -57,10 +58,10 @@
         
         .jogo-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-family: 'Segoe UI'; font-size: 0.9rem; border: 1px solid transparent; transition: 0.3s; }
         .jogo-item:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
-        .jogo-hora { color: #00ff00; font-weight: bold; font-family: 'Orbitron'; width: 100px; line-height: 1.2;}
+        .jogo-hora { color: #00ff00; font-weight: bold; font-family: 'Orbitron'; width: 100px; line-height: 1.2; flex-shrink: 0;}
         .jogo-desc { flex-grow: 1; padding: 0 15px; }
         .jogo-quadra { color: rgba(255,255,255,0.5); font-size: 0.8rem; display: block;}
-        .btn-edit-jogo { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .btn-edit-jogo { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; flex-shrink: 0;}
         .btn-edit-jogo:hover { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); }
 
         .tabs-container { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; gap: 5px; overflow-x: auto; }
@@ -124,34 +125,34 @@
             .mini-bracket-wrapper { background: white !important; }
         }
 
-        /* 🔥 REGRAS DE RESPONSIVIDADE EXTREMA (CELULARES MODERNOS E DESCOMPRESSÃO DO FOOTBAR) 🔥 */
+        /* 🔥 REGRAS DE RESPONSIVIDADE EXTREMA E MARGENS 🔥 */
         @media (max-width: 850px) {
-            /* Força os blocos que estavam lado a lado a caírem um abaixo do outro */
             .grid-2 { grid-template-columns: 1fr !important; gap: 15px !important; }
-            
-            /* Encurta o padding do vidro para expandir quase até as bordas da tela */
-            .glass { padding: 15px 5px !important; border-radius: 12px !important; }
+            .glass { padding: 15px 10px !important; border-radius: 12px !important; }
             .config-section { padding: 15px 10px !important; border-radius: 10px !important; margin-bottom: 15px !important; }
-            .stepper-container { padding: 15px 5px !important; margin-bottom: 15px !important; }
-            
+            .stepper-container { padding: 15px 8px !important; margin-bottom: 15px !important; }
             .dias-group { gap: 5px !important; }
             .dia-btn { flex: 1 1 30%; text-align: center; padding: 10px 5px !important; font-size: 0.8rem !important; }
             .switch-container { flex-direction: column; align-items: flex-start; gap: 12px !important; }
             .switch-container span { line-height: 1.4; display: block; width: 100%; }
             
-            /* Garante que os botões embaixo se adequem também */
-            .impressao-botoes { flex-direction: column !important; gap: 15px !important; width: 100%; }
+            .impressao-botoes { flex-direction: column !important; gap: 15px !important; width: 100%; padding-bottom: 140px !important; }
             .impressao-botoes button { width: 100% !important; margin: 0 !important; }
-            
-            /* 🔥 Joga um preenchimento extra no fundo da página para que o Footbar não cubra nada 🔥 */
-            .arena-container { padding-bottom: 100px !important; }
+            .arena-container { padding-bottom: 140px !important; }
         }
 
         @media (max-width: 480px) {
-            /* Zero bordas em celulares pequenos, aproveitamento 100% total */
-            .glass { padding: 15px 0px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
-            .config-section { padding: 15px 8px !important; border-left: none !important; border-right: none !important; border-radius: 8px !important; }
-            .arena-container { padding-left: 0 !important; padding-right: 0 !important; }
+            /* Deixa uma margem lateral leve (6px) para não colar nas paredes */
+            .arena-container { padding-left: 6px !important; padding-right: 6px !important; }
+            .glass { padding: 15px 8px !important; border-radius: 10px !important; border-left: none !important; border-right: none !important; }
+            .config-section { padding: 15px 8px !important; border-radius: 8px !important; }
+            
+            .dia-card { margin-left: 0 !important; margin-right: 0 !important; border-radius: 10px !important; border-left-width: 4px !important; }
+            .dia-header { padding: 10px !important; }
+            .jogo-item { padding: 12px 10px !important; border-radius: 8px !important; flex-direction: column; align-items: flex-start; gap: 10px; }
+            .jogo-hora { width: 100% !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; }
+            .jogo-desc { padding: 0 !important; width: 100%; }
+            .btn-edit-jogo { width: 100%; margin-top: 10px; padding: 10px !important; }
         }
     </style>
 </head>
@@ -246,8 +247,7 @@
                     </div>
                 </div>
 
-                <!-- 🔥 Adicionado padding-bottom no bloco de botões para não sobrepor o Footbar 🔥 -->
-                <div style="text-align: center; margin-top: 2rem; padding-bottom: 90px;">
+                <div style="text-align: center; margin-top: 2rem;">
                     <button class="btn-acao" style="width: 100%; font-size: 1.2rem; padding: 1.2rem;" onclick="processarAlgoritmo()">✨ Gerar Calendário Inteligente</button>
                     <button class="btn-secundario" style="margin-top: 15px; padding: 10px 20px; border-radius: 20px; border:none; cursor:pointer;" onclick="window.location.href='/torneios.html'">🡨 Voltar e Alterar Torneios</button>
                 </div>
@@ -283,8 +283,7 @@
                 <div id="calendario-esportes-container" style="display: none;"></div>
                 <div id="calendario-tabela-container" style="display: none;"></div>
 
-                <!-- 🔥 Adicionado padding-bottom extra nos botões finais 🔥 -->
-                <div style="display: flex; justify-content: space-between; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; padding-bottom: 90px; flex-wrap: wrap; gap: 15px;" class="impressao-botoes">
+                <div style="display: flex; justify-content: space-between; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; flex-wrap: wrap; gap: 15px;" class="impressao-botoes">
                     <button class="btn-acao btn-secundario" onclick="refazerCalendario()">🡨 Refazer Parâmetros</button>
                     <button class="btn-acao" onclick="finalizarSetupInteiro()">Salvar Tabela Oficial e Abrir Inscrições ➔</button>
                 </div>
@@ -438,6 +437,9 @@
             return quadrasDisponiveis[0]; 
         }
 
+        // 🔥 PROTEÇÃO ANTI-FALHA DE RENDERIZAÇÃO 🔥
+        const safeStr = (str) => str ? String(str) : "";
+
         function processarAlgoritmo() {
             const dtInicio = document.getElementById('data-inicio').value;
             const dtFim = document.getElementById('data-fim').value;
@@ -483,11 +485,19 @@
             document.getElementById('calendario-config').style.display = 'none';
             document.getElementById('ai-loading').style.display = 'block';
 
+            // 🔥 TRATAMENTO DE ERROS INJETADO PARA NÃO TRAVAR A TELA E MOSTRAR O MOTIVO 🔥
             setTimeout(() => {
-                gerarEstruturaDeDados(dtInicio, dtFim);
-                renderizarVisualizacoes();
-                document.getElementById('ai-loading').style.display = 'none';
-                document.getElementById('calendario-result').style.display = 'block';
+                try {
+                    gerarEstruturaDeDados(dtInicio, dtFim);
+                    renderizarVisualizacoes();
+                    document.getElementById('ai-loading').style.display = 'none';
+                    document.getElementById('calendario-result').style.display = 'block';
+                } catch(err) {
+                    console.error("Erro interno ao gerar o calendário:", err);
+                    alert("⚠️ Ocorreu um pequeno erro ao organizar os dados (provavelmente resíduos de jogos antigos). As datas serão resetadas por segurança. Detalhes no console.");
+                    document.getElementById('ai-loading').style.display = 'none';
+                    document.getElementById('calendario-config').style.display = 'block';
+                }
             }, 1500);
         }
 
@@ -745,11 +755,11 @@
 		                    jogosGeradosGlobais.push({
 		                        id: idJogoGlobal++, 
 		                        diaId: dia.idStr, 
-		                        dataJogo: dia.idStr, // Variável que o Java espera
-                                data: dia.idStr, // 🔥 ADICIONADO POR SEGURANÇA
-                                dia: dia.idStr,  // 🔥 ADICIONADO POR SEGURANÇA
+		                        dataJogo: dia.idStr, 
+                                data: dia.idStr, 
+                                dia: dia.idStr,  
 		                        hora: horaDoJogo, 
-		                        horario: horaDoJogo, // Variável que o Java espera
+		                        horario: horaDoJogo, 
 		                        esporte: partida.espObj.nome,
 		                        icone: partida.espObj.icone, 
 		                        genero: setupData.genero, 
@@ -781,8 +791,8 @@
             let mapaDias = {};
             
             todosOsJogosParaRender.forEach(j => {
-                let dId = j.diaId || j.dataJogo || j.data || j.dia; // 🔥 CORREÇÃO: Lê todas variações
-                if (!mapaDias[dId]) {
+                let dId = safeStr(j.diaId || j.dataJogo || j.data || j.dia); // 🔥 CORREÇÃO 
+                if (dId && !mapaDias[dId]) {
                     let dObj = diasGeradosGlobais.find(d => d.idStr === dId);
                     mapaDias[dId] = dObj ? dObj.titulo : dId;
                 }
@@ -791,7 +801,7 @@
             let diasOrdenados = Object.keys(mapaDias).sort();
 
             diasOrdenados.forEach(diaId => {
-                let jogosDoDia = todosOsJogosParaRender.filter(j => (j.diaId || j.dataJogo || j.data || j.dia) === diaId); // 🔥 CORREÇÃO
+                let jogosDoDia = todosOsJogosParaRender.filter(j => safeStr(j.diaId || j.dataJogo || j.data || j.dia) === diaId);
                 
                 jogosDoDia.sort((a, b) => {
                     let horaA = a.hora || a.horario || "";
@@ -807,12 +817,34 @@
                     let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
                     let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
                     
-                    let corTexto = jogo.titulo && (jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA")) ? "#ffee00" : "rgba(255,255,255,0.7)";
+                    let tituloStr = safeStr(jogo.titulo || "Aguardando");
+                    let partesTitulo = tituloStr.split(' | ');
+                    let faseTagOriginal = partesTitulo.length >= 3 ? partesTitulo[1].trim() : (partesTitulo.length === 2 ? partesTitulo[0].trim() : partesTitulo[0].trim());
+                    let faseTagSemTrofeu = faseTagOriginal.replace('🏆', '').trim();
+                    let matchJogo = faseTagSemTrofeu.match(/(\(Jogo \d+\))/i);
+                    let nomeFaseLimpa = matchJogo ? faseTagSemTrofeu.replace(matchJogo[0], '').trim() : faseTagSemTrofeu;
+                    if (faseTagOriginal.includes('🏆')) nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
+
+                    let confrontoBruto = partesTitulo.length >= 3 ? partesTitulo[2].trim() : (partesTitulo.length === 2 ? partesTitulo[1].trim() : "Aguardando Vencedores");
+                    let confrontoSanitizado = HighTechSecurity.sanitizar(confrontoBruto);
+                    let textoConfrontoCompleto = matchJogo ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${matchJogo[1]}</span> ${confrontoSanitizado}` : confrontoSanitizado;
+                    
+                    let horaFormatada = safeStr(jogo.hora || jogo.horario || "--:--").substring(0, 5);
+                    let iconeSeguro = safeStr(jogo.icone || '🏅');
+                    let esporteSeguro = safeStr(jogo.esporte || 'Partida');
+                    let quadraSegura = safeStr(jogo.quadra || 'A Definir');
+                    
+                    let corTexto = tituloStr.includes("FINAL") || tituloStr.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
                     
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-${jogo.id}">
-                            <div class="jogo-hora">${HighTechSecurity.sanitizar(jogo.hora || jogo.horario || "--:--")}</div>
-                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)}</b> <span style="color:${corTexto};">- ${HighTechSecurity.sanitizar(jogo.titulo || "")}</span> <span class="jogo-quadra">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
+                            <div class="jogo-hora">${HighTechSecurity.sanitizar(horaFormatada)}</div>
+                            <div class="jogo-desc">
+                                ${badgeAntigo}<b>${HighTechSecurity.sanitizar(iconeSeguro)} ${HighTechSecurity.sanitizar(esporteSeguro)}</b> 
+                                <span style="color:${corTexto}; display: block; margin-top: 4px; font-weight: bold; font-family: 'Orbitron'; font-size: 0.8rem;">${HighTechSecurity.sanitizar(nomeFaseLimpa)}</span>
+                                <span style="display: block; margin-top: 2px;">${textoConfrontoCompleto}</span> 
+                                <span class="jogo-quadra" style="margin-top: 4px;">📍 ${HighTechSecurity.sanitizar(quadraSegura)}</span>
+                            </div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
@@ -838,13 +870,13 @@
             container.innerHTML = '';
             
             let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
-            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => j.esporte))];
+            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => safeStr(j.esporte)))];
 
             esportesNomes.forEach(nomeEsp => {
-                let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
+                let jogosDoEsporte = todosOsJogosParaRender.filter(j => safeStr(j.esporte) === nomeEsp);
                 
                 jogosDoEsporte.sort((a, b) => {
-                    let diaA = a.diaId || a.dataJogo || a.data || a.dia || ""; // 🔥 CORREÇÃO
+                    let diaA = a.diaId || a.dataJogo || a.data || a.dia || ""; 
                     let diaB = b.diaId || b.dataJogo || b.data || b.dia || "";
                     if (diaA === diaB) {
                         let horaA = a.hora || a.horario || "";
@@ -858,24 +890,48 @@
 
                 let jogosHtml = '';
                 jogosDoEsporte.forEach(jogo => {
-                    let dIdStr = jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia; // 🔥 CORREÇÃO
+                    let dIdStr = safeStr(jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia); 
                     let dataObj = diasGeradosGlobais.find(d => d.idStr === dIdStr);
-                    let dataCurta = dataObj ? dataObj.titulo.split('-')[0].trim().substring(0, 5) : (dIdStr || "").split('-').reverse().slice(0,2).join('/');
+                    let dataCurta = dataObj ? safeStr(dataObj.titulo).split('-')[0].trim().substring(0, 5) : dIdStr.split('-').reverse().slice(0,2).join('/');
                     
                     let isAntigo = jogosExistentesGlobais.some(je => je.id === jogo.id);
                     let badgeAntigo = isAntigo ? `<span style="font-size:0.65rem; background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding:2px 6px; border-radius:4px; color:#aaa; margin-right:8px; font-weight: bold;">ANTIGO</span>` : `<span style="font-size:0.65rem; background:rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); padding:2px 6px; border-radius:4px; color:#00ff00; margin-right:8px; font-weight: bold;">NOVO</span>`;
                     
-                    let corTexto = jogo.titulo && (jogo.titulo.includes("FINAL") || jogo.titulo.includes("ÚLTIMA RODADA")) ? "#ffee00" : "rgba(255,255,255,0.7)";
+                    let tituloStr = safeStr(jogo.titulo || "Aguardando");
+                    let partesTitulo = tituloStr.split(' | ');
+                    let faseTagOriginal = partesTitulo.length >= 3 ? partesTitulo[1].trim() : (partesTitulo.length === 2 ? partesTitulo[0].trim() : partesTitulo[0].trim());
+                    let faseTagSemTrofeu = faseTagOriginal.replace('🏆', '').trim();
+                    let matchJogo = faseTagSemTrofeu.match(/(\(Jogo \d+\))/i);
+                    let nomeFaseLimpa = matchJogo ? faseTagSemTrofeu.replace(matchJogo[0], '').trim() : faseTagSemTrofeu;
+                    if (faseTagOriginal.includes('🏆')) nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
+
+                    let confrontoBruto = partesTitulo.length >= 3 ? partesTitulo[2].trim() : (partesTitulo.length === 2 ? partesTitulo[1].trim() : "Aguardando Vencedores");
+                    let confrontoSanitizado = HighTechSecurity.sanitizar(confrontoBruto);
+                    let textoConfrontoCompleto = matchJogo ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${matchJogo[1]}</span> ${confrontoSanitizado}` : confrontoSanitizado;
+                    
+                    let horaFormatada = safeStr(jogo.hora || jogo.horario || "--:--").substring(0, 5);
+                    let iconeSeguro = safeStr(jogo.icone || '🏅');
+                    let quadraSegura = safeStr(jogo.quadra || 'A Definir');
+                    
+                    let corTexto = tituloStr.includes("FINAL") || tituloStr.includes("ÚLTIMA RODADA") ? "#ffee00" : "rgba(255,255,255,0.7)";
 
                     jogosHtml += `
                         <div class="jogo-item" id="div-jogo-esp-${jogo.id}">
-                            <div class="jogo-hora">${HighTechSecurity.sanitizar(dataCurta)}<br><span style="color:var(--theme-primary);">${HighTechSecurity.sanitizar(jogo.hora || jogo.horario || "--:--")}</span></div>
-                            <div class="jogo-desc">${badgeAntigo}<b>${HighTechSecurity.sanitizar(jogo.titulo || "")}</b> <span class="jogo-quadra" style="color:${corTexto};">| 📍 ${HighTechSecurity.sanitizar(jogo.quadra)}</span></div>
+                            <div class="jogo-hora">
+                                <span style="font-size:0.75rem; color:#aaa; font-family:'Segoe UI'; display:block; margin-bottom:3px;">${HighTechSecurity.sanitizar(dataCurta)}</span>
+                                <span style="color:var(--theme-primary); font-size:1.1rem;">${HighTechSecurity.sanitizar(horaFormatada)}</span>
+                            </div>
+                            <div class="jogo-desc">
+                                ${badgeAntigo}<b>${HighTechSecurity.sanitizar(iconeSeguro)} ${HighTechSecurity.sanitizar(nomeEsp)}</b> 
+                                <span style="color:${corTexto}; display: block; margin-top: 4px; font-weight: bold; font-family: 'Orbitron'; font-size: 0.8rem;">${HighTechSecurity.sanitizar(nomeFaseLimpa)}</span>
+                                <span style="display: block; margin-top: 2px;">${textoConfrontoCompleto}</span> 
+                                <span class="jogo-quadra" style="margin-top: 4px;">📍 ${HighTechSecurity.sanitizar(quadraSegura)}</span>
+                            </div>
                             <button class="btn-edit-jogo" onclick="abrirModalEdicao(${jogo.id})">✏️ Mover</button>
                         </div>
                     `;
                 });
-                let iconeEsp = jogosDoEsporte[0].icone;
+                let iconeEsp = safeStr(jogosDoEsporte[0].icone || '🏅');
                 container.innerHTML += `
                     <div class="dia-card">
                         <div class="dia-header"><h5>${HighTechSecurity.sanitizar(iconeEsp)} ${HighTechSecurity.sanitizar(nomeEsp)}</h5><span style="font-family: 'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5);">${jogosDoEsporte.length} Partidas</span></div>
@@ -890,13 +946,13 @@
 		            container.innerHTML = '';
 		            
 		            let todosOsJogosParaRender = [...jogosExistentesGlobais, ...jogosGeradosGlobais];
-		            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => j.esporte))];
+		            let esportesNomes = [...new Set(todosOsJogosParaRender.map(j => safeStr(j.esporte)))];
 
 		            esportesNomes.forEach(nomeEsp => {
-		                let jogosDoEsporte = todosOsJogosParaRender.filter(j => j.esporte === nomeEsp);
+		                let jogosDoEsporte = todosOsJogosParaRender.filter(j => safeStr(j.esporte) === nomeEsp);
 		                if (jogosDoEsporte.length === 0) return;
 		                
-		                let iconeEsp = jogosDoEsporte[0].icone;
+		                let iconeEsp = safeStr(jogosDoEsporte[0].icone || '🏅');
 		                
 		                let espSetup = setupData.esportes.find(e => {
 		                    let m = modalidadeDefs.find(md => md.id === e.id);
@@ -937,7 +993,16 @@
 		                    <div class="mini-bracket-wrapper">
 		                        ${jogosDoEsporte.map(j => {
 		                            let eqs = extrairEqs(j);
-		                            let faseStr = j.titulo ? j.titulo.split(' | ')[0] : 'Confronto';
+		                            
+                                    let tituloOriginalSeguro = safeStr(j.titulo || "Aguardando");
+                                    let partesTitulo = tituloOriginalSeguro.split(' | ');
+                                    let faseTagOriginal = partesTitulo.length >= 3 ? partesTitulo[1].trim() : (partesTitulo.length === 2 ? partesTitulo[0].trim() : partesTitulo[0].trim());
+                                    let faseTagSemTrofeu = faseTagOriginal.replace('🏆', '').trim();
+                                    let matchJogo = faseTagSemTrofeu.match(/(\(Jogo \d+\))/i);
+                                    let nomeFaseLimpa = matchJogo ? faseTagSemTrofeu.replace(matchJogo[0], '').trim() : faseTagSemTrofeu;
+                                    if (faseTagOriginal.includes('🏆')) nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
+                                    let faseStr = nomeFaseLimpa;
+
 		                            let isFinal = faseStr.toUpperCase().includes('FINAL') && !faseStr.toUpperCase().includes('SEMI') && !faseStr.toUpperCase().includes('QUARTAS');
 		                            
 		                            return `
@@ -1012,7 +1077,7 @@
 		                container.innerHTML += `
 		                    <div class="dia-card" style="border-left-color: #ffd700; background: rgba(0,0,0,0.6);">
 		                        <div class="dia-header" style="border-bottom-color: rgba(255,215,0,0.3);">
-		                            <h5 style="color: #ffd700; font-size: 1.1rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">${iconeEsp} ${nomeEsp}</h5>
+		                            <h5 style="color: #ffd700; font-size: 1.1rem; text-shadow: 0 0 5px rgba(255,215,0,0.5);">${HighTechSecurity.sanitizar(iconeEsp)} ${HighTechSecurity.sanitizar(nomeEsp)}</h5>
 		                            <span style="font-family: 'Segoe UI'; font-size: 0.75rem; background: rgba(255,215,0,0.1); padding: 4px 8px; border-radius: 5px; color: #ffd700; text-transform: uppercase; font-weight: bold; border: 1px solid rgba(255,215,0,0.3);">${formato.replace('_', ' ')}</span>
 		                        </div>
 		                        ${htmlTabela}
@@ -1026,8 +1091,8 @@
             if(!jogo) return;
 
             document.getElementById('edit-jogo-id').value = jogo.id;
-            document.getElementById('edit-jogo-nome').innerHTML = `${HighTechSecurity.sanitizar(jogo.icone)} ${HighTechSecurity.sanitizar(jogo.esporte)} - ${HighTechSecurity.sanitizar(jogo.titulo)}`;
-            document.getElementById('edit-hora').value = jogo.hora || jogo.horario || "";
+            document.getElementById('edit-jogo-nome').innerHTML = `${HighTechSecurity.sanitizar(safeStr(jogo.icone || '🏅'))} ${HighTechSecurity.sanitizar(safeStr(jogo.esporte || 'Partida'))} - ${HighTechSecurity.sanitizar(safeStr(jogo.titulo))}`;
+            document.getElementById('edit-hora').value = safeStr(jogo.hora || jogo.horario || "").substring(0, 5);
 
             const selectDia = document.getElementById('edit-dia');
             selectDia.innerHTML = '';
@@ -1035,11 +1100,11 @@
             let mapaDiasDropdown = {};
             diasGeradosGlobais.forEach(d => { mapaDiasDropdown[d.idStr] = d.titulo; });
             jogosExistentesGlobais.forEach(j => {
-                let dId = j.diaId || j.dataJogo || j.data || j.dia; // 🔥 CORREÇÃO
+                let dId = j.diaId || j.dataJogo || j.data || j.dia; 
                 if (dId && !mapaDiasDropdown[dId]) { mapaDiasDropdown[dId] = dId; }
             });
 
-            let jogoDataAtual = jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia; // 🔥 CORREÇÃO
+            let jogoDataAtual = jogo.diaId || jogo.dataJogo || jogo.data || jogo.dia; 
             Object.keys(mapaDiasDropdown).forEach(dId => {
                 let isSelected = (dId === jogoDataAtual) ? "selected" : "";
                 selectDia.innerHTML += `<option value="${dId}" ${isSelected}>${HighTechSecurity.sanitizar(mapaDiasDropdown[dId])}</option>`;
@@ -1058,7 +1123,6 @@
 
         function fecharModal() { document.getElementById('modal-edicao').style.display = 'none'; }
 
-        // 🔥 CORREÇÃO: MODAL DE EDIÇÃO AGORA TAMBÉM INJETA AS VARIÁVEIS DO JAVA 🔥
         function salvarEdicaoJogo() {
             const id = parseInt(document.getElementById('edit-jogo-id').value);
             let jogo = jogosGeradosGlobais.find(j => j.id === id) || jogosExistentesGlobais.find(j => j.id === id);
@@ -1066,8 +1130,8 @@
             if(jogo) {
                 jogo.diaId = document.getElementById('edit-dia').value;
                 jogo.dataJogo = document.getElementById('edit-dia').value; 
-                jogo.data = document.getElementById('edit-dia').value; // 🔥 ADICIONADO POR SEGURANÇA
-                jogo.dia = document.getElementById('edit-dia').value;  // 🔥 ADICIONADO POR SEGURANÇA
+                jogo.data = document.getElementById('edit-dia').value; 
+                jogo.dia = document.getElementById('edit-dia').value;  
                 
                 jogo.hora = document.getElementById('edit-hora').value;
                 jogo.horario = document.getElementById('edit-hora').value; 
@@ -1093,7 +1157,7 @@
             let mapaDias = {};
             diasGeradosGlobais.forEach(d => { mapaDias[d.idStr] = d; });
             jogosExistentesGlobais.forEach(j => {
-                let dId = j.diaId || j.dataJogo || j.data || j.dia; // 🔥 CORREÇÃO
+                let dId = j.diaId || j.dataJogo || j.data || j.dia; 
                 if (dId && !mapaDias[dId]) { mapaDias[dId] = { idStr: dId, titulo: dId, partidasPendentes: [] }; }
             });
             diasFinais = Object.values(mapaDias);

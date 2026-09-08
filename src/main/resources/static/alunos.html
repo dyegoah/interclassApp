@@ -35,7 +35,6 @@
         .btn-acao { background: var(--theme-primary); color: #000; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem; }
         .btn-acao:hover { box-shadow: 0 0 20px var(--theme-glow); background: #fff; color: #000; }
         
-        /* 🔥 BOTÕES DE EXCLUSÃO 🔥 */
         .btn-excluir { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; z-index: 10; }
         .btn-excluir:hover { background: rgba(255,0,85,0.2); box-shadow: 0 0 10px rgba(255,0,85,0.5); transform: scale(1.05); }
 
@@ -68,7 +67,6 @@
         .eq-turma { font-family: 'Segoe UI'; font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 10px; white-space: nowrap;}
         .eq-count-badge { font-family: 'Orbitron'; font-weight: bold; font-size: 1.1rem; border: 1px solid; border-radius: 20px; padding: 4px 15px; background: rgba(0,0,0,0.4); display: inline-block; }
 
-        /* 🔥 AJUSTES DO CARD DE ATLETAS PARA CABER O CHECKBOX 🔥 */
         .grid-alunos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 2rem;}
         .aluno-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; padding-left: 45px; display: flex; align-items: center; gap: 15px; transition: 0.3s; position: relative; overflow: hidden; }
         .aluno-card:hover { border-color: var(--theme-primary); background: rgba(255, 255, 255, 0.05); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
@@ -91,7 +89,6 @@
         .btn-page.active { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); box-shadow: 0 0 15px var(--theme-glow); }
         .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* 🔥 BARRA DE AÇÃO EM MASSA 🔥 */
         .barra-acao-massa { display: none; justify-content: space-between; align-items: center; background: rgba(255, 0, 85, 0.15); border: 1px solid #ff0055; border-radius: 10px; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(255,0,85,0.3); animation: slideDown 0.3s ease; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -122,7 +119,6 @@
         <div id="topbar-placeholder"></div>
 
         <div class="glass">
-            <!-- 🔥 TOPO COM O BOTÃO DE GERAR PDF ADICIONADO AQUI 🔥 -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 1.5rem;">
                 <div>
                     <h2 class="section-title">👥 Gestão de Atletas</h2>
@@ -164,7 +160,6 @@
                 ⏳ Conectando ao Banco de Dados Seguro...
             </div>
 
-            <!-- 🔥 BARRA FLUTUANTE DE EXCLUSÃO EM MASSA 🔥 -->
             <div id="barra-acao-massa" class="barra-acao-massa">
                 <div style="font-family: 'Orbitron'; font-weight: bold; color: #ffccdd;">
                     🗑️ <span id="texto-qtd-selecionados">0</span> Atleta(s) Selecionado(s)
@@ -206,7 +201,6 @@
         const itensPorPagina = 9;
         let esporteAbaSelecionada = null;
         
-        // 🔥 CONTROLE DE ALUNOS SELECIONADOS PARA EXCLUSÃO 🔥
         let alunosSelecionadosParaExclusao = new Set();
 
         window.onload = async () => {
@@ -238,7 +232,7 @@
             generoAtual = genero; 
             paginaAtual = 1; 
             esporteAbaSelecionada = null; 
-            limparSelecoesGlobais(); // 🔥 Limpa a seleção ao trocar de lote
+            limparSelecoesGlobais(); 
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -337,17 +331,25 @@
             document.getElementById('titulo-lista-alunos').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // 🔥 CORREÇÃO DEFINITIVA: Restabelecendo o "pacote" de dados para que o calendário saiba o que agendar! 🔥
 		function iniciarSetupDoEsporte(nomeEsporte) {
 		    const defEsporte = modalidadeDefs.find(m => m.nome === nomeEsporte);
 		    
-		    // 🔥 CORREÇÃO 1: Salvando o NOME do esporte explícito para evitar a "Modalidade Desconhecida"
 		    localStorage.setItem('arenaSetup', JSON.stringify({ 
 		        genero: generoAtual, 
-		        nomeEsporte: nomeEsporte, // O segredo está aqui! O nome agora viaja junto.
-		        esportes: [ { id: defEsporte ? defEsporte.id : 99, nome: nomeEsporte, configurado: false } ] 
+		        nomeEsporte: nomeEsporte,
+		        esportes: [ { 
+                    id: defEsporte ? defEsporte.id : 99, 
+                    nome: nomeEsporte, 
+                    icone: defEsporte ? defEsporte.icone : '🏅',
+                    formato: 'eliminatoria',
+                    tipoDisputa: 'coletiva',
+                    idaEVolta: false,
+                    configurado: true 
+                } ] 
 		    }));
 		    
-		    window.location.href = '/torneios.html';
+		    window.location.href = '/calendario.html';
 		}
 
         function renderizarGridPaginado() {
@@ -368,7 +370,6 @@
             alunosPaginaAtual.forEach(aluno => {
                 let fotoSegura = aluno.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome)}&background=222&color=fff`;
                 let instaColorClass = `insta-${aluno.genero}`;
-                // Mantém a seleção (checkbox) marcada mesmo mudando de página
                 let isChecked = alunosSelecionadosParaExclusao.has(aluno.hashPublico) ? 'checked' : '';
 
                 container.innerHTML += `
@@ -388,9 +389,6 @@
             renderizarControlesPaginacao(totalPaginas);
         }
 
-        // 🔥 FUNÇÕES DE EXCLUSÃO 🔥
-
-        // Adiciona ou remove da lista de selecionados
         function toggleSelecaoExclusao(hashPublico) {
             if (alunosSelecionadosParaExclusao.has(hashPublico)) {
                 alunosSelecionadosParaExclusao.delete(hashPublico);
@@ -403,10 +401,9 @@
         function limparSelecoesGlobais() {
             alunosSelecionadosParaExclusao.clear();
             atualizarBarraAcaoMassa();
-            renderizarGridPaginado(); // Desmarca todos visualmente
+            renderizarGridPaginado(); 
         }
 
-        // Mostra a barra flutuante se houver atletas selecionados
         function atualizarBarraAcaoMassa() {
             const barra = document.getElementById('barra-acao-massa');
             const txtQtd = document.getElementById('texto-qtd-selecionados');
@@ -418,7 +415,6 @@
             }
         }
 
-        // Exclusão Individual (Botão da Lixeira no Card)
         async function excluirAlunoIndividual(hashPublico, nome) {
             if (!confirm(`⚠️ Tem certeza que deseja EXCLUIR permanentemente o atleta: ${nome}?`)) return;
             
@@ -430,8 +426,8 @@
                 });
                 
                 if (res.ok) {
-                    alunosSelecionadosParaExclusao.delete(hashPublico); // Limpa da lista se estivesse marcado
-                    await buscarAlunosDoServidor(); // Atualiza tudo do banco
+                    alunosSelecionadosParaExclusao.delete(hashPublico); 
+                    await buscarAlunosDoServidor(); 
                 } else {
                     alert("❌ Falha ao tentar excluir o atleta. Acesso negado.");
                 }
@@ -440,7 +436,6 @@
             }
         }
 
-        // Exclusão em Massa (Botão Vermelho da Barra Flutuante)
         async function excluirAlunosEmMassa() {
             const qtd = alunosSelecionadosParaExclusao.size;
             if (!confirm(`⚠️ ATENÇÃO: Você está prestes a EXCLUIR PERMANENTEMENTE ${qtd} atleta(s) do seu banco de dados.\n\nDeseja continuar?`)) return;
@@ -450,7 +445,6 @@
             
             document.body.style.cursor = 'wait';
             
-            // Usamos Promise.all para excluir vários ao mesmo tempo, mantendo a velocidade
             const promessasExclusao = Array.from(alunosSelecionadosParaExclusao).map(hashPublico => 
                 fetch(`/api/alunos/${hashPublico}`, {
                     method: 'DELETE',
@@ -465,8 +459,8 @@
             document.body.style.cursor = 'default';
             alert(`✅ Exclusão concluída! ${sucessoCount} atleta(s) removido(s) com sucesso.`);
             
-            limparSelecoesGlobais(); // Limpa e esconde a barra
-            await buscarAlunosDoServidor(); // Refaz a contagem e filtros na tela
+            limparSelecoesGlobais(); 
+            await buscarAlunosDoServidor(); 
         }
 
         function renderizarControlesPaginacao(totalPaginas) {
@@ -478,7 +472,6 @@
             container.innerHTML = html;
         }
 
-        // 🔥 FUNÇÃO DE GERAR PDF EXCEL-LIKE (CORRIGIDA) 🔥
         function gerarPDFAlunos() {
             if (listaAlunosBase.length === 0) {
                 alert("Nenhum atleta inscrito para gerar o relatório.");
