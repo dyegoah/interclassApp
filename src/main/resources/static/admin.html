@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - Interclass Arena</title>
+    <title>Super Admin - interclasseApp</title>
     
     <link rel="stylesheet" href="/estilo-global.css">
     <script src="/seguranca.js"></script>
@@ -52,7 +52,6 @@
         .btn-log { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.3s; font-family: 'Orbitron'; margin-right: 5px;}
         .btn-log:hover { background: var(--theme-primary); color: #000; border-color: var(--theme-primary); }
         
-        /* Botão específico de exclusão de log */
         .btn-log-del { background: rgba(255, 69, 0, 0.1); border: 1px solid #ff4500; color: #ff4500; }
         .btn-log-del:hover { background: #ff4500; color: #fff; }
 
@@ -87,7 +86,6 @@
         .btn-cancelar { background: transparent; border: 1px solid #aaa; color: #aaa; box-shadow: none; }
         .btn-cancelar:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff; box-shadow: none;}
 
-        /* CSS EXCLUSIVO DO RELATÓRIO JUDICIAL */
         @media print {
             body * { visibility: hidden; }
             #relatorio-print { 
@@ -104,7 +102,7 @@
                 z-index: 9999;
             }
             #relatorio-print * { visibility: visible !important; }
-            .container { display: none !important; } /* Esconde o painel por trás */
+            .container { display: none !important; } 
         }
         
         .search-bar-logs {
@@ -138,7 +136,7 @@
             <div class="admin-profile">
                 <span style="font-size: 1.5rem;">👑</span>
                 <div>
-                    <div style="font-weight: bold; color: #fff; font-family: 'Segoe UI'; font-size: 0.95rem;">Diretoria Interclass Arena</div>
+                    <div style="font-weight: bold; color: #fff; font-family: 'Segoe UI'; font-size: 0.95rem;">Diretoria interclasseApp</div>
                     <div style="font-size: 0.75rem; color: var(--theme-primary); font-family: 'Orbitron', sans-serif;">Nível: Deus</div>
                 </div>
                 <button class="btn-sair-admin" onclick="sairDoAdmin()">🚪 Sair</button>
@@ -166,7 +164,6 @@
             <button class="tab-btn" id="tab-auditoria" onclick="mudarAba('auditoria')">🛡️ Logs de Segurança</button>
         </div>
 
-        <!-- VIEW DE PROFESSORES -->
         <div id="view-lista">
             <button id="btn-limpar-filtro" class="btn-acao btn-cancelar" style="display:none; width:auto; margin-bottom: 15px; padding: 8px 15px; font-size: 0.8rem;" onclick="limparFiltroAuditoria()">❌ Limpar Investigação e Ver Todos</button>
 
@@ -198,7 +195,6 @@
             </div>
         </div>
 
-        <!-- VIEW DE AUDITORIA (LOGS) -->
         <div id="view-auditoria" style="display: none;">
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
@@ -219,7 +215,6 @@
                         </tr>
                     </thead>
                     <tbody id="tabela-logs-body">
-                        <!-- Será preenchido via JavaScript -->
                     </tbody>
                 </table>
                 
@@ -232,10 +227,8 @@
 
     </div>
 
-    <!-- 🔥 MOLDE DE PDF JUDICIAL 🔥 -->
     <div id="relatorio-print" style="display: none;"></div>
 
-    <!-- Modais de Senha e Status (Ocultos) -->
     <div id="modal-senha" class="modal-overlay">
         <div class="modal-box">
             <h3>🔑 Alterar Senha</h3>
@@ -258,7 +251,6 @@
     </div>
 
     <script>
-        // CONTROLES DE ESTADO
         let professores = [];
         let profSelecionadoId = null;
         let filtroEmailInvestigacao = "";
@@ -273,7 +265,6 @@
             await carregarProfessores(0);
         };
 
-        // 🛡️ REQUISIÇÃO CENTRALIZADA
         async function apiAdmin(endpoint, method = 'GET', body = null) {
             const token = localStorage.getItem('interclassToken');
             if (!token) { window.location.href = '/index.html'; return null; }
@@ -288,9 +279,6 @@
             } catch (error) { return null; }
         }
 
-        // ==========================================
-        // ABA 1: GESTÃO DE PROFESSORES
-        // ==========================================
         async function carregarProfessores(pagina = 0) {
             paginaProfAtual = pagina;
             const res = await apiAdmin(`/api/admin/professores?page=${pagina}&size=${itensPorPagina}&sort=id,desc`);
@@ -361,9 +349,6 @@
             }
         }
 
-        // ==========================================
-        // ABA 3: AUDITORIA E LOGS 
-        // ==========================================
         async function carregarLogsAuditoria(pagina = 0) {
             paginaLogAtual = pagina;
             document.getElementById('input-busca-logs').value = ''; 
@@ -405,7 +390,6 @@
                 let badgeClass = isBloq ? 'badge-ataque' : 'badge-ativo';
                 let dataFormatada = (log.dataHora || '').replace('T', ' às ').substring(0, 19);
                 
-                // 🔥 BOTÃO DE EXCLUSÃO INDIVIDUAL (X) ADICIONADO AQUI 🔥
                 tbody.innerHTML += `
                     <tr>
                         <td>${dataFormatada}</td>
@@ -450,7 +434,6 @@
             }
         }
 
-        // 🔥 FUNÇÃO EXCLUSÃO INDIVIDUAL DE LOG 🔥
         async function excluirLogIndividual(id) {
             if (id === 0) return alert("Modo de teste: O log simulado não pode ser excluído.");
             
@@ -464,9 +447,6 @@
             }
         }
 
-        // ==========================================
-        // FUNÇÕES DE INVESTIGAÇÃO E PDF OFICIAL
-        // ==========================================
         async function isolarContaParaInvestigacao(emailAlvo) {
             if(!emailAlvo || emailAlvo === 'N/A') return alert("E-mail não disponível para investigação.");
             filtroEmailInvestigacao = emailAlvo;
@@ -493,11 +473,11 @@
                 <div style="max-width: 800px; margin: 0 auto; color: #000;">
                     <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px;">
                         <h1 style="margin:0; font-size: 1.5rem; text-transform: uppercase;">RELATÓRIO OFICIAL DE AUDITORIA DE SISTEMA</h1>
-                        <h3 style="margin:5px 0 0 0; color: #555;">Plataforma Interclass Arena - Departamento de Segurança da Informação</h3>
+                        <h3 style="margin:5px 0 0 0; color: #555;">Plataforma interclasseApp - Departamento de Segurança da Informação</h3>
                     </div>
                     
                     <p style="text-align: justify; line-height: 1.6;">
-                        O presente documento certifica a extração fidedigna de registros de acesso lógico aos servidores da plataforma <b>Interclass Arena</b>. 
+                        O presente documento certifica a extração fidedigna de registros de acesso lógico aos servidores da plataforma <b>interclasseApp</b>. 
                         Ressalta-se que a coleta, retenção e fornecimento deste registro encontram-se amparados legalmente pelas diretrizes do <b>Marco Civil da Internet (Lei Federal Nº 12.965/2014, Cap. III, Seção II, Art. 15)</b>, que determina a obrigatoriedade da guarda de registros de acesso a aplicações de internet em ambiente seguro e sigiloso.
                     </p>
 
@@ -529,9 +509,6 @@
             }, 200);
         }
 
-        // ==========================================
-        // UTILITÁRIOS E MODAIS GERAIS
-        // ==========================================
         function mudarAba(aba) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('view-lista').style.display = 'none';

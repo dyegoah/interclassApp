@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Interclass Arena</title>
+    <title>Login - interclasseApp</title>
     
     <!-- 🛡️ ANTI-FLICKER INTELIGENTE E ANTI-LOOP -->
     <script>
@@ -47,7 +47,7 @@
 </head>
 <body class="bg-arena-login">
     <div class="glass-form">
-        <h1 class="form-title">Interclass Arena</h1>
+        <h1 class="form-title">interclasseApp</h1>
         
         <div id="etapa-1">
             <p class="subtitle">Acesse o seu painel de gestão esportiva.</p>
@@ -67,7 +67,6 @@
             </form>
 
             <div class="links-rodape">
-                <!-- 🔥 Ação do WhatsApp adicionada aqui 🔥 -->
                 <a onclick="recuperarSenha(event)">Esqueceu a sua senha?</a>
                 <a href="/cadastro-professor.html" style="background: rgba(255, 0, 222, 0.1); border: 1px solid #ff00de; color: #ff00de !important; padding: 10px; border-radius: 8px; font-family: 'Orbitron'; font-weight: bold; text-transform: uppercase;">Nova Escola? Cadastre-se</a>
             </div>
@@ -123,7 +122,8 @@
                         document.getElementById('etapa-2').style.display = 'block';
                         setTimeout(() => document.getElementById('codigo2fa').focus(), 100);
                     } else {
-                        alert("❌ " + erroServidor);
+                        // Correção: exibe mensagem fixa de credenciais incorretas ao invés do erro do backend
+                        alert("❌ E-mail ou senha incorretos. Por favor, tente novamente.");
                     }
                 }
             } catch (error) {
@@ -168,8 +168,8 @@
                     
                     window.location.replace('/admin.html'); 
                 } else {
-                    const erroServidor = await response.text();
-                    alert("🔒 Acesso Negado: " + erroServidor);
+                    // Correção: Força mensagem de código inválido sem mostrar retorno bruto do servidor
+                    alert("🔒 Acesso Negado: Código 2FA inválido ou expirado. Tente novamente.");
                     document.getElementById('codigo2fa').value = ""; 
                     document.getElementById('codigo2fa').focus();
                 }
@@ -188,19 +188,15 @@
             document.getElementById('codigo2fa').value = ""; 
         }
 
-        // 🔥 FUNÇÃO DE REDIRECIONAMENTO PARA WHATSAPP 🔥
         function recuperarSenha(event) {
-            event.preventDefault(); // Impede que a página recarregue
+            event.preventDefault(); 
             
-            // Pop-up informativo
             alert("🔒 Por motivos de segurança, a redefinição de senha é realizada através da nossa central de atendimento.\n\nClique em OK para falar com nossa equipe no WhatsApp.");
             
-            // Mensagem pronta e link do WhatsApp (Substitua o 5511999999999 pelo número real)
             const numeroWhatsApp = "5588996312358"; 
-            const mensagem = "Olá, esqueci minha senha no Interclass Arena e preciso de ajuda para recuperar meu acesso.";
+            const mensagem = "Olá, esqueci minha senha no interclasseApp e preciso de ajuda para recuperar meu acesso.";
             const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
             
-            // Abre o WhatsApp em uma nova aba
             window.open(linkWhatsApp, "_blank");
         }
     </script>
