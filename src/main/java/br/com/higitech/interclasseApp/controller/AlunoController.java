@@ -20,7 +20,6 @@ import br.com.higitech.interclasseApp.model.Aluno;
 import br.com.higitech.interclasseApp.model.Professor;
 import br.com.higitech.interclasseApp.repositories.AlunoRepository;
 import br.com.higitech.interclasseApp.repositories.ProfessorRepository;
-// 🔥 IMPORTS DE SEGURANÇA ADICIONADOS AQUI 🔥
 import br.com.higitech.interclasseApp.service.LoginAttemptService;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -34,7 +33,6 @@ public class AlunoController {
     @Autowired
     private ProfessorRepository professorRepository;
 
-    // 🔥 SERVIÇO DE LOGS DE AUDITORIA INJETADO AQUI 🔥
     @Autowired
     private LoginAttemptService loginAttemptService;
 
@@ -45,21 +43,14 @@ public class AlunoController {
         public String esporte;
         public String iconeEsporte;
         public String genero;
-        public String honeypot; // 🍯 O Pote de Mel (Campo Invisível)
+        public String honeypot; 
     }
 
-    // ==========================================
-    // ROTAS DE INSCRIÇÃO DOS ALUNOS
-    // ==========================================
-    // 🔥 Capturamos o HttpServletRequest para saber a Cidade e a Internet (IP) do Atacante 🔥
     @PostMapping("/public/{professorHash}")
     public ResponseEntity<?> inscreverAluno(@PathVariable String professorHash, @RequestBody InscricaoRequestDTO dto, HttpServletRequest request) {
         
-        // 🚨 O GOLPE DO HONEYPOT: Se o robô preencheu o campo invisível
         if (dto.honeypot != null && !dto.honeypot.trim().isEmpty()) {
-            // Registra silenciosamente no painel do Diretor
             loginAttemptService.registrarLog("SPAM: " + dto.nome, "ATAQUE SPAM BLOQUEADO (HONEYPOT)", request);
-            // Devolve o "Sorriso Irônico" (Finge que cadastrou com sucesso)
             return ResponseEntity.status(HttpStatus.CREATED).body("Inscrição confirmada na Modalidade!");
         }
 
@@ -75,6 +66,24 @@ public class AlunoController {
 
         if (dto.nome == null || dto.nome.trim().length() < 2 || dto.nome.length() > 50) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome inválido ou suspeito.");
+        }
+
+        // 🔥 BLINDAGEM DE UPLOAD (Validação de Base64) 🔥
+        if (dto.fotoUrl != null && !dto.fotoUrl.trim().isEmpty()) {
+            // 1. Prevenção contra DoS (Exaustão de Memória)
+            // 5MB em Base64 representa aproximadamente 6.8MB de caracteres. O limite trava strings abusivas.
+            if (dto.fotoUrl.length() > 7 * 1024 * 1024) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A imagem excede o tamanho máximo de 5MB.");
+            }
+            
+            // 2. Prevenção contra Malware e XSS Avançado (SVG/Scripts)
+            // Aceita estritamente os cabeçalhos MIME de imagens seguras
+            if (!dto.fotoUrl.startsWith("data:image/jpeg;base64,") &&
+                !dto.fotoUrl.startsWith("data:image/png;base64,") &&
+                !dto.fotoUrl.startsWith("data:image/webp;base64,") &&
+                !dto.fotoUrl.startsWith("data:image/gif;base64,")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de imagem inválido. Envie apenas JPG, PNG, WEBP ou GIF.");
+            }
         }
 
         long totalAlunos = alunoRepository.countByProfessorId(professor.getId());
@@ -104,18 +113,12 @@ public class AlunoController {
         return ResponseEntity.ok(profOpt.get().isInscricoesAbertas());
     }
 
-    // ==========================================
-    // ROTA PÚBLICA (PORTAL DO ATLETA - ARENA)
-    // ==========================================
     @GetMapping("/public/{hashPublico}")
     public ResponseEntity<List<Aluno>> getAlunosPublicos(@PathVariable String hashPublico) {
         List<Aluno> alunos = alunoRepository.findByProfessorHashPublico(hashPublico);
         return ResponseEntity.ok(alunos);
     }
 
-    // ==========================================
-    // ROTAS ADMINISTRATIVAS DO PROFESSOR (COM LOGIN)
-    // ==========================================
     @PutMapping("/status-inscricoes")
     public ResponseEntity<?> alterarStatusInscricoes(@AuthenticationPrincipal Professor professorLogado) {
         professorLogado.setInscricoesAbertas(!professorLogado.isInscricoesAbertas());

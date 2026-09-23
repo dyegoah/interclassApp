@@ -24,13 +24,12 @@ public class TorneioService {
         for (EsporteSetup esporte : payload.esportes) {
             Torneio torneio = new Torneio();
             
-            // Preenche o Titulo
             torneio.setTitulo(payload.genero.toUpperCase() + " | Esporte ID: " + esporte.id + " | Formato: " + esporte.formato);
-            
-            // 🔥 Preenche o Nome para evitar o Erro do Postgres
             torneio.setNome("Categoria " + payload.genero.toUpperCase()); 
-            
             torneio.setStatus("CONFIGURADO");
+            
+            // 🔥 PROTEÇÃO IDOR: Vincula o torneio ao professor logado
+            torneio.setProfessor(professorLogado);
             
             torneioRepository.save(torneio);
         }
@@ -39,12 +38,17 @@ public class TorneioService {
     public Torneio criarTorneio(TorneioDTO dto, Professor professorLogado) {
         Torneio torneio = new Torneio();
         torneio.setTitulo(dto.getTitulo()); 
-        torneio.setNome(dto.getTitulo()); // 🔥 Copia o título para o nome
+        torneio.setNome(dto.getTitulo()); 
         torneio.setStatus("ATIVO");
+        
+        // 🔥 PROTEÇÃO IDOR: Vincula o torneio ao professor logado
+        torneio.setProfessor(professorLogado);
+        
         return torneioRepository.save(torneio);
     }
 
     public List<Torneio> listarTodos(Professor professorLogado) {
-        return torneioRepository.findAll();
+        // 🔥 PROTEÇÃO IDOR CORRIGIDA: Busca usando o objeto mapeado
+        return torneioRepository.findByProfessor(professorLogado);
     }
 }

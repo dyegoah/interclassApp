@@ -37,16 +37,10 @@ public class AdminController {
     @Autowired
     private LogAcessoRepository logAcessoRepository;
 
-    // 🛡️ O CADEADO MASTER
+    // 🛡️ O CADEADO MASTER BLINDADO: Só permite se o banco disser que é master
     private boolean isSuperAdmin(Professor professor) {
-        if (professor == null || professor.getEmail() == null) return false;
-        
-        String email = professor.getEmail().toLowerCase();
-        
-        return "master".equals(professor.getStatus()) || 
-               email.contains("admin") || 
-               "fut_sumula_pro@hotmail.com".equals(email) ||
-               "dyego@master.com".equals(email);
+        if (professor == null || professor.getStatus() == null) return false;
+        return "master".equals(professor.getStatus());
     }
 
     @GetMapping("/professores")
@@ -79,7 +73,6 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    // 🔥 NOVA ROTA: Exclusão INDIVIDUAL do Log 🔥
     @DeleteMapping("/logs/{id}")
     public ResponseEntity<?> excluirLogIndividual(@PathVariable Long id, @AuthenticationPrincipal Professor adminLogado) {
         if (!isSuperAdmin(adminLogado)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");

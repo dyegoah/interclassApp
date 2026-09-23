@@ -15,31 +15,62 @@ import jakarta.servlet.http.HttpServletRequest;
 public class LoginAttemptService {
     
     private final int MAXIMO_TENTATIVAS = 5;
-    private ConcurrentHashMap<String, Integer> tentativas = new ConcurrentHashMap<>();
+    private final long TEMPO_BLOQUEIO_MS = 15 * 60 * 1000; // 15 minutos
 
-    // 🔥 CORREÇÃO 1: Injeção do repositório para o Java saber onde salvar 🔥
+    // Mapas em memória para controlo por IP
+    private ConcurrentHashMap<String, Integer> tentativas = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Long> bloqueioTemporario = new ConcurrentHashMap<>();
+
     @Autowired
     private LogAcessoRepository logAcessoRepository;
 
-    public void loginComSucesso(String email) {
-        tentativas.remove(email);
+    // Extrai o IP real, contornando balanceadores de carga como o Render
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
     }
 
-    public void loginFalhou(String email) {
-        int erros = tentativas.getOrDefault(email, 0);
-        erros++;
-        tentativas.put(email, erros);
+    public void loginComSucesso(HttpServletRequest request) {
+        String ip = getClientIp(request);
+        tentativas.remove(ip);
+        bloqueioTemporario.remove(ip);
     }
 
-    public boolean estaBloqueado(String email) {
-        return tentativas.getOrDefault(email, 0) >= MAXIMO_TENTATIVAS;
+    public void loginFalhou(HttpServletRequest request) {
+        String ip = getClientIp(request);
+        int erros = tentativas.getOrDefault(ip, 0) + 1;
+        
+        if (erros >= MAXIMO_TENTATIVAS) {
+            bloqueioTemporario.put(ip, System.currentTimeMillis() + TEMPO_BLOQUEIO_MS);
+        } else {
+            tentativas.put(ip, erros);
+        }
+    }
+
+    public boolean estaBloqueado(HttpServletRequest request) {
+        String ip = getClientIp(request);
+        if (bloqueioTemporario.containsKey(ip)) {
+            if (System.currentTimeMillis() < bloqueioTemporario.get(ip)) {
+                return true; // Ainda bloqueado
+            } else {
+                // Tempo de bloqueio expirou
+                bloqueioTemporario.remove(ip);
+                tentativas.remove(ip);
+                return false;
+            }
+        }
+        return false;
     }
     
     public void registrarLog(String email, String status, HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null) ip = request.getRemoteAddr();
+        String ip = getClientIp(request);
 
-        // Chamada na API gratuita para pegar a cidade do IP
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://ip-api.com/json/" + ip + "?fields=city,regionName,country,isp";
         
@@ -53,7 +84,6 @@ public class LoginAttemptService {
             System.out.println("Aviso: Falha ao buscar geolocalização do IP " + ip);
         }
 
-        // Criando e salvando o log
         LogAcesso log = new LogAcesso();
         log.setEmailTentado(email);
         log.setIpOrigem(ip);

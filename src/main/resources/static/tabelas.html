@@ -99,29 +99,34 @@
         .bracket-col:not(:last-child) .mini-match::after { content: ''; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
         .bracket-col:not(:first-child) .mini-match::before { content: ''; position: absolute; left: -15px; top: 50%; width: 15px; height: 2px; background: rgba(255,255,255,0.15); z-index: 1;}
 
-        /* 🔥 REGRAS DE RESPONSIVIDADE EXTREMA E MARGENS 🔥 */
+        /* 🔥 REGRAS DE RESPONSIVIDADE EXTREMA (CELULARES MODERNOS E DESCOMPRESSÃO DO FOOTBAR) 🔥 */
         @media (max-width: 850px) {
-            .arena-container { padding-bottom: 120px !important; }
+            .arena-container { padding-bottom: 100px !important; }
             .playhub-card { grid-template-columns: 1fr; text-align: center; gap: 10px; }
             .play-hora { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 10px; }
             .play-info > div { flex-direction: column; gap: 10px; }
         }
 
         @media (max-width: 480px) {
-            /* Deixa uma margem lateral leve (6px) para não colar nas paredes e aproveita o resto da tela */
-            .arena-container { padding-left: 6px !important; padding-right: 6px !important; }
+            .arena-container { padding-left: 0 !important; padding-right: 0 !important; }
             
-            /* Ajustes internos para não comprimir textos */
-            #playhub-view > div:first-child { padding-left: 5px; padding-right: 5px; }
-            .filtros-lote { padding-left: 5px; padding-right: 5px; }
+            /* Textos do cabeçalho alinhados com o respiro de 8px */
+            #playhub-view > div:first-child { padding-left: 8px; padding-right: 8px; }
             
-            .torneio-grupo { margin-left: 0 !important; margin-right: 0 !important; border-radius: 10px !important; border-left-width: 4px !important; }
+            /* Filtros roláveis alinhados */
+            .filtros-lote { padding-left: 8px; padding-right: 8px; }
+            
+            /* Card principal alargado mas mantendo o afastamento de 8px das bordas */
+            .torneio-grupo { margin-left: 8px !important; margin-right: 8px !important; border-radius: 8px !important; border-left-width: 3px !important; }
             .torneio-header { padding: 12px 10px !important; }
             .torneio-body { padding: 15px 8px !important; }
             
-            .playhub-card { padding: 12px 10px !important; border-radius: 10px !important; border-left-width: 4px !important; }
+            /* Cards de partidas otimizados */
+            .playhub-card { padding: 12px 8px !important; border-radius: 8px !important; border-left-width: 3px !important; }
+            
+            /* Tabela e componentes expandidos */
             .table-wrapper { border-radius: 8px !important; }
-            .campeao-banner { border-radius: 10px !important; padding: 20px 10px !important; }
+            .campeao-banner { border-radius: 8px !important; padding: 20px 10px !important; }
         }
     </style>
 </head>
@@ -166,6 +171,19 @@
     <div id="footbar-placeholder"></div>
 
     <script>
+        // 🛡️ INÍCIO DA PROTEÇÃO XSS GLOBAL
+        window.escapeHTML = function(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag));
+        };
+        // 🛡️ FIM DA PROTEÇÃO XSS
+
         let relatoriosSalvos = {}; 
         let loteAtualSelecionado = null;
         let configuracoesLotesGlobais = {}; 
@@ -234,11 +252,12 @@
 
             generosDisponiveis.forEach((genero, idx) => {
                 let cor = genero === 'masculino' ? '#00f2fe' : (genero === 'feminino' ? '#ff00de' : '#b200ff');
+                let generoSeguro = window.escapeHTML(genero); // 🛡️ Protegido contra XSS
                 
                 container.innerHTML += `
-                    <button id="btn-lote-${genero}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: ${cor}; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s;" 
-                            onclick="mudarLotePlayHub('${genero}', this)">
-                        LOTE: ${genero}
+                    <button id="btn-lote-${generoSeguro}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: ${cor}; padding: 8px 20px; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 0.85rem; transition: 0.3s;" 
+                            onclick="mudarLotePlayHub('${generoSeguro}', this)">
+                        LOTE: ${generoSeguro}
                     </button>
                 `;
             });
@@ -353,7 +372,8 @@
 
 		async function buscarJogosDoBanco(genero) {
             const container = document.getElementById('lista-jogos');
-            container.innerHTML = `<p style="text-align: center; font-family: 'Orbitron'; color: #00f2fe; margin-top: 50px;">⏳ Buscando chaves do Lote ${genero.toUpperCase()}...</p>`;
+            let generoSeguro = window.escapeHTML(genero.toUpperCase());
+            container.innerHTML = `<p style="text-align: center; font-family: 'Orbitron'; color: #00f2fe; margin-top: 50px;">⏳ Buscando chaves do Lote ${generoSeguro}...</p>`;
 
             try {
                 const token = localStorage.getItem('interclassToken');
@@ -415,7 +435,7 @@
                     renderizarJogosEmAcordeao(calOffline[genero].jogos, genero, true);
                 } else {
                     let corAviso = genero === 'feminino' ? '#ff00de' : (genero === 'misto' ? '#b200ff' : '#00f2fe');
-                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); border: 1px dashed ${corAviso}; padding: 20px; border-radius: 10px; margin-top: 50px; background: rgba(0,0,0,0.5);">Ainda não há torneios criados ou agendados para a categoria <b style="color:${corAviso}; text-transform:uppercase;">${genero}</b>.</p>`;
+                    container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); border: 1px dashed ${corAviso}; padding: 20px; border-radius: 10px; margin-top: 50px; background: rgba(0,0,0,0.5);">Ainda não há torneios criados ou agendados para a categoria <b style="color:${corAviso}; text-transform:uppercase;">${generoSeguro}</b>.</p>`;
                 }
             }
         }
@@ -470,6 +490,11 @@
                 
                 let temFaseDeGrupos = dados.jogos.some(j => (j.titulo||"").toUpperCase().includes('GRUPO') || (j.titulo||"").toUpperCase().includes('CLASSIFICAÇÃO') || (j.titulo||"").toUpperCase().includes('LIGA') || (j.titulo||"").toUpperCase().includes('SORTEIO'));
 
+                // 🛡️ HIGIENIZAÇÃO DE DADOS
+                let esporteNomeSeguro = window.escapeHTML(esporteNome);
+                let formatoSeguro = window.escapeHTML(formato);
+                let iconeSeguro = window.escapeHTML(dados.icone);
+
 				dados.jogos.forEach(jogo => {
 				                    let relatorio = relatoriosSalvos[String(jogo.id)]; 
 				                    
@@ -507,8 +532,14 @@
 				                    if (faseTagOriginal.includes('🏆')) {
 				                        nomeFaseLimpa = '🏆 ' + nomeFaseLimpa;
 				                    }
+
+				                    // 🛡️ HIGIENIZAÇÃO DE DADOS DO LAÇO ATUAL
+                                    let nomeFaseLimpaSegura = window.escapeHTML(nomeFaseLimpa);
+                                    let confrontoStrSegura = window.escapeHTML(confrontoStr);
+                                    let quadraSegura = window.escapeHTML(jogo.quadra || 'A Definir');
+                                    let dataCurtaSegura = window.escapeHTML(dataCurta);
 				                    
-				                    let textoConfrontoCompleto = numJogoStr ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${numJogoStr}</span> ${confrontoStr}` : confrontoStr;
+				                    let textoConfrontoCompleto = numJogoStr ? `<span style="color:var(--theme-primary); font-weight:bold; margin-right: 5px;">${numJogoStr}</span> ${confrontoStrSegura}` : confrontoStrSegura;
 
 				                    if (temFaseDeGrupos && !entrouNaFaseFinal && (fUpper.includes('ELIMINATÓRIA') || fUpper.includes('QUARTAS') || fUpper.includes('SEMI') || fUpper.includes('FINAL'))) {
 				                        htmlJogosAgenda += `<div class="secao-agenda-titulo" style="margin-top: 30px; margin-bottom: 20px; color: #ff0055; justify-content: center; font-size: 1.1rem; border-top: 1px dashed rgba(255,0,85,0.3); padding-top: 20px; text-shadow: 0 0 10px rgba(255,0,85,0.5);">🔥 FASE FINAL (Mata-Mata) 🔥</div>`;
@@ -549,13 +580,13 @@
 				                                <div class="play-hora" style="border-right-color: #555;">
 				                                    <span style="font-size:0.75rem; color: #888; font-weight: bold;">ENCERRADO</span>
 				                                    <span style="font-size:1.1rem; font-weight:bold; color: #fff; margin: 5px 0;">${hor}</span>
-				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: #888; margin-bottom: 3px;">${dataCurta}</span>
-                                                    <span style="font-size:0.65rem; font-family:'Segoe UI'; color: rgba(255,255,255,0.5);">📍 ${jogo.quadra || 'A Definir'}</span>
+				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: #888; margin-bottom: 3px;">${dataCurtaSegura}</span>
+                                                    <span style="font-size:0.65rem; font-family:'Segoe UI'; color: rgba(255,255,255,0.5);">📍 ${quadraSegura}</span>
 				                                </div>
 				                                <div class="play-info">
 				                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
 				                                        <div>
-				                                            <h3 style="color: #888; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${nomeFaseLimpa}</h3>
+				                                            <h3 style="color: #888; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px;">${nomeFaseLimpaSegura}</h3>
 				                                            <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #ccc;">${textoConfrontoCompleto}</p>
 				                                        </div>
 				                                        <div style="font-family: 'Orbitron'; font-weight: bold; font-size: 1.3rem; color: #00ff00; background: rgba(0,255,0,0.05); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(0,255,0,0.1); min-width: 80px; text-align: center;">
@@ -563,7 +594,7 @@
 				                                        </div>
 				                                    </div>
 				                                </div>
-				                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', true)">📄 SÚMULA</button>
+				                                <button class="btn-play" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" onclick="abrirSaaS('${esporteNomeSeguro}', ${jogo.id}, '${window.escapeHTML(genero)}', true)">📄 SÚMULA</button>
 				                            </div>
 				                        `;
 				                    } else {
@@ -581,14 +612,14 @@
 				                            <div class="playhub-card" style="border-left: 4px solid ${corBorda}; background: ${corBg}; opacity: ${opacity}; ${brilhoBox}">
 				                                <div class="play-hora" style="border-right-color: ${corBorda};">
 				                                    <span style="font-size:1.1rem; color: #fff; font-weight: bold; margin-bottom: 5px;">${hor}</span>
-				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda}; margin-bottom: 3px;">${dataCurta}</span>
-                                                    <span style="font-size:0.65rem; font-family:'Segoe UI'; color: rgba(255,255,255,0.5);">📍 ${jogo.quadra || 'A Definir'}</span>
+				                                    <span style="font-size:0.75rem; font-family:'Segoe UI'; color: ${corBorda}; margin-bottom: 3px;">${dataCurtaSegura}</span>
+                                                    <span style="font-size:0.65rem; font-family:'Segoe UI'; color: rgba(255,255,255,0.5);">📍 ${quadraSegura}</span>
 				                                </div>
 				                                <div class="play-info">
-				                                    <h3 style="color: ${corTextoFase}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 8px ${corBg.replace('0.08', '0.6')};">${nomeFaseLimpa}</h3>
+				                                    <h3 style="color: ${corTextoFase}; font-size: 0.85rem; font-family: 'Orbitron'; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 8px ${corBg.replace('0.08', '0.6')};">${nomeFaseLimpaSegura}</h3>
 				                                    <p style="font-family: 'Segoe UI'; font-size: 1rem; color: #fff; font-weight: 500;">${textoConfrontoCompleto}</p>
 				                                </div>
-				                                <button class="btn-play" style="${estiloBotao}" onclick="abrirSaaS('${esporteNome}', ${jogo.id}, '${genero}', false)">${textoBotao}</button>
+				                                <button class="btn-play" style="${estiloBotao}" onclick="abrirSaaS('${esporteNomeSeguro}', ${jogo.id}, '${window.escapeHTML(genero)}', false)">${textoBotao}</button>
 				                            </div>
 				                        `;
 				                    }
@@ -596,6 +627,7 @@
 								
                 let campeaoHtml = '';
                 if (campeaoNome) {
+                    let campeaoNomeSeguro = window.escapeHTML(campeaoNome);
                     let fotoHtml = '';
                     let esportesIndividuais = ['Xadrez', 'Tênis de Mesa', 'Dama', 'E-Sports', 'Natação', 'Atletismo'];
                     
@@ -610,7 +642,7 @@
                             <div style="font-size: 3rem; margin-bottom: 5px; text-shadow: 0 0 15px rgba(255,255,255,0.8); line-height: 1;">🏆</div>
                             ${fotoHtml}
                             <h2 style="margin-top: 10px;">Grande Campeão</h2>
-                            <p>${campeaoNome}</p>
+                            <p>${campeaoNomeSeguro}</p>
                         </div>
                     `;
                 }
@@ -623,9 +655,9 @@
                 container.innerHTML += `
                     <div class="torneio-grupo" style="border-color: ${corTemaDefault};">
                         <div class="torneio-header" onclick="toggleTorneio('${domId}', this)">
-                            <h3>${dados.icone} Torneio de ${esporteNome} <span style="font-family:'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: normal; margin-left: 10px;">(${formato.toUpperCase()})</span></h3>
+                            <h3>${iconeSeguro} Torneio de ${esporteNomeSeguro} <span style="font-family:'Segoe UI'; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: normal; margin-left: 10px;">(${formatoSeguro.toUpperCase()})</span></h3>
                             <div style="display: flex; align-items: center; gap: 15px;">
-                                <button class="btn-delete-torneio" onclick="confirmarExclusaoTorneio(event, '${genero}', '${esporteNome}')" title="Excluir este Torneio">🗑️</button>
+                                <button class="btn-delete-torneio" onclick="confirmarExclusaoTorneio(event, '${window.escapeHTML(genero)}', '${esporteNomeSeguro}')" title="Excluir este Torneio">🗑️</button>
                                 <div class="torneio-toggle">Painel <span class="seta-toggle">${setaText}</span></div>
                             </div>
                         </div>
@@ -750,10 +782,11 @@
 		                        let classe = i === 0 ? 'linha-campeao' : '';
 		                        let saldo = t.gp - t.gc;
 		                        let corSaldo = saldo > 0 ? '#00ff00' : (saldo < 0 ? '#ff0000' : '#fff');
+                                let nomeEquipeSeguro = window.escapeHTML(t.nome); // 🛡️ Protegido contra XSS
 		                        trs += `
 		                            <tr class="${classe}">
 		                                <td>${i+1}º</td>
-		                                <td style="text-align:left; font-weight:bold;">${t.nome}</td>
+		                                <td style="text-align:left; font-weight:bold;">${nomeEquipeSeguro}</td>
 		                                <td style="color:var(--theme-primary); font-weight:bold;">${t.pts}</td>
 		                                <td>${t.j}</td>
 		                                <td>${t.v}</td>
@@ -802,7 +835,7 @@
 		            }
 		        }
 
-        function toggleTorneio(id, headerEl) {
+        window.toggleTorneio = function(id, headerEl) {
             const body = document.getElementById(`body-${id}`);
             const seta = headerEl.querySelector('.seta-toggle');
             if (body.style.display === 'block') {
@@ -812,7 +845,7 @@
                 body.style.display = 'block';
                 if(seta) seta.textContent = '▲';
             }
-        }
+        };
 
         function abrirSaaS(esporteNome, idJogo, lote, readonly) {
             let nomeNormalizado = (esporteNome || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();

@@ -184,6 +184,19 @@
     </div>
     
     <script>
+        // 🛡️ INÍCIO DA PROTEÇÃO XSS GLOBAL
+        window.escapeHTML = function(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag));
+        };
+        // 🛡️ FIM DA PROTEÇÃO XSS
+
         const modalidadeDefs = [
             { id: 1, nome: 'Futsal', icone: '⚽' }, { id: 2, nome: 'Vôlei', icone: '🏐' },
             { id: 3, nome: 'Basquete', icone: '🏀' }, { id: 4, nome: 'Handebol', icone: '🤾' },
@@ -301,7 +314,9 @@
             let htmlTabs = `<p style="font-family: 'Segoe UI'; font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-bottom: 15px;">💡 Selecione uma modalidade abaixo para ver as turmas formadas e iniciar a criação do torneio:</p><div style="display: flex; flex-wrap: wrap; gap: 10px;">`;
             for (let chave in contagem) {
                 let esp = contagem[chave];
-                htmlTabs += `<div class="badge-sport-summary ${esporteAbaSelecionada === esp.nome ? 'active' : ''}" onclick="clicarAbaEsporte('${esp.nome}')">${esp.icone} ${esp.nome} <b style="color: #fff; margin-left: 5px;">(${esp.count})</b></div>`;
+                let espNomeSeguro = window.escapeHTML(esp.nome); // 🛡️ Protegido contra XSS
+                let espIconeSeguro = window.escapeHTML(esp.icone);
+                htmlTabs += `<div class="badge-sport-summary ${esporteAbaSelecionada === esp.nome ? 'active' : ''}" onclick="clicarAbaEsporte('${espNomeSeguro}')">${espIconeSeguro} ${espNomeSeguro} <b style="color: #fff; margin-left: 5px;">(${esp.count})</b></div>`;
             }
             container.innerHTML = htmlTabs + `</div>`;
             if (esporteAbaSelecionada && contagem[esporteAbaSelecionada]) renderizarGavetaDoEsporte(esporteAbaSelecionada, contagem[esporteAbaSelecionada].alunos);
@@ -319,13 +334,16 @@
             let htmlEq = '';
 			arrEq.forEach(eq => {
                 let corStatus = eq.count >= minExigido ? '#00ff00' : (eq.count >= (minExigido / 2) ? '#ffd700' : '#ff0055');
-                htmlEq += `<div class="equipe-summary-card" style="border-top-color: ${corStatus}; cursor: pointer;" onclick="filtrarAlunosPorTurma('${eq.turma}')" title="Ver alunos desta turma">
-                    <div class="eq-turma">${eq.turma}</div>
+                let turmaSegura = window.escapeHTML(eq.turma); // 🛡️ Protegido contra XSS
+                htmlEq += `<div class="equipe-summary-card" style="border-top-color: ${corStatus}; cursor: pointer;" onclick="filtrarAlunosPorTurma('${turmaSegura}')" title="Ver alunos desta turma">
+                    <div class="eq-turma" title="${turmaSegura}">${turmaSegura}</div>
                     <div class="eq-count-badge" style="color: ${corStatus}; border-color: ${corStatus}; box-shadow: 0 0 10px rgba(${corStatus === '#00ff00' ? '0,255,0' : (corStatus === '#ffd700' ? '255,215,0' : '255,0,85')}, 0.2);">${eq.count} <span style="font-size:0.65rem; color:#ccc; font-weight:normal;">/ ${minExigido}</span></div>
                 </div>`;
             });
             let ic = modalidadeDefs.find(m => m.nome === nomeEsporte)?.icone || '🏅';
-            detailsContainer.innerHTML = `<div class="sport-details-box"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 15px;"><h4 class="sub-section-title" style="margin: 0; border: none;">${ic} Status das Turmas (${nomeEsporte})</h4><button class="btn-acao" onclick="iniciarSetupDoEsporte('${nomeEsporte}')" style="box-shadow: 0 0 15px var(--theme-glow);">⚙️ Criar Torneio ➔</button></div><div class="equipes-scroll-container">${htmlEq}</div></div>`;
+            let icSeguro = window.escapeHTML(ic);
+            let nomeEsporteSeguro = window.escapeHTML(nomeEsporte);
+            detailsContainer.innerHTML = `<div class="sport-details-box"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 15px;"><h4 class="sub-section-title" style="margin: 0; border: none;">${icSeguro} Status das Turmas (${nomeEsporteSeguro})</h4><button class="btn-acao" onclick="iniciarSetupDoEsporte('${nomeEsporteSeguro}')" style="box-shadow: 0 0 15px var(--theme-glow);">⚙️ Criar Torneio ➔</button></div><div class="equipes-scroll-container">${htmlEq}</div></div>`;
         }
 		
 		function filtrarAlunosPorTurma(turma) {
@@ -335,7 +353,6 @@
             document.getElementById('titulo-lista-alunos').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // 🔥 CORREÇÃO DEFINITIVA: Restabelecendo o "pacote" de dados para que o calendário saiba o que agendar! 🔥
 		function iniciarSetupDoEsporte(nomeEsporte) {
 		    const defEsporte = modalidadeDefs.find(m => m.nome === nomeEsporte);
 		    
@@ -363,7 +380,7 @@
             
             if (alunosFiltradosGlobais.length === 0) {
                 container.style.display = 'block'; tituloLista.style.display = 'none';
-                container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 3rem 0;">Nenhum atleta na categoria ${generoAtual.toUpperCase()}.</p>`;
+                container.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 3rem 0;">Nenhum atleta na categoria ${window.escapeHTML(generoAtual.toUpperCase())}.</p>`;
                 document.getElementById('paginacao-container').innerHTML = ''; return;
             }
 
@@ -375,17 +392,24 @@
                 let fotoSegura = aluno.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome)}&background=222&color=fff`;
                 let instaColorClass = `insta-${aluno.genero}`;
                 let isChecked = alunosSelecionadosParaExclusao.has(aluno.hashPublico) ? 'checked' : '';
+                
+                // 🛡️ SANITIZAÇÃO DE DADOS INSERIDOS POR USUÁRIOS
+                let nomeSeguro = window.escapeHTML(aluno.nome);
+                let turmaSegura = window.escapeHTML(aluno.turma);
+                let esporteSeguro = window.escapeHTML(aluno.esporte);
+                let iconeSeguro = window.escapeHTML(aluno.iconeEsporte || '🏅');
+                let hashSeguro = window.escapeHTML(aluno.hashPublico);
 
                 container.innerHTML += `
-                    <div class="aluno-card" id="card-aluno-${aluno.hashPublico}">
-                        <input type="checkbox" class="aluno-checkbox" onchange="toggleSelecaoExclusao('${aluno.hashPublico}')" ${isChecked} title="Selecionar para exclusão">
+                    <div class="aluno-card" id="card-aluno-${hashSeguro}">
+                        <input type="checkbox" class="aluno-checkbox" onchange="toggleSelecaoExclusao('${hashSeguro}')" ${isChecked} title="Selecionar para exclusão">
                         <img src="${fotoSegura}" class="aluno-foto insta-foto ${instaColorClass}" alt="Foto Atleta">
                         <div class="aluno-info">
-                            <div class="aluno-nome" title="${aluno.nome}">${aluno.nome}</div>
-                            <div class="aluno-detalhes">Turma: ${aluno.turma}</div>
-                            <div class="badge-esporte">${aluno.iconeEsporte || '🏅'} ${aluno.esporte}</div>
+                            <div class="aluno-nome" title="${nomeSeguro}">${nomeSeguro}</div>
+                            <div class="aluno-detalhes">Turma: ${turmaSegura}</div>
+                            <div class="badge-esporte">${iconeSeguro} ${esporteSeguro}</div>
                         </div>
-                        <button class="btn-excluir" onclick="excluirAlunoIndividual('${aluno.hashPublico}', '${aluno.nome}')" title="Excluir Atleta">🗑️</button>
+                        <button class="btn-excluir" onclick="excluirAlunoIndividual('${hashSeguro}', '${nomeSeguro}')" title="Excluir Atleta">🗑️</button>
                     </div>
                 `;
             });
@@ -488,19 +512,24 @@
                 return a.nome.localeCompare(b.nome);
             });
 
-            let inst = localStorage.getItem('profEscola') ? localStorage.getItem('profEscola').replace(/"/g, '') : 'Instituição Não Definida';
-            let prof = localStorage.getItem('profNome') ? localStorage.getItem('profNome').replace(/"/g, '') : 'Professor';
+            let inst = localStorage.getItem('profEscola') ? window.escapeHTML(localStorage.getItem('profEscola').replace(/"/g, '')) : 'Instituição Não Definida';
+            let prof = localStorage.getItem('profNome') ? window.escapeHTML(localStorage.getItem('profNome').replace(/"/g, '')) : 'Professor';
             let dataAtual = new Date().toLocaleDateString('pt-BR');
             let horaAtual = new Date().toLocaleTimeString('pt-BR');
 
             let linhas = "";
             alunosOrdenados.forEach((a, idx) => {
+                let nSeguro = window.escapeHTML(a.nome);
+                let tSegura = window.escapeHTML(a.turma);
+                let eSeguro = window.escapeHTML(a.esporte);
+                let genSeguro = window.escapeHTML(a.genero);
+                
                 linhas += "<tr>" +
                     "<td style='text-align:center; padding: 3px;'>" + (idx + 1) + "</td>" +
-                    "<td style='padding: 3px;'><b>" + a.turma + "</b></td>" +
-                    "<td style='padding: 3px;'>" + a.nome + "</td>" +
-                    "<td style='padding: 3px; text-transform: capitalize;'>" + a.genero + "</td>" +
-                    "<td style='padding: 3px;'>" + a.esporte + "</td>" +
+                    "<td style='padding: 3px;'><b>" + tSegura + "</b></td>" +
+                    "<td style='padding: 3px;'>" + nSeguro + "</td>" +
+                    "<td style='padding: 3px; text-transform: capitalize;'>" + genSeguro + "</td>" +
+                    "<td style='padding: 3px;'>" + eSeguro + "</td>" +
                 "</tr>";
             });
 

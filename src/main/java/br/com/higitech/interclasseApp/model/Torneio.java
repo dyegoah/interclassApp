@@ -2,10 +2,14 @@ package br.com.higitech.interclasseApp.model;
 
 import java.time.Year;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,8 +26,13 @@ public class Torneio {
     private Integer ano = Year.now().getValue();
     private Boolean ativo = true;
 
-    // 🔥 CORREÇÃO: A coluna "nome" que o PostgreSQL está exigindo
     private String nome = "Torneio Oficial";
+
+    // 🔥 BLINDAGEM IDOR: O Torneio agora tem um dono exclusivo (Multi-Tenant)
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "professor_id", nullable = false)
+    private Professor professor;
 
     // ==========================
     // GETTERS E SETTERS
@@ -45,4 +54,7 @@ public class Torneio {
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
+
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
 }
