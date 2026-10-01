@@ -59,7 +59,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto, HttpServletRequest request) {
         
-        // 1. CHECAGEM DE BLOQUEIO POR FORÇA BRUTA (Passando o request em vez do email)
         if (loginAttemptService.estaBloqueado(request)) {
             loginAttemptService.registrarLog(dto.email, "BLOQUEADO (FORÇA BRUTA)", request); 
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
@@ -68,7 +67,6 @@ public class AuthController {
 
         Optional<Professor> opt = professorRepository.findByEmail(dto.email);
         
-        // 2. E-MAIL NÃO EXISTE
         if (opt.isEmpty()) {
             loginAttemptService.loginFalhou(request); 
             loginAttemptService.registrarLog(dto.email, "E-MAIL DESCONHECIDO", request); 
@@ -77,18 +75,18 @@ public class AuthController {
         
         Professor prof = opt.get();
 
-        // 3. SENHA INCORRETA
         if (!passwordEncoder.matches(dto.senha, prof.getSenha())) {
             loginAttemptService.loginFalhou(request); 
             loginAttemptService.registrarLog(dto.email, "SENHA INCORRETA", request); 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha incorretos.");
         }
 
-        // 🚀 RECONHECIMENTO MASTER SEGURO: Apenas valida pelo banco de dados
-        boolean isMaster = "master".equals(prof.getStatus());
+        // 🚀 RECONHECIMENTO MASTER CORRIGIDO: Força a proteção 2FA pela ID principal ou pelo email
+        boolean isMaster = "master".equalsIgnoreCase(prof.getStatus()) || prof.getId() == 1L || prof.getEmail().toLowerCase().contains("admin");
 
         if (isMaster) {
             if (dto.codigo2fa == null || dto.codigo2fa.trim().isEmpty()) {
+                // Dispara o status correto (428) exigido pelo front-end para exibir a etapa 2
                 return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
                         .body("Código 2FA obrigatório para contas Master.");
             }
@@ -106,7 +104,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Sua conta está inativa ou bloqueada.");
         }
 
-        // 4. SUCESSO TOTAL
         loginAttemptService.loginComSucesso(request);
         loginAttemptService.registrarLog(dto.email, "LOGIN BEM-SUCEDIDO", request); 
 
